@@ -1,0 +1,45 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Base.astro";
+import IconLink from "@/components/IconLink.astro";
+import { Search } from "@/components/writing";
+import { SITE } from "@config";
+import { render } from "astro:content";
+
+const collections = await Promise.all([
+  getCollection("essays"),
+  getCollection("notes"),
+]);
+
+const essays = await Promise.all(
+  collections[0].map(async (essay) => {
+    const { remarkPluginFrontmatter } = await render(essay);
+
+    return {
+      id: essay.id,
+      readTime: remarkPluginFrontmatter.minutesRead,
+      type: "essay" as const,
+      ...essay.data,
+    };
+  }),
+);
+
+const notes = collections[1].map((note) => ({
+  id: note.id,
+  type: "note" as const,
+  ...note.data,
+}));
+
+const posts = [...essays, ...notes];
+const topics = [...new Set(posts.flatMap((post) => post.topics))];
+---
+
+<Layout title="Writing - paczkow.me">
+  <Search client:load topics={topics} posts={posts}>
+    <div slot="icons" class="mt-auto hidden gap-4 lg:flex">
+      <IconLink to={SITE.social.github} icon="github" />
+      <IconLink to={SITE.social.linkedin} icon="linkedin" />
+      <IconLink to="Bluesky" icon="bluesky" />
+    </div>
+  </Search>
+</Layout>

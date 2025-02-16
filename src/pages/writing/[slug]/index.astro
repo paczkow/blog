@@ -1,0 +1,197 @@
+---
+import Prose from "@/components/Prose.astro";
+import Layout from "@/layouts/Base.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const writing = await Promise.all([
+    getCollection("essays"),
+    getCollection("notes"),
+  ]);
+
+  const essays = await Promise.all(
+    writing[0].map(async (essay) => {
+      const { remarkPluginFrontmatter } = await render(essay);
+
+      return {
+        params: { slug: essay.id },
+        props: {
+          post: {
+            type: "essay" as const,
+            readTime: remarkPluginFrontmatter.minutesRead,
+            ...essay,
+          },
+        },
+      };
+    }),
+  );
+
+  const notes = writing[1].map((note) => ({
+    params: { slug: note.id },
+    props: { post: { ...note, type: "note" as const } },
+  }));
+
+  return [...essays, ...notes];
+}
+
+const props = Astro.props;
+const { post } = props;
+const { Content, headings } = await render(post);
+---
+
+<Layout title={post.data.title}>
+  <Prose>
+    <article
+      class={`col-span-full flex justify-center ${post.data.toc ? "lg:justify-between lg:gap-8" : ""}`}
+    >
+      <div class="max-w-[65ch]">
+        <h1 class="mb-10">{post.data.title}</h1>
+        <Content />
+      </div>
+      {
+        post.data.toc && (
+          <nav
+            id="toc"
+            class="sticky top-[96px] hidden h-[400px] flex-col lg:flex"
+          >
+            <span class="text-sand-12 font-semibold">Table of Contents</span>
+            <ul class="mt-0">
+              {headings
+                .filter((heading) => heading.depth === 2)
+                .map((heading) => {
+                  const id = heading.slug;
+                  const section = heading.text.replace("#", "");
+
+                  return (
+                    <li
+                      data-scroll-section={id}
+                      class="cursor-pointer not-prose text-sand-8 my-2"
+                    >
+                      {section}
+                    </li>
+                  );
+                })}
+            </ul>
+          </nav>
+        )
+      }
+    </article>
+  </Prose>
+</Layout>
+
+<style>
+  #toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+
+    & li {
+      padding-left: 0;
+      margin-left: 0;
+
+      &:hover {
+        color: var(--color-sand-12);
+      }
+    }
+  }
+</style>
+
+<script>
+  const { hash } = window.location;
+  let observerEnabled = true;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const links = Array.from(document.querySelectorAll("#toc li"));
+    const activeLink =
+      links.find(
+        (link) =>
+          link.getAttribute("data-scroll-section") === hash.replace("#", "")
+      ) ?? links[0];
+
+    activeLink.classList.add("text-sand-12");
+
+    links.forEach((link) => {
+      link.addEventListener("click", () => {
+        const id = link.getAttribute("data-scroll-section");
+        const section = document.getElementById(id ?? "");
+
+        links.forEach((l) => l.classList.remove("text-sand-12"));
+        link.classList.add("text-sand-12");
+
+        if (section) {
+          observerEnabled = false;
+          section?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+          setTimeout(() => {
+            observerEnabled = true;
+          }, 1000);
+        }
+      });
+    });
+  });
+
+  const headers = document.querySelectorAll("h2");
+  const links = Array.from(document.querySelectorAll("#toc li"));
+
+  const seen = new WeakSet();
+  
+  // Function to check if we're at the bottom of the page
+  const isAtBottom = () => {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    return scrollTop + windowHeight >= documentHeight - 50;
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!observerEnabled) return;
+
+      // Check if we're at the bottom of the page first
+      if (isAtBottom()) {
+        links.forEach((link) => link.classList.remove("text-sand-12"));
+        if (links.length > 0) {
+          links[links.length - 1].classList.add("text-sand-12");
+        }
+        return;
+      }
+
+      entries.forEach((entry) => {
+        if (!seen.has(entry.target)) {
+          seen.add(entry.target);
+          return;
+        }
+
+        const current = links.findIndex((link) => {
+          const id = link.getAttribute("data-scroll-section");
+          return id === entry.target.id;
+        });
+
+        if (entry.isIntersecting) {
+          links.forEach((link, index) => {
+            if (index === current) {
+              link.classList.add("text-sand-12");
+            } else {
+              link.classList.remove("text-sand-12");
+            }
+          });
+        } else if (
+          entry.intersectionRatio === 0 &&
+          entry.boundingClientRect.bottom >= 0 &&
+          current > 0
+        ) {
+          links[current].classList.remove("text-sand-12");
+          links[current - 1].classList.add("text-sand-12");
+        }
+      });
+    },
+    {
+      root: null,
+      rootMargin: "0px 0px -50% 0px",
+    }
+  );
+
+  headers.forEach((header) => observer.observe(header));
+</script>

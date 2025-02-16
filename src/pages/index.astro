@@ -1,0 +1,184 @@
+---
+import { getCollection, render } from "astro:content";
+
+import { Card } from "@/components/Card.tsx";
+import IconLink from "@/components/IconLink.astro";
+import Link from "@/components/Navlink.astro";
+import { getSortedByDate } from "@/helpers/posts.ts";
+import Layout from "@/layouts/Base.astro";
+import { SITE } from "@config";
+
+const collections = await Promise.all([
+  getCollection("essays"),
+  getCollection("notes"),
+]);
+
+const essays = await Promise.all(
+  collections[0].map(async (essay) => {
+    const { remarkPluginFrontmatter } = await render(essay);
+
+    return {
+      id: essay.id,
+      readTime: remarkPluginFrontmatter.minutesRead,
+      type: "essay" as const,
+      ...essay.data,
+    };
+  }),
+);
+
+const notes = collections[1].map((note) => ({
+  id: note.id,
+  type: "note" as const,
+  ...note.data,
+}));
+
+const sortedEssays = getSortedByDate(essays);
+const sortedNotes = getSortedByDate(notes);
+---
+
+<Layout title={SITE.title}>
+  <div
+    class="sticky col-span-full mb-8 flex flex-col gap-4 lg:top-(--nav-height) lg:col-start-1 lg:col-end-2 lg:mb-0 lg:h-[calc(100vh-242px)]"
+  >
+    <h2 class="text-sand-12 font-semibold">Michał Paczków</h2>
+    <p class="text-sand-11">Hello. I'm just curious.</p>
+
+    <div class="mt-16 hidden flex-col gap-4 lg:flex">
+      <Link to="essays" label="Essays" className="active" />
+      <Link to="notes" label="Notes" />
+      <Link to="about" label="About" />
+    </div>
+    <div class="mt-auto hidden gap-4 lg:flex">
+      <IconLink to={SITE.social.github} icon="github" />
+      <IconLink to={SITE.social.linkedin} icon="linkedin" />
+      <IconLink to={SITE.social.bluesky} icon="bluesky" />
+    </div>
+  </div>
+  <div class="col-span-full flex flex-col gap-20 lg:col-start-2 lg:col-end-3 mr-[2px]">
+    <section id="essays" class="mt-[-116px] flex flex-col gap-12 pt-[116px]">
+      <h2 class="text-sand-12">Essays</h2>
+      <div class="group flex flex-col gap-16 md:gap-8">
+        {
+          sortedEssays.map((post) => {
+            return (
+              <Card
+                id={post.id}
+                variant="essay"
+                date={post.date}
+                topics={post.topics}
+                title={post.title}
+                date={post.date}
+                readTime={post.readTime}
+                description={post.description}
+              />
+            );
+          })
+        }
+      </div>
+    </section>
+    <section id="notes" class="mt-[-116px] flex flex-col gap-12 pt-[116px]">
+      <h2 class="text-sand-12">Notes</h2>
+      <span class="text-sand-11">
+        Why notes?<br /><br /> This how I cultivate my ideas, that's my <a
+          class="hover:text-sand-12 underline"
+          href="https://maggieappleton.com/garden-history/">digital garden</a
+        >. I want to share my thoughts on various topics that I find
+        interesting. These notes are not meant to be comprehensive or
+        definitive, but rather a reflection of my current understanding and
+        perspective on a particular topic. <br /> I believe writing-in-public is
+        a powerful way to learn and grow as well overcome perfectionism. If certain
+        idea is tickle your brain, let me know. It helps us to build another essays.
+      </span>
+      <div class="group flex flex-col gap-16 md:gap-8">
+        {
+          sortedNotes.map((post) => (
+            <Card
+              id={post.id}
+              variant="note"
+              date={post.date}
+              topics={post.topics}
+              title={post.title}
+              status="evergreen"
+            />
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="about" class="flex flex-col gap-12">
+      <h2 class="text-sand-12">About</h2>
+      <p class="text-sand-11">
+        Hello! I'm Michał ✋ <br /><br /> 
+        
+        <i>(place for awkward introduction here)</i> <br /><br />  
+
+        Currently, I am focused on building web products and experimenting with AI, primarily to enhance learning and productivity. <br /><br />
+  I believe in "Learning in public" and "Tiny Experiments". This blog serves as manifesto for both. That's why you'll find here not only essays but also imperfect notes that are part of my Personal Knowledge Management (PKM) system (called also <a href="https://maggieappleton.com/garden-history/" class="underline hover:text-sand-12">digital garden</a>). <br /><br />
+        
+        I hope you find some useful insights here. If you have any questions, comments, or if you disagree with any of my notes (I'd love to hear your perspective), feel free to reach out to me on social media or at <a href="mailto:michal.paczkow@gmail.com" class="underline hover:text-sand-12">email</a>.
+      </p>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  let observerEnabled = true;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const links = Array.from(document.querySelectorAll("li.link"));
+    const sections = Array.from(document.querySelectorAll("section"));
+
+    registerScrollIntoSections(links);
+    registerObserver(links, sections);
+  });
+
+  function registerScrollIntoSections(links: Element[]) {
+    links.forEach((link) => {
+      link.addEventListener("click", () => {
+        links.forEach((l) => l.classList.remove("active"));
+        link.classList.add("active");
+
+        const sectionId = link.getAttribute("data-scroll-section");
+        const section = document.getElementById(sectionId ?? "");
+
+        if (section) {
+          observerEnabled = false;
+          section.scrollIntoView({ behavior: "smooth" });
+          setTimeout(() => {
+            observerEnabled = true;
+          }, 500);
+        }
+      });
+    });
+  }
+
+  function registerObserver(links: Element[], sections: Element[] | null) {
+    if (!sections?.length) return;
+
+    const observerOptions = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.5,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      if (!observerEnabled) return;
+
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const activeLink = links.find(
+            (link) =>
+              link.getAttribute("data-scroll-section") === entry.target.id,
+          );
+
+          links.forEach((link) => link.classList.remove("active"));
+          activeLink?.classList.add("active");
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
+  }
+</script>

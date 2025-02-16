@@ -1,0 +1,14 @@
+---
+interface Props {
+  to: string;
+  label: string;
+}
+
+const { to, label } = Astro.props;
+---
+
+<a href={to} class="group relative no-underline hover:no-underline">
+  <span class="text-sand-11 group-hover:text-sand-12 duration-300 ease-in-out"
+    >{label}</span
+  >
+</a>

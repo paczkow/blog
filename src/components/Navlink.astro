@@ -1,0 +1,21 @@
+---
+interface Props {
+  to: string;
+  label: string;
+  className?: string;
+}
+
+const { to, label, className } = Astro.props;
+---
+
+<li
+  data-scroll-section={to}
+  class={`link group flex cursor-pointer items-center ${className}`}
+>
+  <span
+    class="bg-sand-8 group-hover:bg-sand-12 [.active_&]:bg-sand-12 mr-4 inline-block h-px w-8 transition-all group-hover:w-16 motion-reduce:transition-none [.active_&]:w-16"
+  ></span>
+  <span class="text-sand-8 group-hover:text-sand-12 [.active_&]:text-sand-12"
+    >{label}</span
+  >
+</li>
