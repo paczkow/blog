@@ -12,7 +12,7 @@ export const Card = (props: Props) => {
 
     return (
         <a href={`/writing/${id}`} className="block no-underline">
-            <article className="before:border-sand-3 before:bg-sand-2 dark:before:border-sand-5 dark:before:bg-sand-4 relative flex cursor-pointer gap-16 transition-opacity duration-300 ease-in-out group-hover:opacity-50 before:absolute before:inset-[-2px] before:-z-10 before:rounded-md before:border before:opacity-0 before:transition-opacity before:duration-300 before:ease-in-out before:content-[''] group-hover:hover:opacity-100 hover:before:opacity-100 md:ml-[-24px] md:rounded md:p-6">
+            <article className="before:border-sand-3 before:bg-sand-2 dark:before:border-sand-5 dark:before:bg-sand-4 relative flex cursor-pointer gap-16 transition-opacity duration-300 ease-in-out group-hover:opacity-50 before:absolute before:left-[-1rem] before:right-[-1rem] before:top-[-2px] before:bottom-[-2px] before:-z-10 before:border before:opacity-20 before:border-opacity-30 before:transition-opacity before:duration-300 before:ease-in-out before:content-[''] group-hover:hover:opacity-100 hover:before:opacity-100 active:before:opacity-100 active:opacity-100 touch-action-manipulation md:hover:before:opacity-100 md:before:opacity-0 md:before:border-opacity-0 md:before:inset-[-2px] md:before:rounded-md ml-[-24px] md:rounded py-4 p-6">
                 <time
                     className="hidden min-w-[80px] text-sm text-neutral-500 md:block"
                     dateTime={date.toISOString()}
