@@ -1,7 +1,7 @@
 ---
 title: How I use Obsidian to manage mental overload in fast-paced tech world?
 date: 2025-06-01
-description: "In the fast-paced tech world, managing mental overload is crucial for being effective and focused. As a software engineer, I realized that my brain functions more like a CPU, processing information rather than storing it. To combat this, I use an external storage system—journaling in Obsidian. This practice allows me to offload tasks, outline plans, and jot down notes, preventing mental clutter."
+description: In the fast-paced tech world, I use Obsidian to capture my thoughts, keeping my mind clear, focused, and productive.
 image: 'social-media.png'
 toc: true
 topics: ["Better Thinking", "Tools for Thought"]
