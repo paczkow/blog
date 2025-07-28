@@ -55,5 +55,8 @@ export default defineConfig({
   integrations: [icon(), mdx(), react()],
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      allowedHosts: ["localhost"],
+    },
   },
 });
