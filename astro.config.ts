@@ -55,8 +55,5 @@ export default defineConfig({
   integrations: [icon(), mdx(), react()],
   vite: {
     plugins: [tailwindcss()],
-    server: {
-      allowedHosts: ["localhost", "0d981c4e84f5.ngrok-free.app"],
-    },
   },
 });

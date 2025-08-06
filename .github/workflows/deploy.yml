@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/blog-paczkow-me
+      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/blog
 
     steps:
       - name: Checkout code
