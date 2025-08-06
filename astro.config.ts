@@ -55,11 +55,6 @@ export default defineConfig({
   },
   integrations: [icon(), mdx(), react()],
   vite: {
-    resolve: {
-      alias: {
-        "@": path.resolve("./src"),
-      },
-    },
     plugins: [tailwindcss()],
   },
 });

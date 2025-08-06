@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Options } from "./Input";
-import { useSearch } from "./useSearch";
-import { SearchList } from "./List";
+
 import { getSortedByDate } from "@/helpers/posts";
 import type { Post } from "@/models";
+import { Options } from "./Input";
+import { SearchList } from "./List";
+import { useSearch } from "./useSearch";
 
 export const Search = ({
   icons,

@@ -1,10 +1,10 @@
 ---
-import { getCollection } from "astro:content";
-import Layout from "@/layouts/Base.astro";
+import { getCollection, render } from "astro:content";
+
 import IconLink from "@/components/IconLink.astro";
-import { Search } from "@/components/writing/index";
+import { Search } from "@/components/writing/Search";
+import Layout from "@/layouts/Base.astro";
 import { SITE } from "@config";
-import { render } from "astro:content";
 
 const collections = await Promise.all([
   getCollection("essays"),
