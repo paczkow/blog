@@ -1,4 +1,4 @@
-import type { Essay, Note } from "@/models";
+import type { Essay, Note } from "@/models.ts";
 import { Card } from "../Card";
 
 type Post = Essay & { readTime: number } | Note;

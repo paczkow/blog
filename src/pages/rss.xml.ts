@@ -1,7 +1,7 @@
 import { getCollection } from "astro:content";
 import rss from "@astrojs/rss";
 
-import { getSortedByDate } from "@/helpers/posts";
+import { getSortedByDate } from "@/helpers/posts.ts";
 import { SITE } from "config";
 
 export async function GET() {

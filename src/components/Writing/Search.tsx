@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { getSortedByDate } from "@/helpers/posts";
-import type { Post } from "@/models";
+import { getSortedByDate } from "@/helpers/posts.ts";
+import type { Post } from "@/models.ts";
 import { Options } from "./Input";
 import { SearchList } from "./List";
 import { useSearch } from "./useSearch";

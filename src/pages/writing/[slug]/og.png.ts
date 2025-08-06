@@ -1,7 +1,7 @@
 import { getCollection } from "astro:content";
 import type { APIRoute } from "astro";
 
-import { createWritingOgImage } from "@/og";
+import { createWritingOgImage } from "@/og/index.ts";
 
 export async function getStaticPaths() {
   const writing = await Promise.all([

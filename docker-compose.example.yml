@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  blog:
+    image: your-dockerhub-username/blog-paczkow-me:latest
+    container_name: blog-paczkow-me
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    labels:
+      # Watchtower labels for automatic updates
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - blog-network
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # Check for updates every 5 minutes
+      - WATCHTOWER_POLL_INTERVAL=300
+      # Only update containers with the watchtower label
+      - WATCHTOWER_LABEL_ENABLE=true
+      # Clean up old images after update
+      - WATCHTOWER_CLEANUP=true
+      # Enable notifications (optional)
+      - WATCHTOWER_NOTIFICATIONS=email
+      - WATCHTOWER_NOTIFICATION_EMAIL_FROM=your-email@example.com
+      - WATCHTOWER_NOTIFICATION_EMAIL_TO=your-email@example.com
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER=smtp.gmail.com
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT=587
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER=your-email@example.com
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD=your-app-password
+    networks:
+      - blog-network
+
+  # Optional: Reverse proxy with SSL
+  nginx-proxy:
+    image: jwilder/nginx-proxy:latest
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+    environment:
+      - DEFAULT_HOST=your-domain.com
+    networks:
+      - blog-network
+    depends_on:
+      - blog
+
+networks:
+  blog-network:
+    driver: bridge
