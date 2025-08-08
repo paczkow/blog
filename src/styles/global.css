@@ -4,7 +4,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter Variable", system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.625;
+  }
 }
 
 @theme {
@@ -22,6 +30,7 @@
   --color-sand-12: #21201c;
 
   --nav-height: 140px;
+  --font-weight-semimedium: 450;
 }
 
 :root.dark {
@@ -49,8 +58,4 @@
       }
     }
   }
-}
-
-html {
-  scroll-behavior: smooth;
 }
