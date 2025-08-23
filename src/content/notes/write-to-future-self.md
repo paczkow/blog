@@ -3,7 +3,7 @@ title: How to increase the usefulness of notes over time? Write to your future s
 date: 2025-06-01
 status: evergreen
 topics:
-  - Better Thinking
+  - Tools for Thought
 ---
 
 When creating a note now, write it as if you are addressing another person—your future self. This approach helps you establish the context in which you want to find the note and decide why it is important and useful. In the future, **you will be a different person and won't have the same knowledge and context you possess now**, so keep that in mind! That's why you want to convey this information to your future self.
