@@ -1,7 +1,7 @@
 ---
-title: Never forget a great idea again with AI and automations.
+title: How do I integrate my Apple Watch with AI and n8n to capture ideas in seconds?
 date: 2025-08-25
-description: AI and automation can capture spontaneous, brilliant ideas anytime and anywhere. By using tools like iOS Shortcuts and n8n, you can streamline your creative process, effortlessly turning voice into notes or tasks.
+description: A quick introduction to AI-based automation. We use tools like iOS Shortcuts, LLM, and n8n to capture spontaneous, brilliant ideas anytime and anywhere with just one tap.
 toc: true
 topics:
   - AI
@@ -17,17 +17,29 @@ As a result, I would forget some of them, or get frustrated when I had to interr
 
 ## Use voice to capture ideas instantly
 
-AI is transforming creative work, making once-complex tasks simple (not, shit Sherlock). In my case, with OpenAI Whisper, turning voice notes into text is effortless—just connect it to your system (like iOS), and it handles everything.
+OpenAI Whisper effortlessly turns voice notes into text — just connect it to your system, and it takes care of everything.
 
-I wanted a seamless way to capture thoughts on my Apple devices. Thankfully, Apple Shortcuts lets you automate and trigger actions, especially for capturing voice on iPhone or Apple Watch.
+I was looking for a seamless way to capture my thoughts on my Apple devices and send them to TickTick, the to-do app I'm currently using. I utilized iOS Shortcuts, which allows me to create a set of actions using blocks.
 
-With an API-based solution, it’s easy—just use “Get contents of URL" in Shortcuts to send your request.
+<!--TODO: wyjaśnij co to API endpoint oraz API Token -->
 
 ## Sync Solution - iOS Shortcuts
 
 ![iOS Workflow Schema](./ios-workflow-schema.png)
 
-Initially, I started by putting everything into iOS Shortcuts. It was quite simple to set up—just get the OpenAPI Token, send the request, wait for the answer, and voila! I get the thought in written form. At this point, I can do whatever I want with the text, run another Shortcut, or pass it into a different application.
+<!--TODO: dodać schemat wykorzystania chat GPT, by stworzył zadanie i wrzucił je do TickTick, chodzi tutaj o skupieniu się na prompt i jego konwersji z zadania -->
+
+To convert voice to text, simply add the "Get Contents of URL" action to the flow to send the request.
+
+Initially, I started by putting everything into iOS Shortcuts. It was quite simple to set up — just get the OpenAPI Token, send the request to convert voice to text, wait for the answer, send another request to LLM transform to text into task, wait for the answer (x2) and send to TickTick (At this point, you can do whatever you want with the text, run another Shortcut, or pass it into a different application).
+
+I used the following prompt to convert text into task.
+
+```prompt
+sssss
+```
+
+I wanted to keep it in JSON format what is really convienet form to grap information into further steps.
 
 It’s a type of synchronous approach: send the request, wait, and receive the response in the same place you sent the request. It’s really convenient and simple; you control the whole flow in one place, and you can adjust and tweak the output in the next steps.
 
@@ -39,11 +51,11 @@ Despite all these advantages, time was a major blocker for me. When trying to ca
 
 ![n8n Workflow Schema](./n8n-workflow-schema.png)
 
-One of my primary assumptions was to be able to quickly capture multiple, independent thoughts. In the previous synchronous approach, I had to wait for each flow to complete, which involved waiting for the request to the OpenAI API. Such a waste of time! 
+One of my primary assumptions was to be able to quickly capture multiple, independent thoughts. In the previous synchronous approach, I had to wait for each flow to complete, which involved waiting for the request to the OpenAI API. Such a waste of time!
 
 Instead, I just capture the voice, create a file, send the request, and forget about it. The rest is processed in the background, asynchronously, allowing me to record the next thought.
 
-To allow uploads from different places, I used a [Webhook](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/) node that confirms the audio file upload in the first step. The Webhook offers an endpoint URL where you can upload your file to trigger the workflow. I integrated this functionality with "iOS Shortcuts" using the "Get Contents of URL" action, similar to my previous automation. 
+To allow uploads from different places, I used a [Webhook](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/) node that confirms the audio file upload in the first step. The Webhook offers an endpoint URL where you can upload your file to trigger the workflow. I integrated this functionality with "iOS Shortcuts" using the "Get Contents of URL" action, similar to my previous automation.
 
 This automation utilizes an [AI Agent](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/) node with a custom prompt for creating a task from the transcript. I also ensured that the output is formatted to align with the TickTick API by using the [Structured Output Parse](https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.outputparserstructured/).
 
