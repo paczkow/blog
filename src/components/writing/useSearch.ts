@@ -1,7 +1,7 @@
 import Fuse from "fuse.js";
 import { useCallback, useEffect, useRef } from "react";
 
-const KEYS = ["title", "description", "topics"];
+const KEYS = ["title", "description"];
 
 export const useSearch = <T>(posts: T[]) => {
   const fuse = useRef(
@@ -16,26 +16,15 @@ export const useSearch = <T>(posts: T[]) => {
   }, [posts]);
 
   const search = useCallback(
-    (query: string, topics: string[]) => {
-      if (query.length === 0 && topics.length === 0) {
+    (query: string) => {
+      if (query.length === 0) {
         return posts ?? [];
       }
 
-      const searchConditions = [];
-
-      if (query.length > 0) {
-        searchConditions.push({
-          $or: [{ title: `'${query}` }, { description: `'${query}` }],
-        });
-      }
-
-      if (topics.length > 0) {
-        const topicsQuery = topics.map((topic) => `'${topic}`).join(" | ");
-        searchConditions.push({ topics: topicsQuery });
-      }
-
       return fuse.current
-        .search({ $and: searchConditions })
+        .search({
+          $or: [{ title: `'${query}` }, { description: `'${query}` }],
+        })
         .map((record) => record.item);
     },
     [posts],

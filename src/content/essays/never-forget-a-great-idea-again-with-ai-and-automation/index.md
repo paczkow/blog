@@ -3,9 +3,6 @@ title: How do I integrate my Apple Watch with AI and n8n to capture ideas in sec
 date: 2025-08-25
 description: A quick introduction to AI-based automation. We use tools like iOS Shortcuts, LLM, and n8n to capture spontaneous, brilliant ideas anytime and anywhere with just one tap.
 toc: true
-topics:
-  - AI
-  - Automation
 ---
 
 Have you ever noticed that your best ideas often come when you least expect them? Maybe while you’re out for a run, in the middle of a gym session, or even when you’re deeply focused on a different task at work. These creative moments seem to appear out of nowhere — often at the most inconvenient times.

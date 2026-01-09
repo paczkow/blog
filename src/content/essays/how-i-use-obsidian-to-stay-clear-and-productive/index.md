@@ -4,7 +4,6 @@ date: 2025-06-01
 description: In the fast-paced tech world, keeping a decluttered mind is essential for being effective. I use Obsidian to capture my thoughts, which helps maintain clarity, focus, and productivity.
 image: 'social-media.png'
 toc: true
-topics: ["Tools for Thought"]
 ---
 
 I’ve been working as a Software Engineer for almost a decade now. In the tech world, things move fast, and we’re constantly bombarded with more and more information. Too often, we tell ourselves, “I’ll remember it” or “I’ll keep it in my head.”

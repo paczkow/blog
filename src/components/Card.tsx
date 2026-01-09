@@ -4,13 +4,12 @@ type Props = {
   id: string;
   date: Date;
   title: string;
-  topics: string[];
   readTime: number;
   description: string;
 };
 
 export const Card = (props: Props) => {
-  const { id, date, title, topics, readTime, description } = props;
+  const { id, date, title, readTime, description } = props;
 
   const baseClasses =
     "relative flex cursor-pointer gap-16 md:ml-[-24px] md:rounded md:py-4 md:p-6";
@@ -40,13 +39,6 @@ export const Card = (props: Props) => {
           </div>
           <div>
             <p className="text-sand-11 text-sm">{description}</p>
-          </div>
-          <div className="flex gap-4">
-            {topics.map((topic) => (
-              <span key={topic} className="text-sm text-neutral-500">
-                {topic}
-              </span>
-            ))}
           </div>
         </div>
       </article>

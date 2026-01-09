@@ -20,12 +20,10 @@ const posts = await Promise.all(
     };
   }),
 );
-
-const topics = [...new Set(posts.flatMap((post) => post.topics))];
 ---
 
 <Layout title="Writing - paczkow.me">
-  <Search client:load topics={topics} posts={posts}>
+  <Search client:load posts={posts}>
     <div slot="icons" class="mt-auto hidden gap-4 lg:flex">
       <IconLink to={SITE.social.github} icon="github" />
       <IconLink to={SITE.social.linkedin} icon="linkedin" />

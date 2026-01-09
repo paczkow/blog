@@ -15,7 +15,6 @@ export const SearchList = ({ posts }: { posts: Essay[] }) => {
           description={post.description}
           date={post.date}
           readTime={post.readTime}
-          topics={post.topics}
         />
       ))}
     </div>
