@@ -4,12 +4,7 @@ import type { APIRoute } from "astro";
 import { createWritingOgImage } from "@/og/index.ts";
 
 export async function getStaticPaths() {
-  const writing = await Promise.all([
-    getCollection("essays"),
-    getCollection("notes"),
-  ]);
-
-  const posts = [...writing[0], ...writing[1]];
+  const posts = await getCollection("essays");
 
   return posts.map((post) => ({
     params: { slug: post.id },

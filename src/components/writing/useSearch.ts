@@ -1,7 +1,7 @@
 import Fuse from "fuse.js";
 import { useCallback, useEffect, useRef } from "react";
 
-const KEYS = ["title", "description", "topics", "type"];
+const KEYS = ["title", "description", "topics"];
 
 export const useSearch = <T>(posts: T[]) => {
   const fuse = useRef(
@@ -16,8 +16,8 @@ export const useSearch = <T>(posts: T[]) => {
   }, [posts]);
 
   const search = useCallback(
-    (query: string, topics: string[], types: ("essay" | "note")[]) => {
-      if (query.length === 0 && topics.length === 0 && types.length === 0) {
+    (query: string, topics: string[]) => {
+      if (query.length === 0 && topics.length === 0) {
         return posts ?? [];
       }
 
@@ -32,12 +32,6 @@ export const useSearch = <T>(posts: T[]) => {
       if (topics.length > 0) {
         const topicsQuery = topics.map((topic) => `'${topic}`).join(" | ");
         searchConditions.push({ topics: topicsQuery });
-      }
-
-      if (types.length > 0) {
-        searchConditions.push({
-          $or: types.map((type) => ({ type: `'${type}` })),
-        });
       }
 
       return fuse.current

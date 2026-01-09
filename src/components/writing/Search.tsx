@@ -16,19 +16,11 @@ export const Search = ({
   posts: Post[];
 }) => {
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<{
-    topics: string[];
-    types: ("essay" | "note")[];
-  }>({
-    topics: [],
-    types: [],
-  });
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 
   const { search } = useSearch(posts);
 
-  const filteredPosts = getSortedByDate(
-    search(query, selected.topics, selected.types),
-  );
+  const filteredPosts = getSortedByDate(search(query, selectedTopics));
 
   return (
     <>
@@ -37,12 +29,12 @@ export const Search = ({
         <p className="text-sand-11 mb-4">Find all my writing here</p>
         <Options
           topics={topics}
-          selected={selected}
+          selectedTopics={selectedTopics}
           onChange={(query) => {
             setQuery(query);
           }}
-          onSelect={(selected) => {
-            setSelected(selected);
+          onSelect={(topics) => {
+            setSelectedTopics(topics);
           }}
         />
         {icons}

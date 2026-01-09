@@ -6,8 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "transform:notes": "node --experimental-transform-types --env-file=.env scripts/zettelkasten/index.ts"
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.3",

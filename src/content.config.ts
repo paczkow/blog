@@ -1,6 +1,6 @@
 import { glob } from "astro/loaders";
 import { defineCollection, z } from "astro:content";
-import { Essay, Note } from "@/models.ts";
+import { Essay } from "@/models.ts";
 
 const essays = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/essays" }),
@@ -10,9 +10,4 @@ const essays = defineCollection({
     }),
 });
 
-const notes = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/notes" }),
-  schema: Note,
-});
-
-export const collections = { essays, notes };
+export const collections = { essays };

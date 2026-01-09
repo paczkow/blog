@@ -6,13 +6,10 @@ import { Search } from "@/components/writing/Search";
 import Layout from "@/layouts/Base.astro";
 import { SITE } from "config";
 
-const collections = await Promise.all([
-  getCollection("essays"),
-  getCollection("notes"),
-]);
+const essayCollection = await getCollection("essays");
 
-const essays = await Promise.all(
-  collections[0].map(async (essay) => {
+const posts = await Promise.all(
+  essayCollection.map(async (essay) => {
     const { remarkPluginFrontmatter } = await render(essay);
 
     return {
@@ -24,13 +21,6 @@ const essays = await Promise.all(
   }),
 );
 
-const notes = collections[1].map((note) => ({
-  id: note.id,
-  type: "note" as const,
-  ...note.data,
-}));
-
-const posts = [...essays, ...notes];
 const topics = [...new Set(posts.flatMap((post) => post.topics))];
 ---
 

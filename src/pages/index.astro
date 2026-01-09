@@ -8,13 +8,10 @@ import { getSortedByDate } from "@/helpers/posts.ts";
 import Layout from "@/layouts/Base.astro";
 import { SITE } from "config";
 
-const collections = await Promise.all([
-  getCollection("essays"),
-  getCollection("notes"),
-]);
+const essayCollection = await getCollection("essays");
 
 const essays = await Promise.all(
-  collections[0].map(async (essay) => {
+  essayCollection.map(async (essay) => {
     const { remarkPluginFrontmatter } = await render(essay);
 
     return {
@@ -26,14 +23,7 @@ const essays = await Promise.all(
   }),
 );
 
-const notes = collections[1].map((note) => ({
-  id: note.id,
-  type: "note" as const,
-  ...note.data,
-}));
-
 const sortedEssays = getSortedByDate(essays);
-const sortedNotes = getSortedByDate(notes);
 ---
 
 <Layout title={SITE.title}>
@@ -49,7 +39,6 @@ const sortedNotes = getSortedByDate(notes);
 
     <div class="mt-16 hidden flex-col gap-4 lg:flex">
       <Link to="essays" label="Essays" className="active" />
-      <Link to="notes" label="Notes" />
       <Link to="about" label="About" />
     </div>
     <div class="mt-auto hidden gap-4 lg:flex">
@@ -79,32 +68,6 @@ const sortedNotes = getSortedByDate(notes);
               />
             );
           })
-        }
-      </div>
-    </section>
-    <section id="notes" class="mt-[-116px] flex flex-col gap-12 pt-[116px]">
-      <h2 class="text-sand-12 font-medium">Notes</h2>
-      <span class="text-sand-11">
-        Why notes?<br /><br /> This how I cultivate my ideas, that's my <a
-          class="hover:text-sand-12 underline"
-          href="https://maggieappleton.com/garden-history/">digital garden</a
-        >. Atomic notes, unlike essays, are not intended to be comprehensive or
-        definitive. Instead, they reflect my current understanding and
-        perspective on a particular topic and help me learn and develop ideas
-        through iterations.
-      </span>
-      <div class="group flex flex-col gap-16 md:gap-8">
-        {
-          sortedNotes.map((post) => (
-            <Card
-              id={post.id}
-              variant="note"
-              date={post.date}
-              topics={post.topics}
-              title={post.title}
-              status="evergreen"
-            />
-          ))
         }
       </div>
     </section>

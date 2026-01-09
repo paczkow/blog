@@ -4,13 +4,10 @@ import Layout from "@/layouts/Base.astro";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
-  const writing = await Promise.all([
-    getCollection("essays"),
-    getCollection("notes"),
-  ]);
+  const essayCollection = await getCollection("essays");
 
   const essays = await Promise.all(
-    writing[0].map(async (essay) => {
+    essayCollection.map(async (essay) => {
       const { remarkPluginFrontmatter } = await render(essay);
 
       return {
@@ -26,12 +23,7 @@ export async function getStaticPaths() {
     }),
   );
 
-  const notes = writing[1].map((note) => ({
-    params: { slug: note.id },
-    props: { post: { ...note, type: "note" as const } },
-  }));
-
-  return [...essays, ...notes];
+  return essays;
 }
 
 const props = Astro.props;

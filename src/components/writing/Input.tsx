@@ -3,22 +3,14 @@ import { useDebouncedCallback } from "use-debounce";
 
 import { Button } from "./Button.tsx";
 
-const WRITING_TYPES = ["essay", "note"] as const;
-
 interface Props {
-  selected: {
-    types: (typeof WRITING_TYPES)[number][];
-    topics: string[];
-  };
+  selectedTopics: string[];
   topics: string[];
   onChange: (query: string) => void;
-  onSelect: (value: {
-    topics: string[];
-    types: (typeof WRITING_TYPES)[number][];
-  }) => void;
+  onSelect: (topics: string[]) => void;
 }
 
-export const Options = ({ topics, selected, onChange, onSelect }: Props) => {
+export const Options = ({ topics, selectedTopics, onChange, onSelect }: Props) => {
   const [searchQuery, setQuery] = useState("");
 
   const debounced = useDebouncedCallback((query: string) => {
@@ -26,29 +18,13 @@ export const Options = ({ topics, selected, onChange, onSelect }: Props) => {
   }, 100);
 
   const handleTopicSelect = (topic: string) => {
-    const isSelected = selected.topics.includes(topic);
+    const isSelected = selectedTopics.includes(topic);
 
-    const newSearchQuery = {
-      ...selected,
-      topics: isSelected
-        ? selected.topics.filter((t) => t !== topic)
-        : [...selected.topics, topic],
-    };
+    const newTopics = isSelected
+      ? selectedTopics.filter((t) => t !== topic)
+      : [...selectedTopics, topic];
 
-    onSelect(newSearchQuery);
-  };
-
-  const handleTypeSelect = (type: (typeof WRITING_TYPES)[number]) => {
-    const isSelected = selected.types.includes(type);
-
-    const newSearchQuery = {
-      ...selected,
-      types: isSelected
-        ? selected.types.filter((t) => t !== type)
-        : [...selected.types, type],
-    };
-
-    onSelect(newSearchQuery);
+    onSelect(newTopics);
   };
 
   return (
@@ -63,26 +39,12 @@ export const Options = ({ topics, selected, onChange, onSelect }: Props) => {
         value={searchQuery}
       />
       <div>
-        <h2 className="mb-4 text-sand-12">Types</h2>
-        <div className="flex gap-2">
-          {WRITING_TYPES.map((type) => (
-            <Button
-              key={type}
-              active={selected.types.includes(type)}
-              onClick={() => handleTypeSelect(type)}
-            >
-              <span className="capitalize">{type}</span>
-            </Button>
-          ))}
-        </div>
-      </div>
-      <div>
         <h2 className="mb-4 text-sand-12">Topics</h2>
         <div className="flex gap-2 flex-wrap">
           {topics.map((topic) => (
             <Button
               key={topic}
-              active={selected.topics.includes(topic)}
+              active={selectedTopics.includes(topic)}
               onClick={() => handleTopicSelect(topic)}
             >
               {topic}
