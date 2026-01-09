@@ -3,6 +3,7 @@ import { getCollection, render } from "astro:content";
 
 import IconLink from "@/components/IconLink.astro";
 import { Search } from "@/components/writing/Search";
+import { Icon } from "astro-icon/components";
 import Layout from "@/layouts/Base.astro";
 import { SITE } from "config";
 
@@ -23,6 +24,12 @@ const posts = await Promise.all(
 ---
 
 <Layout title="Writing - paczkow.me">
+  <a
+    href="/"
+    class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1 mb-2"
+  >
+    <Icon name="corner-up-left" class="w-4 h-4" /> Index
+  </a>
   <Search client:load posts={posts}>
     <div slot="icons" class="mt-auto hidden gap-4 lg:flex">
       <IconLink to={SITE.social.github} icon="github" />

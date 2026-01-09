@@ -10,7 +10,6 @@ import { remarkReadingTime } from "./plugins/minutes-read.mjs";
 
 import type { Element } from "node_modules/rehype-autolink-headings/lib";
 import { SITE } from "./config";
-import path from "node:path";
 
 export default defineConfig({
   site: SITE.website,

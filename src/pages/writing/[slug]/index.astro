@@ -1,6 +1,7 @@
 ---
 import Prose from "@/components/Prose.astro";
 import Layout from "@/layouts/Base.astro";
+import { Icon } from "astro-icon/components";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -32,6 +33,12 @@ const { Content, headings } = await render(post);
 ---
 
 <Layout title={post.data.title}>
+  <a
+    href="/writing"
+    class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1 mb-2"
+  >
+    <Icon name="corner-up-left" class="w-4 h-4" /> Writing
+  </a>
   <Prose>
     <article
       class={`col-span-full flex justify-center ${post.data.toc ? "lg:justify-between lg:gap-8" : ""}`}
@@ -97,7 +104,7 @@ const { Content, headings } = await render(post);
     const activeLink =
       links.find(
         (link) =>
-          link.getAttribute("data-scroll-section") === hash.replace("#", "")
+          link.getAttribute("data-scroll-section") === hash.replace("#", ""),
       ) ?? links[0];
 
     activeLink.classList.add("text-sand-12");
@@ -128,7 +135,7 @@ const { Content, headings } = await render(post);
   const links = Array.from(document.querySelectorAll("#toc li"));
 
   const seen = new WeakSet();
-  
+
   // Function to check if we're at the bottom of the page
   const isAtBottom = () => {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -182,7 +189,7 @@ const { Content, headings } = await render(post);
     {
       root: null,
       rootMargin: "0px 0px -50% 0px",
-    }
+    },
   );
 
   headers.forEach((header) => observer.observe(header));

@@ -4,6 +4,7 @@ import { getCollection, render } from "astro:content";
 import { Card } from "@/components/Card.tsx";
 import IconLink from "@/components/IconLink.astro";
 import Link from "@/components/Navlink.astro";
+import { Icon } from "astro-icon/components";
 import { getSortedByDate } from "@/helpers/posts.ts";
 import Layout from "@/layouts/Base.astro";
 import { SITE } from "config";
@@ -28,15 +29,11 @@ const sortedEssays = getSortedByDate(essays);
 
 <Layout title={SITE.title}>
   <div
-    class="sticky col-span-full mb-8 flex flex-col gap-4 lg:top-(--nav-height) lg:col-start-1 lg:col-end-2 lg:mb-0 lg:h-[calc(100vh-242px)]"
+    class="sticky col-span-full mb-8 flex flex-col gap-4 lg:top-(--nav-height) lg:col-start-1 lg:col-end-2 lg:mb-0 lg:h-[calc(100vh-160px)]"
   >
-    <p class="text-sand-11">Hello, I'm Michał.</p>
     <p class="text-sand-11">
-      Product Engineer blending ideas at the intersection of code, AI, and
-      cognition.
+      Hey, I'm Michał, currently a Product Engineer at Meta. In my spare time, I explore ways to combine AI with cognitive strategies to enhance learning and thinking.
     </p>
-    <p class="text-sand-11">Currently building at a FAANG company.</p>
-
     <div class="mt-16 hidden flex-col gap-4 lg:flex">
       <Link to="essays" label="Essays" className="active" />
       <Link to="about" label="About" />
@@ -51,7 +48,14 @@ const sortedEssays = getSortedByDate(essays);
     class="col-span-full flex flex-col gap-20 lg:col-start-2 lg:col-end-3 mr-[2px]"
   >
     <section id="essays" class="mt-[-116px] flex flex-col gap-12 pt-[116px]">
-      <h2 class="text-sand-12 font-medium">Essays</h2>
+      <div class="flex align-baseline justify-between">
+        <h2 class="text-sand-12 font-medium">Writing</h2>
+        <a
+          href="/writing"
+          class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1 mb-2"
+          >All Writing <Icon name="arrow-up-right" class="h-4 w-4" /></a
+        >
+      </div>
       <div class="group flex flex-col gap-16 md:gap-8">
         {
           sortedEssays.map((post) => {

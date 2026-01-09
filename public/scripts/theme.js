@@ -1,9 +1,14 @@
-const theme = localStorage.getItem("theme");
+// Apply theme based on system preference
+const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-if (
-  theme === "dark" ||
-  (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)
-) {
-  console.log("dark");
-  document.documentElement.classList.add("dark");
+function applyTheme(isDark) {
+  document.documentElement.classList.toggle("dark", isDark);
 }
+
+// Apply initial theme
+applyTheme(darkModeQuery.matches);
+
+// Listen for system preference changes
+darkModeQuery.addEventListener("change", (e) => {
+  applyTheme(e.matches);
+});
