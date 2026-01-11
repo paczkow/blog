@@ -1,0 +1,21 @@
+---
+import Icon from "node_modules/astro-icon/components/Icon.astro";
+
+interface Props {
+    label: string;
+    href: string;
+    icon: string;
+    id?: string;
+    class?: string;
+}
+
+const { label, href, icon, id, class: className } = Astro.props;
+---
+
+<a
+    id={id}
+    href={href}
+    class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1 text-sm mb-4"
+>
+    <Icon name={icon} class="w-4 h-4" />{label}
+</a>

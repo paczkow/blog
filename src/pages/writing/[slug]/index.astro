@@ -1,6 +1,6 @@
 ---
 import Prose from "@/components/Prose.astro";
-import Layout from "@/layouts/Base.astro";
+import Layout from "@/layouts/Essay.astro";
 import { Icon } from "astro-icon/components";
 import { getCollection, render } from "astro:content";
 
@@ -33,49 +33,38 @@ const { Content, headings } = await render(post);
 ---
 
 <Layout title={post.data.title}>
-  <a
-    href="/writing"
-    class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1 mb-2"
-  >
-    <Icon name="corner-up-left" class="w-4 h-4" /> Writing
-  </a>
-  <Prose>
+  <Prose slot="content">
     <article
       class={`col-span-full flex justify-center ${post.data.toc ? "lg:justify-between lg:gap-8" : ""}`}
     >
       <div class="max-w-[65ch]">
-        <h1 class="mb-10">{post.data.title}</h1>
         <Content />
       </div>
-      {
-        post.data.toc && (
-          <nav
-            id="toc"
-            class="sticky top-[96px] hidden h-[400px] flex-col lg:flex"
-          >
-            <span class="text-sand-12 font-semibold">Table of Contents</span>
-            <ul class="mt-0">
-              {headings
-                .filter((heading) => heading.depth === 2)
-                .map((heading) => {
-                  const id = heading.slug;
-                  const section = heading.text.replace("#", "");
-
-                  return (
-                    <li
-                      data-scroll-section={id}
-                      class="cursor-pointer not-prose text-sand-8 my-2"
-                    >
-                      {section}
-                    </li>
-                  );
-                })}
-            </ul>
-          </nav>
-        )
-      }
     </article>
   </Prose>
+  {
+    post.data.toc && (
+      <Fragment slot="navigation">
+          <ul class="mt-0">
+            {headings
+              .filter((heading) => heading.depth === 2)
+              .map((heading) => {
+                const id = heading.slug;
+                const section = heading.text.replace("#", "");
+
+                return (
+                  <li
+                    data-scroll-section={id}
+                    class="cursor-pointer not-prose text-sand-8 my-2"
+                  >
+                    {section}
+                  </li>
+                );
+              })}
+          </ul>
+      </Fragment>
+    )
+  }
 </Layout>
 
 <style>
