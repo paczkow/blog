@@ -30,14 +30,15 @@ const sortedEssays = getSortedByDate(essays);
 <Layout title={SITE.title}>
   <main class="contents">
     <div
-      class="sticky col-span-full mb-8 flex flex-col gap-4 lg:top-(--nav-height) lg:col-start-1 lg:col-end-2 lg:mb-0 lg:h-[calc(100vh-160px)]"
+      class="sticky col-span-full mb-8 flex flex-col gap-4 lg:top-(--nav-height) lg:col-start-1 lg:col-end-2 lg:mb-0 lg:h-[calc(100vh-224px)]"
     >
       <p class="text-sand-11">
-        Hey, I'm Michał, Product Engineer currently working at Meta.
+        "Learn in Public" space for software engineering, AI, productivity and thinking
+        systems by <a href="#about" class="underline hover:text-sand-12"
+          >@paczkow</a
+        >
       </p>
-      <p class="text-sand-11">
-        The blog is way to learn in public by documenting lessons about building products, AI, and tools to enhance learning and thinking.
-      </p>
+      <p></p>
       <div class="mt-16 hidden flex-col gap-4 lg:flex">
         <Link to="essays" label="Essays" className="active" />
         <Link to="about" label="About" />
