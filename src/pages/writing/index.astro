@@ -1,10 +1,10 @@
 ---
 import { getCollection, render } from "astro:content";
 
-import BackLink from "@/components/BackLink.astro";
 import IconLink from "@/components/IconLink.astro";
-import { Search } from "@/components/writing/Search";
-import Layout from "@/layouts/Base.astro";
+import { SearchResults } from "@/components/writing/SearchResults";
+import { SearchSidebar } from "@/components/writing/SearchSidebar";
+import Layout from "@/layouts/TwoColumn.astro";
 import { SITE } from "config";
 
 const essayCollection = await getCollection("essays");
@@ -24,18 +24,16 @@ const posts = await Promise.all(
 ---
 
 <Layout title="Writing - paczkow.me">
-  <main class="col-span-full flex flex-col flex-1 lg:contents">
-    <BackLink
-      href="/"
-      label="Index"
-      icon="corner-up-left"
-    />
-    <Search client:load posts={posts}>
+  <Fragment slot="sidebar">
+    <SearchSidebar client:load>
       <div slot="icons" class="mt-auto hidden gap-4 lg:flex">
         <IconLink to={SITE.social.github} icon="github" />
         <IconLink to={SITE.social.linkedin} icon="linkedin" />
-        <IconLink to="Bluesky" icon="bluesky" />
+        <IconLink to={SITE.social.bluesky} icon="bluesky" />
       </div>
-    </Search>
-  </main>
+    </SearchSidebar>
+  </Fragment>
+  <Fragment slot="content">
+    <SearchResults client:load posts={posts} />
+  </Fragment>
 </Layout>

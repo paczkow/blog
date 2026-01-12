@@ -1,6 +1,6 @@
 ---
 import Prose from "@/components/Prose.astro";
-import Layout from "@/layouts/Essay.astro";
+import Layout from "@/layouts/Base.astro";
 import { Icon } from "astro-icon/components";
 import { getCollection, render } from "astro:content";
 
@@ -33,38 +33,71 @@ const { Content, headings } = await render(post);
 ---
 
 <Layout title={post.data.title}>
-  <Prose slot="content">
-    <article
-      class={`col-span-full flex justify-center ${post.data.toc ? "lg:justify-between lg:gap-8" : ""}`}
-    >
-      <div class="max-w-[65ch]">
-        <Content />
-      </div>
-    </article>
-  </Prose>
-  {
-    post.data.toc && (
-      <Fragment slot="navigation">
-          <ul class="mt-0">
-            {headings
-              .filter((heading) => heading.depth === 2)
-              .map((heading) => {
-                const id = heading.slug;
-                const section = heading.text.replace("#", "");
+  <div
+    class="mx-auto grid grid-cols-1 lg:grid-cols-[192px_65ch_1fr] px-8 lg:px-8 gap-x-12 xl:gap-x-16"
+  >
+    <!-- Row 1: Back link and Title -->
+    <div class="hidden lg:block">
+      <a
+        href="/writing"
+        class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1"
+      >
+        <Icon name="arrow-up-left" class="w-4 h-4" />
+        All Writing
+      </a>
+    </div>
+    <div class="mb-16">
+      <h1 class="text-sand-12 font-medium">{post.data.title}</h1>
+      <time
+        class="text-sand-11 text-sm"
+        datetime={post.data.date.toISOString()}
+      >
+        {
+          post.data.date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        }
+      </time>
+    </div>
+    <div class="hidden lg:block"></div>
 
-                return (
+    <!-- Row 2: TOC and Content -->
+    <aside class="hidden lg:block">
+      {
+        post.data.toc && (
+          <nav id="toc" class="sticky top-36">
+            <ul class="list-none p-0 m-0">
+              {headings
+                .filter((h) => h.depth === 2)
+                .map((heading) => (
                   <li
-                    data-scroll-section={id}
-                    class="cursor-pointer not-prose text-sand-8 my-2"
+                    data-scroll-section={heading.slug}
+                    class="cursor-pointer text-sand-8 my-2 hover:text-sand-12 text-xs"
                   >
-                    {section}
+                    {heading.text.replace("#", "")}
                   </li>
-                );
-              })}
-          </ul>
-      </Fragment>
-    )
-  }
+                ))}
+            </ul>
+          </nav>
+        )
+      }
+    </aside>
+    <article>
+      <Prose>
+        <Content />
+      </Prose>
+      <a
+        href="/writing"
+        class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1 mt-12 lg:hidden"
+      >
+        <Icon name="arrow-up-left" class="w-4 h-4" />
+        All Writing
+      </a>
+    </article>
+    <div class="hidden lg:block"></div>
+  </div>
 </Layout>
 
 <style>
@@ -90,13 +123,15 @@ const { Content, headings } = await render(post);
 
   document.addEventListener("DOMContentLoaded", () => {
     const links = Array.from(document.querySelectorAll("#toc li"));
+    if (links.length === 0) return;
+
     const activeLink =
       links.find(
         (link) =>
           link.getAttribute("data-scroll-section") === hash.replace("#", ""),
       ) ?? links[0];
 
-    activeLink.classList.add("text-sand-12");
+    activeLink?.classList.add("text-sand-12");
 
     links.forEach((link) => {
       link.addEventListener("click", () => {

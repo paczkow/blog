@@ -29,7 +29,7 @@
   --color-sand-11: #63635e;
   --color-sand-12: #21201c;
 
-  --nav-height: 100px;
+  --nav-height: calc(122px + 64px);
   --font-weight-semimedium: 450;
 }
 

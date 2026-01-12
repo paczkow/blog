@@ -3,11 +3,11 @@ import { Card } from "../Card";
 
 export const SearchList = ({ posts }: { posts: Essay[] }) => {
   return (
-    <div className="group flex flex-col gap-16 md:gap-8">
+    <div className="group flex flex-col gap-8">
       {!posts.length && (
         <h2 className="text-sand-12">No results found</h2>
       )}
-      {posts.map((post) => (
+      {[...posts, ...posts].map((post) => (
         <Card
           id={post.id}
           key={post.id}
