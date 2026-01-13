@@ -16,22 +16,83 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year}`;
 };
 
+/**
+ * Core layout and structural styles - applied to all devices
+ */
+const layoutClasses = [
+  "relative",
+  "flex",
+  "items-baseline",
+  "cursor-pointer",
+  "gap-16",
+  "p-4",
+  "rounded-md",
+].join(" ");
+
+/**
+ * Touch device interaction: Simple background on tap
+ * @media(hover:none) = primary input cannot hover (touch screens)
+ * Uses hover: because touch devices simulate hover on tap
+ */
+const touchInteractionClasses = [
+  "[@media(hover:none)]:hover:bg-sand-3",
+  "[@media(hover:none)]:dark:hover:bg-sand-6",
+].join(" ");
+
+/**
+ * Hover device interaction: Animated ::before pseudo-element
+ * @media(hover:hover) = primary input can hover (mouse/trackpad)
+ */
+const hoverInteractionClasses = [
+  // Pseudo-element setup
+  "[@media(hover:hover)]:before:content-['']",
+  "[@media(hover:hover)]:before:absolute",
+  "[@media(hover:hover)]:before:inset-[-2px]",
+  "[@media(hover:hover)]:before:rounded-md",
+  "[@media(hover:hover)]:before:-z-10",
+  // Light mode colors
+  "[@media(hover:hover)]:before:border",
+  "[@media(hover:hover)]:before:border-sand-3",
+  "[@media(hover:hover)]:before:bg-sand-2",
+  // Dark mode colors
+  "[@media(hover:hover)]:dark:before:border-sand-5",
+  "[@media(hover:hover)]:dark:before:bg-sand-4",
+  // Hidden by default
+  "[@media(hover:hover)]:before:opacity-0",
+  // Transition
+  "[@media(hover:hover)]:before:transition-opacity",
+  "[@media(hover:hover)]:before:duration-300",
+  "[@media(hover:hover)]:before:ease-in-out",
+  // Show on hover
+  "[@media(hover:hover)]:hover:before:opacity-100",
+].join(" ");
+
+/**
+ * Group hover effect: Dim siblings when one card is hovered
+ * Only active on hover-capable devices
+ */
+const groupHoverClasses = [
+  "[@media(hover:hover)]:transition-opacity",
+  "[@media(hover:hover)]:duration-300",
+  "[@media(hover:hover)]:ease-in-out",
+  "[@media(hover:hover)]:group-hover:opacity-20",
+  "[@media(hover:hover)]:group-hover:hover:opacity-100",
+].join(" ");
+
 export const Card = (props: Props) => {
   const { id, date, title, description } = props;
-
-  const baseClasses =
-    "relative flex items-baseline cursor-pointer gap-16 p-4 rounded-md transition-colors duration-200 hover:bg-sand-3 md:hover:bg-transparent md:[@media(hover:none)]:active:bg-sand-3 md:dark:[@media(hover:none)]:active:bg-sand-6 md:py-4";
-
-  const transitionClasses =
-    "transition-opacity duration-300 ease-in-out group-hover:opacity-20 group-hover:hover:opacity-100";
-  const beforeClasses =
-    "md:before:border-sand-3 md:before:bg-sand-2 md:dark:before:border-sand-5 md:dark:before:bg-sand-4 md:before:absolute md:before:-z-10 md:before:border md:before:opacity-0 md:before:border-opacity-0 md:before:transition-opacity md:before:duration-300 md:before:ease-in-out md:before:content-[''] md:hover:before:opacity-100 md:before:inset-[-2px] md:before:rounded-md";
-
   const formattedDate = formatDate(date);
 
   return (
     <a href={`/writing/${id}`} className="block no-underline group/card">
-      <article className={clsx(baseClasses, transitionClasses, beforeClasses)}>
+      <article
+        className={clsx(
+          layoutClasses,
+          touchInteractionClasses,
+          hoverInteractionClasses,
+          groupHoverClasses
+        )}
+      >
         <time
           className="hidden min-w-[80px] text-sm text-neutral-500 md:block"
           dateTime={new Date(date).toISOString()}
