@@ -3,8 +3,8 @@ import { useStore } from "@nanostores/react";
 import { getSortedByDate } from "@/helpers/posts.ts";
 import type { Post } from "@/models.ts";
 import { searchQuery } from "@/stores/searchQuery";
-import { SearchList } from "./List";
 import { useSearch } from "./useSearch";
+import { Card } from "../Card";
 
 export const SearchResults = ({ posts }: { posts: Post[] }) => {
 	const query = useStore(searchQuery);
@@ -14,7 +14,21 @@ export const SearchResults = ({ posts }: { posts: Post[] }) => {
 
 	return (
 		<section id="articles" className="flex flex-1 flex-col gap-12">
-			<SearchList posts={filteredPosts} />
+			<div className="group flex flex-col gap-8">
+				{!filteredPosts.length && (
+					<h2 className="text-sand-12">No results found</h2>
+				)}
+				{filteredPosts.map((post) => (
+					<Card
+						id={post.id}
+						key={post.id}
+						title={post.title}
+						description={post.description}
+						date={post.date}
+						readTime={post.readTime}
+					/>
+				))}
+			</div>
 		</section>
 	);
 };
