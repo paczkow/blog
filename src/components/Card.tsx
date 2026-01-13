@@ -8,18 +8,7 @@ type Props = {
   description: string;
 };
 
-const formatDate = (date: Date) => {
-  const d = new Date(date);
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
-/**
- * Core layout and structural styles - applied to all devices
- */
-const layoutClasses = [
+const baseClasses = [
   "relative",
   "flex",
   "items-baseline",
@@ -29,15 +18,6 @@ const layoutClasses = [
   "rounded-md",
 ].join(" ");
 
-/**
- * Touch device interaction: Simple background on tap
- * @media(hover:none) = primary input cannot hover (touch screens)
- * Uses hover: because touch devices simulate hover on tap
- */
-const touchInteractionClasses = [
-  "[@media(hover:none)]:hover:bg-sand-3",
-  "[@media(hover:none)]:dark:hover:bg-sand-6",
-].join(" ");
 
 /**
  * Hover device interaction: Animated ::before pseudo-element
@@ -45,26 +25,21 @@ const touchInteractionClasses = [
  */
 const hoverInteractionClasses = [
   // Pseudo-element setup
-  "[@media(hover:hover)]:before:content-['']",
-  "[@media(hover:hover)]:before:absolute",
-  "[@media(hover:hover)]:before:inset-[-2px]",
-  "[@media(hover:hover)]:before:rounded-md",
-  "[@media(hover:hover)]:before:-z-10",
-  // Light mode colors
-  "[@media(hover:hover)]:before:border",
-  "[@media(hover:hover)]:before:border-sand-3",
-  "[@media(hover:hover)]:before:bg-sand-2",
-  // Dark mode colors
-  "[@media(hover:hover)]:dark:before:border-sand-5",
-  "[@media(hover:hover)]:dark:before:bg-sand-4",
-  // Hidden by default
-  "[@media(hover:hover)]:before:opacity-0",
-  // Transition
-  "[@media(hover:hover)]:before:transition-opacity",
-  "[@media(hover:hover)]:before:duration-300",
-  "[@media(hover:hover)]:before:ease-in-out",
-  // Show on hover
-  "[@media(hover:hover)]:hover:before:opacity-100",
+  "before:content-['']",
+  "before:absolute",
+  "before:inset-[-2px]",
+  "before:rounded-md",
+  "before:-z-10",
+  "before:border",
+  "before:border-sand-3",
+  "before:bg-sand-2",
+  "dark:before:border-sand-5",
+  "dark:before:bg-sand-4",
+  "before:opacity-0",
+  "before:transition-opacity",
+  "before:duration-300",
+  "before:ease-in-out",
+  "hover:before:opacity-100",
 ].join(" ");
 
 /**
@@ -72,23 +47,21 @@ const hoverInteractionClasses = [
  * Only active on hover-capable devices
  */
 const groupHoverClasses = [
-  "[@media(hover:hover)]:transition-opacity",
-  "[@media(hover:hover)]:duration-300",
-  "[@media(hover:hover)]:ease-in-out",
-  "[@media(hover:hover)]:group-hover:opacity-20",
-  "[@media(hover:hover)]:group-hover:hover:opacity-100",
+  "transition-opacity",
+  "duration-300",
+  "ease-in-out",
+  "group-hover:opacity-20",
+  "group-hover:hover:opacity-100",
 ].join(" ");
 
 export const Card = (props: Props) => {
   const { id, date, title, description } = props;
-  const formattedDate = formatDate(date);
 
   return (
     <a href={`/writing/${id}`} className="block no-underline group/card">
       <article
         className={clsx(
-          layoutClasses,
-          touchInteractionClasses,
+          baseClasses,
           hoverInteractionClasses,
           groupHoverClasses
         )}
