@@ -62,7 +62,7 @@ const sortedEssays = getSortedByDate(essays);
         </div>
         <div class="group flex flex-col gap-8">
           {
-            [...sortedEssays, ...sortedEssays].slice(0, 4).map((post) => {
+            sortedEssays.slice(0, 4).map((post) => {
               return (
                 <Card
                   id={post.id}

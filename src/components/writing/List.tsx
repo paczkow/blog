@@ -7,7 +7,7 @@ export const SearchList = ({ posts }: { posts: Essay[] }) => {
       {!posts.length && (
         <h2 className="text-sand-12">No results found</h2>
       )}
-      {[...posts, ...posts].map((post) => (
+      {posts.map((post) => (
         <Card
           id={post.id}
           key={post.id}
