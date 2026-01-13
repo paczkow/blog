@@ -94,17 +94,29 @@ export const Card = (props: Props) => {
         )}
       >
         <time
-          className="hidden min-w-[80px] text-sm text-neutral-500 md:block"
+          className="hidden min-w-max text-sm text-sand-11 md:block"
           dateTime={new Date(date).toISOString()}
         >
-          {formattedDate}
+          {
+            date.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          }
         </time>
         <div className="flex flex-col gap-4">
           <time
-            className="text-sand-10 text-sm md:hidden"
+            className="text-sand-11 text-sm md:hidden"
             dateTime={new Date(date).toISOString()}
           >
-            {formattedDate}
+            {
+              date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
           </time>
           <h3 className="text-sand-12 font-[450] ">
             {title}
