@@ -20,7 +20,7 @@ export const Card = (props: Props) => {
   const { id, date, title, description } = props;
 
   const baseClasses =
-    "relative flex items-baseline cursor-pointer gap-16 p-4 rounded-md transition-colors duration-200 hover:bg-sand-3 md:hover:bg-transparent md:[@media(hover:none)]:active:bg-sand-3 md:py-4";
+    "relative flex items-baseline cursor-pointer gap-16 p-4 rounded-md transition-colors duration-200 hover:bg-sand-3 md:hover:bg-transparent md:[@media(hover:none)]:active:bg-sand-3 md:dark:[@media(hover:none)]:active:bg-sand-6 md:py-4";
 
   const transitionClasses =
     "transition-opacity duration-300 ease-in-out group-hover:opacity-20 group-hover:hover:opacity-100";
