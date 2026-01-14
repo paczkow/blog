@@ -73,7 +73,7 @@ export const Card = (props: Props) => {
         )}
       >
         <time
-          className="hidden min-w-max text-sm text-sand-11 md:block"
+          className="hidden min-w-[120px] text-sm text-sand-11 md:block"
           dateTime={new Date(date).toISOString()}
         >
           {
@@ -97,7 +97,7 @@ export const Card = (props: Props) => {
               })
             }
           </time>
-          <h3 className="text-sand-12 font-[450]">
+          <h3 className="text-sand-12 font-medium">
             {title}
           </h3>
           <div>
