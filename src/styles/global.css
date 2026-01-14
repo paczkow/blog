@@ -7,10 +7,13 @@
   --font-sans: "Inter Variable", system-ui, -apple-system, sans-serif;
 }
 
+@custom-variant pressed (&[data-pressed="true"]);
+
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
     line-height: 1.625;
   }
 }
