@@ -1,56 +1,10 @@
 import { clsx } from "clsx";
-import { useEffect, useRef, useState } from "react";
-
-function usePressEffect() {
-  const [isPressed, setIsPressed] = useState(false);
-  const startRef = useRef({ time: 0, x: 0, y: 0 });
-
-  const TIME_THRESHOLD = 250;
-  const MOVE_THRESHOLD = 5;
-
-  useEffect(() => {
-    const handleUp = (e: PointerEvent) => {
-      const { time, x, y } = startRef.current;
-      if (time === 0) return;
-
-      const duration = Date.now() - time;
-      const distance = Math.hypot(e.clientX - x, e.clientY - y);
-
-      if (duration < TIME_THRESHOLD && distance < MOVE_THRESHOLD) {
-        setIsPressed(true);
-        setTimeout(() => setIsPressed(false), 100);
-      }
-
-      startRef.current = { time: 0, x: 0, y: 0 };
-    };
-
-    const handleCancel = () => {
-      setIsPressed(false);
-      startRef.current = { time: 0, x: 0, y: 0 };
-    };
-
-    console.log('xxxx')
-
-    window.addEventListener("pointerup", handleUp);
-    window.addEventListener("pointercancel", handleCancel);
-    return () => {
-      window.removeEventListener("pointerup", handleUp);
-      window.removeEventListener("pointercancel", handleCancel);
-    };
-  }, []);
-
-  const onPointerDown = (e: React.PointerEvent) => {
-    startRef.current = { time: Date.now(), x: e.clientX, y: e.clientY };
-  };
-
-  return { isPressed, onPointerDown };
-}
+import { useState } from "react";
 
 type Props = {
   id: string;
   date: Date;
   title: string;
-  readTime: number;
   description: string;
 };
 
@@ -83,11 +37,6 @@ const hoverInteractionClasses = [
   "hover:before:opacity-100",
 ].join(" ");
 
-const pressedClasses = [
-  "data-[pressed=true]:bg-sand-3",
-  "dark:data-[pressed=true]:bg-sand-5",
-].join(" ");
-
 const groupHoverClasses = [
   "transition-opacity",
   "duration-300",
@@ -98,21 +47,29 @@ const groupHoverClasses = [
 
 export const Card = (props: Props) => {
   const { id, date, title, description } = props;
-  const { isPressed, onPointerDown } = usePressEffect();
+  const [isActive, setIsActive] = useState(false);
+
+  const handleClick = () => {
+    setIsActive(true);
+    setTimeout(() => {
+      setIsActive(false);
+    }, 50);
+  };
+
 
   return (
     <a
       href={`/writing/${id}`}
-      className={clsx("block no-underline group/card data-[pressed=true]:bg-red-500")}
-      onPointerDown={onPointerDown}
+      className={clsx("block no-underline group/card")}
     >
       <article
-        data-pressed={isPressed}
+        onClick={handleClick}
         className={clsx(
           baseClasses,
           hoverInteractionClasses,
-          pressedClasses,
-          groupHoverClasses
+          groupHoverClasses,
+          "transition-colors duration-50 ease-in-out",
+          isActive && "bg-sand-3 dark:bg-sand-5"
         )}
       >
         <time
