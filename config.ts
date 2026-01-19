@@ -1,7 +1,7 @@
 export const SITE = {
   website: "https://paczkow.me",
   title: "paczkow.me",
-  desc: "Michał Paczków's Blog",
+  desc: "Learn in public space created by Michał Paczków",
   author: "Michał Paczków",
   social: {
     github: "https://github.com/paczkow",

@@ -31,11 +31,10 @@ const sortedEssays = getSortedByDate(essays);
   <Fragment slot="sidebar">
     <div class="flex flex-col gap-4 h-full">
       <p class="text-sand-11 lg:px-0">
-        "Learn in Public" space for software craftsmanship, AI,
-        and note-taking system to expand thinking by <a
+        Learn in Public space created by <a
           href="#about"
           class="underline hover:text-sand-12">@paczkow</a
-        >
+        >.
       </p>
       <p></p>
       <div class="mt-16 hidden flex-col gap-4 lg:flex">
@@ -69,7 +68,6 @@ const sortedEssays = getSortedByDate(essays);
                   id={post.id}
                   date={post.date}
                   title={post.title}
-                  readTime={post.readTime}
                   description={post.description}
                 />
               );
