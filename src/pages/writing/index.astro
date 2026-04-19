@@ -1,11 +1,9 @@
 ---
 import { getCollection, render } from "astro:content";
 
-import IconLink from "@/components/IconLink.astro";
 import { SearchResults } from "@/components/writing/SearchResults";
 import { SearchSidebar } from "@/components/writing/SearchSidebar";
 import Layout from "@/layouts/TwoColumn.astro";
-import { SITE } from "config";
 
 const essayCollection = await getCollection("essays");
 
@@ -25,15 +23,34 @@ const posts = await Promise.all(
 
 <Layout title="Writing - paczkow.me">
   <Fragment slot="sidebar">
-    <SearchSidebar client:load>
-      <div slot="icons" class="mt-auto hidden gap-4 lg:flex">
-        <IconLink to={SITE.social.github} icon="github" />
-        <IconLink to={SITE.social.linkedin} icon="linkedin" />
-        <IconLink to={SITE.social.bluesky} icon="bluesky" />
+    <div class="flex flex-col gap-10 h-full">
+      <nav
+        aria-label="Breadcrumb"
+        class="flex items-center gap-2 text-sm text-sand-11"
+      >
+        <a href="/" class="transition-colors hover:text-sand-12">Home</a>
+        <span class="text-sand-9">/</span>
+        <span class="text-sand-12">Writing</span>
+      </nav>
+
+      <div class="flex flex-col gap-6">
+        <span
+          class="text-sand-11 text-xs uppercase tracking-[0.2em] font-medium"
+        >
+          Writing
+        </span>
+        <h1
+          class="font-serif font-normal text-sand-12 text-4xl md:text-5xl leading-[1.05] tracking-tight"
+        >
+          An archive of essays<span class="text-sand-9 italic">.</span>
+        </h1>
+        <SearchSidebar client:load count={posts.length} />
       </div>
-    </SearchSidebar>
+    </div>
   </Fragment>
   <Fragment slot="content">
-    <SearchResults client:load posts={posts} />
+    <div class="lg:pt-9">
+      <SearchResults client:load posts={posts} />
+    </div>
   </Fragment>
 </Layout>
