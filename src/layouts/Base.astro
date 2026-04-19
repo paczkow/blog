@@ -1,7 +1,7 @@
 ---
 import "@fontsource-variable/inter";
-import "@fontsource-variable/crimson-pro";
-import "@fontsource-variable/crimson-pro/wght-italic.css";
+import "@fontsource-variable/fraunces";
+import "@fontsource-variable/fraunces/wght-italic.css";
 
 import Head from "@/components/Head.astro";
 import { NeuralBackground } from "@/components/NeuralBackground.tsx";
@@ -21,10 +21,24 @@ const isHome = Astro.url.pathname === "/";
   <Head title={title} />
   <body class="m-0 w-full">
     {isHome && <NeuralBackground client:only="react" />}
-    <nav
-      class="mx-auto max-w-3xl lg:max-w-6xl sticky top-0 left-0 right-0 pt-16 pb-8 z-50 backdrop-blur-md bg-sand-1/70"
+    <svg
+      aria-hidden="true"
+      class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-[0.035] mix-blend-multiply dark:mix-blend-screen dark:opacity-[0.06]"
     >
-      <div class="mx-auto max-w-6xl h-full px-4 flex items-center min-h-6">
+      <filter id="grain">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.9"
+          numOctaves="2"
+          stitchTiles="stitch"></feTurbulence>
+        <feColorMatrix type="saturate" values="0"></feColorMatrix>
+      </filter>
+      <rect width="100%" height="100%" filter="url(#grain)"></rect>
+    </svg>
+    <nav
+      class="fixed top-0 left-0 right-0 mx-auto max-w-3xl lg:max-w-6xl h-14 z-50 backdrop-blur-md bg-sand-1/70"
+    >
+      <div class="mx-auto max-w-6xl h-full px-4 flex items-center">
         {
           !isHome && (
             <a
@@ -37,7 +51,7 @@ const isHome = Astro.url.pathname === "/";
         }
       </div>
     </nav>
-    <div class="relative z-10 mx-auto max-w-3xl lg:max-w-6xl pt-4 pb-32">
+    <div class="relative z-10 mx-auto max-w-3xl lg:max-w-6xl pt-(--nav-height) pb-(--page-bottom)">
       <slot />
     </div>
   </body>

@@ -48,7 +48,7 @@ export const Card = (props: Props) => {
             <span className="tabular-nums">{readTime} min read</span>
           ) : null}
         </div>
-        <h3 className="font-serif text-sand-12 text-2xl leading-tight mb-2">
+        <h3 className="font-serif text-sand-12 text-xl leading-tight mb-2">
           {title}
         </h3>
         <p className="text-sand-11 leading-relaxed">{description}</p>

@@ -2,7 +2,7 @@
 import { getCollection, render } from "astro:content";
 
 import { Card } from "@/components/Card.tsx";
-import IconLink from "@/components/IconLink.astro";
+import { WritingHeatmap } from "@/components/WritingHeatmap.tsx";
 import { getSortedByDate } from "@/helpers/posts.ts";
 import Layout from "@/layouts/TwoColumn.astro";
 import { Icon } from "astro-icon/components";
@@ -24,6 +24,12 @@ const essays = await Promise.all(
 );
 
 const sortedEssays = getSortedByDate(essays);
+
+const heatmapPosts = sortedEssays.map((essay) => ({
+  id: essay.id,
+  title: essay.title,
+  date: essay.date.toISOString(),
+}));
 ---
 
 <Layout title={SITE.title}>
@@ -43,10 +49,8 @@ const sortedEssays = getSortedByDate(essays);
         </p>
       </div>
 
-      <div class="mt-auto flex items-center gap-5">
-        <IconLink to={SITE.social.github} icon="github" />
-        <IconLink to={SITE.social.linkedin} icon="linkedin" />
-        <IconLink to={SITE.social.bluesky} icon="bluesky" />
+      <div class="mt-auto hidden lg:block">
+        <WritingHeatmap client:load posts={heatmapPosts} weeks={26} />
       </div>
     </div>
   </Fragment>
