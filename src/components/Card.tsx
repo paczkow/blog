@@ -9,45 +9,10 @@ type Props = {
   readTime?: number;
 };
 
-const baseClasses = [
-  "relative",
-  "block",
-  "cursor-pointer",
-  "px-4",
-  "py-6",
-  "rounded-md",
-].join(" ");
-
-const hoverInteractionClasses = [
-  "before:content-['']",
-  "before:absolute",
-  "before:inset-[-2px]",
-  "before:rounded-md",
-  "before:-z-10",
-  "before:border",
-  "before:border-sand-3",
-  "before:bg-sand-2",
-  "dark:before:border-sand-5",
-  "dark:before:bg-sand-4",
-  "before:opacity-0",
-  "before:transition-opacity",
-  "before:duration-300",
-  "before:ease-in-out",
-  "hover:before:opacity-100",
-].join(" ");
-
-const groupHoverClasses = [
-  "transition-opacity",
-  "duration-300",
-  "ease-in-out",
-  "group-hover:opacity-30",
-  "group-hover:hover:opacity-100",
-].join(" ");
-
 const formatDate = (date: Date) =>
   new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
   });
 
@@ -61,31 +26,29 @@ export const Card = (props: Props) => {
   };
 
   return (
-    <a href={`/writing/${id}`} className="block no-underline group/card">
+    <a href={`/writing/${id}`} className="block no-underline">
       <article
         onClick={handleClick}
         className={clsx(
-          baseClasses,
-          hoverInteractionClasses,
-          groupHoverClasses,
-          "transition-colors duration-50 ease-in-out",
+          "relative block cursor-pointer px-4 py-6 rounded-md will-change-transform",
+          "transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "group-hover:opacity-60",
+          "hover:!opacity-100 hover:translate-x-1",
           isActive && "bg-sand-3 dark:bg-sand-5",
         )}
       >
-        <div className="flex items-baseline justify-between gap-4 mb-3">
+        <div className="flex items-baseline justify-between gap-4 mb-3 text-sand-10 text-sm">
           <time
-            className="text-sand-11 text-xs uppercase tracking-wider tabular-nums"
+            className="tabular-nums"
             dateTime={new Date(date).toISOString()}
           >
             {formatDate(date)}
           </time>
           {readTime ? (
-            <span className="text-sand-10 text-xs tabular-nums">
-              {readTime} min read
-            </span>
+            <span className="tabular-nums">{readTime} min read</span>
           ) : null}
         </div>
-        <h3 className="font-serif text-sand-12 text-2xl md:text-3xl leading-tight mb-3 tracking-tight">
+        <h3 className="font-serif text-sand-12 text-2xl leading-tight mb-2">
           {title}
         </h3>
         <p className="text-sand-11 leading-relaxed">{description}</p>
