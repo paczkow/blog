@@ -5,7 +5,7 @@
 
 @theme {
   --font-sans: "Inter Variable", system-ui, -apple-system, sans-serif;
-  --font-serif: "Fraunces Variable", "Iowan Old Style", "Apple Garamond", Georgia, serif;
+  --font-serif: "Newsreader Variable", "Iowan Old Style", "Apple Garamond", Georgia, serif;
 }
 
 @custom-variant pressed (&[data-pressed="true"]);
@@ -20,7 +20,6 @@
 
   .font-serif {
     font-optical-sizing: auto;
-    font-variation-settings: "SOFT" 50, "WONK" 0;
   }
 }
 
