@@ -6,18 +6,17 @@ type Props = {
   date: Date;
   title: string;
   description: string;
+  readTime?: number;
 };
 
 const baseClasses = [
   "relative",
-  "flex",
-  "items-baseline",
+  "block",
   "cursor-pointer",
-  "gap-16",
-  "p-4",
+  "px-4",
+  "py-6",
   "rounded-md",
 ].join(" ");
-
 
 const hoverInteractionClasses = [
   "before:content-['']",
@@ -41,27 +40,28 @@ const groupHoverClasses = [
   "transition-opacity",
   "duration-300",
   "ease-in-out",
-  "group-hover:opacity-20",
+  "group-hover:opacity-30",
   "group-hover:hover:opacity-100",
 ].join(" ");
 
+const formatDate = (date: Date) =>
+  new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
 export const Card = (props: Props) => {
-  const { id, date, title, description } = props;
+  const { id, date, title, description, readTime } = props;
   const [isActive, setIsActive] = useState(false);
 
   const handleClick = () => {
     setIsActive(true);
-    setTimeout(() => {
-      setIsActive(false);
-    }, 50);
+    setTimeout(() => setIsActive(false), 50);
   };
 
-
   return (
-    <a
-      href={`/writing/${id}`}
-      className={clsx("block no-underline group/card")}
-    >
+    <a href={`/writing/${id}`} className="block no-underline group/card">
       <article
         onClick={handleClick}
         className={clsx(
@@ -69,41 +69,26 @@ export const Card = (props: Props) => {
           hoverInteractionClasses,
           groupHoverClasses,
           "transition-colors duration-50 ease-in-out",
-          isActive && "bg-sand-3 dark:bg-sand-5"
+          isActive && "bg-sand-3 dark:bg-sand-5",
         )}
       >
-        <time
-          className="hidden min-w-[120px] text-sm text-sand-11 md:block"
-          dateTime={new Date(date).toISOString()}
-        >
-          {
-            date.toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })
-          }
-        </time>
-        <div className="flex flex-col gap-4">
+        <div className="flex items-baseline justify-between gap-4 mb-3">
           <time
-            className="text-sand-11 text-sm md:hidden"
+            className="text-sand-11 text-xs uppercase tracking-wider tabular-nums"
             dateTime={new Date(date).toISOString()}
           >
-            {
-              date.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-            }
+            {formatDate(date)}
           </time>
-          <h3 className="text-sand-12 font-medium">
-            {title}
-          </h3>
-          <div>
-            <p className="text-sand-11">{description}</p>
-          </div>
+          {readTime ? (
+            <span className="text-sand-10 text-xs tabular-nums">
+              {readTime} min read
+            </span>
+          ) : null}
         </div>
+        <h3 className="font-serif text-sand-12 text-2xl md:text-3xl leading-tight mb-3 tracking-tight">
+          {title}
+        </h3>
+        <p className="text-sand-11 leading-relaxed">{description}</p>
       </article>
     </a>
   );

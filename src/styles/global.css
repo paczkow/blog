@@ -5,6 +5,7 @@
 
 @theme {
   --font-sans: "Inter Variable", system-ui, -apple-system, sans-serif;
+  --font-serif: "Crimson Pro Variable", "Iowan Old Style", "Apple Garamond", Georgia, serif;
 }
 
 @custom-variant pressed (&[data-pressed="true"]);

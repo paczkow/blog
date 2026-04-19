@@ -1,7 +1,10 @@
 ---
 import "@fontsource-variable/inter";
+import "@fontsource-variable/crimson-pro";
+import "@fontsource-variable/crimson-pro/wght-italic.css";
 
 import Head from "@/components/Head.astro";
+import { NeuralBackground } from "@/components/NeuralBackground.tsx";
 
 import "@/styles/global.css";
 
@@ -10,22 +13,31 @@ interface Props {
 }
 
 const { title } = Astro.props;
+const isHome = Astro.url.pathname === "/";
 ---
 
 <!doctype html>
-<html lang="en" class="m-0 w-full">
+<html lang="en" class="bg-sand-1 m-0 w-full">
   <Head title={title} />
-  <body class="bg-sand-1 dark:bg-dark-sand-1 m-0 w-full">
+  <body class="m-0 w-full">
+    {isHome && <NeuralBackground client:only="react" />}
     <nav
-      class="mx-auto max-w-3xl lg:max-w-6xl sticky top-0 left-0 right-0 pt-16 pb-8 z-50 backdrop-blur-md bg-sand-1/80 dark:bg-dark-sand-1/80"
+      class="mx-auto max-w-3xl lg:max-w-6xl sticky top-0 left-0 right-0 pt-16 pb-8 z-50 backdrop-blur-md bg-sand-1/70"
     >
       <div class="mx-auto max-w-6xl h-full px-4 flex items-center">
-        <a href="/" class="text-sand-12 px-4 font-medium hover:text-sand-11"
-          >Michał Paczków</a
-        >
+        {
+          !isHome && (
+            <a
+              href="/"
+              class="text-sand-12 px-4 font-medium hover:text-sand-11"
+            >
+              Michał Paczków
+            </a>
+          )
+        }
       </div>
     </nav>
-    <div class="mx-auto max-w-3xl lg:max-w-6xl pt-16 pb-32">
+    <div class="relative z-10 mx-auto max-w-3xl lg:max-w-6xl pt-16 pb-32">
       <slot />
     </div>
   </body>

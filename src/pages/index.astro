@@ -3,7 +3,6 @@ import { getCollection, render } from "astro:content";
 
 import { Card } from "@/components/Card.tsx";
 import IconLink from "@/components/IconLink.astro";
-import Link from "@/components/Navlink.astro";
 import { getSortedByDate } from "@/helpers/posts.ts";
 import Layout from "@/layouts/TwoColumn.astro";
 import { Icon } from "astro-icon/components";
@@ -29,19 +28,22 @@ const sortedEssays = getSortedByDate(essays);
 
 <Layout title={SITE.title}>
   <Fragment slot="sidebar">
-    <div class="flex flex-col gap-4 h-full">
-      <p class="text-sand-11 lg:px-0">
-        Learn in Public space created by <a
-          href="#about"
-          class="underline hover:text-sand-12">@paczkow</a
-        >.
-      </p>
-      <p></p>
-      <div class="mt-16 hidden flex-col gap-4 lg:flex">
-        <Link to="essays" label="Writing" className="active" />
-        <Link to="about" label="About" />
+    <div class="flex flex-col gap-10 h-full">
+      <div class="flex flex-col gap-6">
+        <h1
+          class="font-serif font-normal text-sand-12 text-5xl md:text-6xl leading-[0.95] tracking-tight"
+        >
+          Michał<br />Paczków<span class="text-sand-9 italic">.</span>
+        </h1>
+        <p class="text-sand-11 text-base leading-relaxed max-w-[28ch]">
+          A second brain in public — notes on
+          <span class="text-sand-12">software</span>,
+          <span class="text-sand-12">AI</span>, and
+          <span class="text-sand-12">how we think</span>.
+        </p>
       </div>
-      <div class="mt-auto hidden gap-4 lg:flex">
+
+      <div class="mt-auto flex items-center gap-5">
         <IconLink to={SITE.social.github} icon="github" />
         <IconLink to={SITE.social.linkedin} icon="linkedin" />
         <IconLink to={SITE.social.bluesky} icon="bluesky" />
@@ -49,124 +51,67 @@ const sortedEssays = getSortedByDate(essays);
     </div>
   </Fragment>
   <Fragment slot="content">
-    <div class="flex flex-col gap-20">
-      <section id="essays" class="mt-[-116px] flex flex-col gap-12 pt-[116px]">
+    <div class="flex flex-col gap-24">
+      <section id="essays" class="mt-[-116px] flex flex-col gap-8 pt-[116px]">
         <div class="flex items-baseline justify-between px-4">
-          <h2 class="text-sand-12 font-medium">Writing</h2>
+          <h2
+            class="text-sand-11 text-xs uppercase tracking-[0.2em] font-medium"
+          >
+            Writing
+          </h2>
           <a
             href="/writing"
-            class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1 mb-2 active:text-sand-12"
-            >All Writing <Icon name="arrow-up-right" class="h-4 w-4" /></a
+            class="text-sand-11 text-sm hover:text-sand-12 flex items-center gap-1 transition-colors"
           >
+            All Writing <Icon name="arrow-up-right" class="h-3.5 w-3.5" />
+          </a>
         </div>
-        <div class="group flex flex-col gap-8">
+        <div class="group flex flex-col divide-y divide-sand-3 dark:divide-sand-4">
           {
-            sortedEssays.slice(0, 4).map((post) => {
-              return (
-                <Card
-                  client:load
-                  id={post.id}
-                  date={post.date}
-                  title={post.title}
-                  description={post.description}
-                />
-              );
-            })
+            sortedEssays.slice(0, 4).map((post) => (
+              <Card
+                client:load
+                id={post.id}
+                date={post.date}
+                title={post.title}
+                description={post.description}
+                readTime={post.readTime}
+              />
+            ))
           }
         </div>
       </section>
 
-      <section id="about" class="flex flex-col gap-12 px-4">
-        <h2 class="text-sand-12 font-medium">About</h2>
-        <div class="flex flex-col gap-4">
-          <p class="text-sand-11">
-            With over 10 years of experience in product development. I have
-            worked on both front-end and back-end, starting in a small software
-            house and advancing to FAANG companies.
+      <section id="about" class="flex flex-col gap-6 px-4">
+        <h2 class="text-sand-11 text-xs uppercase tracking-[0.2em] font-medium">
+          About
+        </h2>
+        <div class="flex flex-col gap-5">
+          <p class="font-serif text-sand-12 text-2xl md:text-3xl leading-snug tracking-tight">
+            Ten years in product engineering — from a small software house to
+            FAANG.
           </p>
-          <p class="text-sand-11">
-            I am deeply engaged in tools and methods for cognitive
-            enhancement—such as Personal Knowledge Management (PKM),
-            Zettelkasten, Obsidian, Anki, and AI to improve learning, boost
-            productivity, and manage information overload in our rapidly
-            changing world.
+          <p class="text-sand-11 leading-relaxed">
+            I'm deeply engaged in tools and methods for cognitive
+            enhancement — Personal Knowledge Management, Zettelkasten,
+            Obsidian, Anki, and AI — to learn faster, stay focused, and make
+            sense of an increasingly noisy world.
           </p>
-          <p class="text-sand-11">
-            If you have any questions, feel free to reach out to me on social
-            media.
+          <p class="text-sand-11 leading-relaxed">
+            If something here resonates, find me on
+            <a
+              href={SITE.social.linkedin}
+              class="text-sand-12 underline underline-offset-2 decoration-sand-7 hover:decoration-sand-12 transition-colors"
+              >LinkedIn</a
+            > or
+            <a
+              href={SITE.social.bluesky}
+              class="text-sand-12 underline underline-offset-2 decoration-sand-7 hover:decoration-sand-12 transition-colors"
+              >Bluesky</a
+            >.
           </p>
         </div>
       </section>
     </div>
   </Fragment>
 </Layout>
-
-<script>
-  let observerEnabled = true;
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const links = Array.from(document.querySelectorAll("li.link"));
-    const sections = Array.from(document.querySelectorAll("section"));
-
-    registerScrollIntoSections(links);
-    registerObserver(links, sections);
-  });
-
-  function registerScrollIntoSections(links: Element[]) {
-    links.forEach((link) => {
-      link.addEventListener("click", () => {
-        links.forEach((l) => l.classList.remove("active"));
-        link.classList.add("active");
-
-        const sectionId = link.getAttribute("data-scroll-section");
-        const section = document.getElementById(sectionId ?? "");
-
-        if (section) {
-          observerEnabled = false;
-
-          const elementPosition = section.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - 48;
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: "smooth",
-          });
-
-          setTimeout(() => {
-            observerEnabled = true;
-          }, 500);
-        }
-      });
-    });
-  }
-
-  function registerObserver(links: Element[], sections: Element[]) {
-    if (!sections.length) return;
-
-    const observerOptions = {
-      root: null,
-      rootMargin: "0px 0px -128px 0px",
-      threshold: 0.5,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      if (!observerEnabled) return;
-
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const activeLink = links.find(
-            (link) =>
-              link.getAttribute("data-scroll-section") === entry.target.id,
-          );
-
-          links.forEach((link) => link.classList.remove("active"));
-          activeLink?.classList.add("active");
-        }
-      });
-    }, observerOptions);
-
-    sections.forEach((section) => {
-      observer.observe(section);
-    });
-  }
-</script>
