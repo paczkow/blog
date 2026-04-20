@@ -6,7 +6,7 @@
 @theme {
   --font-sans: "Inter Variable", system-ui, -apple-system, sans-serif;
   --font-serif: "Newsreader Variable", "Iowan Old Style", "Apple Garamond", Georgia, serif;
-  --font-display: "Literata Variable", "Iowan Old Style", "Apple Garamond", Georgia, serif;
+  --font-display: "Newsreader Variable", "Iowan Old Style", "Apple Garamond", Georgia, serif;
 }
 
 @custom-variant pressed (&[data-pressed="true"]);
