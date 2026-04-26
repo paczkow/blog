@@ -6,104 +6,52 @@ type Props = {
   date: Date;
   title: string;
   description: string;
+  readTime?: number;
 };
 
-const baseClasses = [
-  "relative",
-  "flex",
-  "items-baseline",
-  "cursor-pointer",
-  "gap-16",
-  "p-4",
-  "rounded-md",
-].join(" ");
-
-
-const hoverInteractionClasses = [
-  "before:content-['']",
-  "before:absolute",
-  "before:inset-[-2px]",
-  "before:rounded-md",
-  "before:-z-10",
-  "before:border",
-  "before:border-sand-3",
-  "before:bg-sand-2",
-  "dark:before:border-sand-5",
-  "dark:before:bg-sand-4",
-  "before:opacity-0",
-  "before:transition-opacity",
-  "before:duration-300",
-  "before:ease-in-out",
-  "hover:before:opacity-100",
-].join(" ");
-
-const groupHoverClasses = [
-  "transition-opacity",
-  "duration-300",
-  "ease-in-out",
-  "group-hover:opacity-20",
-  "group-hover:hover:opacity-100",
-].join(" ");
+const formatDate = (date: Date) =>
+  new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 
 export const Card = (props: Props) => {
-  const { id, date, title, description } = props;
+  const { id, date, title, description, readTime } = props;
   const [isActive, setIsActive] = useState(false);
 
   const handleClick = () => {
     setIsActive(true);
-    setTimeout(() => {
-      setIsActive(false);
-    }, 50);
+    setTimeout(() => setIsActive(false), 50);
   };
 
-
   return (
-    <a
-      href={`/writing/${id}`}
-      className={clsx("block no-underline group/card")}
-    >
+    <a href={`/writing/${id}`} className="block no-underline">
       <article
         onClick={handleClick}
         className={clsx(
-          baseClasses,
-          hoverInteractionClasses,
-          groupHoverClasses,
-          "transition-colors duration-50 ease-in-out",
-          isActive && "bg-sand-3 dark:bg-sand-5"
+          "relative block cursor-pointer px-4 py-6 rounded-md will-change-transform",
+          "transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "group-hover:opacity-60",
+          "hover:!opacity-100 hover:translate-x-1",
+          isActive && "bg-sand-3 dark:bg-sand-5",
         )}
       >
-        <time
-          className="hidden min-w-[120px] text-sm text-sand-11 md:block"
-          dateTime={new Date(date).toISOString()}
-        >
-          {
-            date.toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })
-          }
-        </time>
-        <div className="flex flex-col gap-4">
+        <div className="flex items-baseline justify-between gap-4 mb-3 text-sand-10 text-sm">
           <time
-            className="text-sand-11 text-sm md:hidden"
+            className="tabular-nums"
             dateTime={new Date(date).toISOString()}
           >
-            {
-              date.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-            }
+            {formatDate(date)}
           </time>
-          <h3 className="text-sand-12 font-medium">
-            {title}
-          </h3>
-          <div>
-            <p className="text-sand-11">{description}</p>
-          </div>
+          {readTime ? (
+            <span className="tabular-nums">{readTime} min read</span>
+          ) : null}
         </div>
+        <h3 className="font-display text-sand-12 text-xl leading-tight mb-2">
+          {title}
+        </h3>
+        <p className="text-sand-11 leading-relaxed">{description}</p>
       </article>
     </a>
   );

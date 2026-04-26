@@ -8,15 +8,24 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     env:
-      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/blog
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
 
     steps:
-      - name: Log in to Docker Hub
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -36,14 +45,14 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.FULL_TAG }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.FULL_TAG }}
 
       - name: Output deployment info
         run: |
           echo "✅ Deployment completed successfully!"
           echo "🐳 Pushed Docker images:"
-          echo "   - ${{ env.IMAGE_NAME }}:latest"
-          echo "   - ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.FULL_TAG }}"
+          echo "   - ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          echo "   - ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.FULL_TAG }}"
           echo "🚀 VPS deployment triggered"
           echo "⏰ Watchtower will automatically update the running container"

@@ -1,7 +1,6 @@
 ---
 import Prose from "@/components/Prose.astro";
 import Layout from "@/layouts/Base.astro";
-import { Icon } from "astro-icon/components";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -30,90 +29,108 @@ export async function getStaticPaths() {
 const props = Astro.props;
 const { post } = props;
 const { Content, headings } = await render(post);
+const tocHeadings = headings
+  .filter((h) => h.depth === 2)
+  .map((h) => ({ ...h, text: h.text.replace(/^#\s*/, "") }));
 ---
 
 <Layout title={post.data.title}>
-  <div
-    class="mx-auto grid grid-cols-1 lg:grid-cols-[192px_65ch_1fr] px-8 lg:px-8 gap-x-12 xl:gap-x-16"
-  >
-    <!-- Row 1: Back link and Title -->
-    <div class="hidden lg:block">
-      <a
-        href="/writing"
-        class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1"
-      >
-        <Icon name="arrow-up-left" class="w-4 h-4" />
-        All Writing
-      </a>
-    </div>
-    <div class="mb-16">
-      <h1 class="text-sand-12 font-medium md:text-lg">{post.data.title}</h1>
-      <time
-        class="text-sand-11 text-sm"
-        datetime={post.data.date.toISOString()}
-      >
-        {
-          post.data.date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })
-        }
-      </time>
-    </div>
-    <div class="hidden lg:block"></div>
-
-    <!-- Row 2: TOC and Content -->
-    <aside class="hidden lg:block">
-      {
-        post.data.toc && (
-          <nav id="toc" class="sticky top-36">
-            <ul class="list-none p-0 m-0">
-              {headings
-                .filter((h) => h.depth === 2)
-                .map((heading) => (
-                  <li
-                    data-scroll-section={heading.slug}
-                    class="cursor-pointer text-sand-8 my-2 hover:text-sand-12 text-xs"
-                  >
-                    {heading.text.replace("#", "")}
-                  </li>
-                ))}
+  <div class="relative">
+    {
+      post.data.toc && tocHeadings.length > 0 && (
+        <aside class="hidden lg:block absolute top-0 h-full left-[calc(50%+32.5ch+6rem)]">
+          <nav id="toc" class="sticky top-(--nav-height)">
+            <ul class="m-0 flex list-none flex-col gap-0 p-0">
+              <li
+                data-scroll-section="article-title"
+                class="toc-item toc-top relative mb-3"
+              >
+                <button type="button" class="toc-button group/toc relative flex w-full cursor-pointer items-center py-1.5 pr-4 text-left">
+                  <span class="toc-dot block h-1 w-1 bg-sand-7 transition-all duration-200 ease-out group-hover/toc:bg-sand-12 dark:bg-sand-8 dark:group-hover/toc:bg-sand-12" />
+                  <span class="toc-label pointer-events-none absolute left-5 whitespace-nowrap text-xs leading-snug text-sand-11 opacity-0 translate-x-1 transition-[opacity,transform] duration-200 ease-out group-hover/toc:translate-x-0 group-hover/toc:text-sand-12 group-hover/toc:opacity-100">
+                    Top
+                  </span>
+                </button>
+              </li>
+              {tocHeadings.map((heading) => (
+                <li
+                  data-scroll-section={heading.slug}
+                  class="toc-item relative"
+                >
+                  <button type="button" class="toc-button group/toc relative flex w-full cursor-pointer items-center py-1.5 pr-4 text-left">
+                    <span class="toc-line block h-px w-6 bg-sand-7 transition-all duration-200 ease-out group-hover/toc:w-9 group-hover/toc:bg-sand-12 dark:bg-sand-8 dark:group-hover/toc:bg-sand-12" />
+                    <span class="toc-label pointer-events-none absolute left-12 whitespace-nowrap text-xs leading-snug text-sand-11 opacity-0 translate-x-1 transition-[opacity,transform] duration-200 ease-out group-hover/toc:translate-x-0 group-hover/toc:text-sand-12 group-hover/toc:opacity-100">
+                      {heading.text}
+                    </span>
+                  </button>
+                </li>
+              ))}
             </ul>
           </nav>
-        )
-      }
-    </aside>
-    <article>
-      <Prose>
-        <Content />
-      </Prose>
-      <a
-        href="/writing"
-        class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1 mt-12 lg:hidden"
+        </aside>
+      )
+    }
+
+    <div class="mx-auto w-full max-w-prose px-4">
+      <nav
+        aria-label="Breadcrumb"
+        class="mb-12 flex items-center gap-2 text-sm text-sand-11"
       >
-        <Icon name="arrow-up-left" class="w-4 h-4" />
-        All Writing
-      </a>
-    </article>
-    <div class="hidden lg:block"></div>
+        <a href="/" class="transition-colors hover:text-sand-12">Home</a>
+        <span class="text-sand-9">/</span>
+        <a href="/writing" class="transition-colors hover:text-sand-12">
+          All Writing
+        </a>
+      </nav>
+
+      <header class="mb-8">
+        <h1
+          id="article-title"
+          class="font-display text-sand-12 text-4xl md:text-5xl font-normal leading-[1.05] tracking-tight"
+        >
+          {post.data.title}
+        </h1>
+        <div class="mt-5 flex items-center gap-3 text-sm text-sand-10">
+          <time datetime={post.data.date.toISOString()} class="tabular-nums">
+            {
+              post.data.date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+          </time>
+          {
+            post.readTime && (
+              <>
+                <span class="text-sand-8">·</span>
+                <span class="tabular-nums">{post.readTime} min read</span>
+              </>
+            )
+          }
+        </div>
+      </header>
+
+      <hr class="mb-12 border-0 border-t border-sand-4 dark:border-sand-6" />
+
+      <article>
+        <Prose>
+          <Content />
+        </Prose>
+      </article>
+    </div>
   </div>
 </Layout>
 
 <style>
-  #toc ul {
-    list-style: none;
-    padding-left: 0;
-    margin-left: 0;
-
-    & li {
-      padding-left: 0;
-      margin-left: 0;
-
-      &:hover {
-        color: var(--color-sand-12);
-      }
-    }
+  .toc-item.active .toc-line {
+    height: 2px;
+    background: var(--color-sand-12);
+  }
+  .toc-item.toc-top.active .toc-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-sand-12);
   }
 </style>
 
@@ -122,24 +139,27 @@ const { Content, headings } = await render(post);
   let observerEnabled = true;
 
   document.addEventListener("DOMContentLoaded", () => {
-    const links = Array.from(document.querySelectorAll("#toc li"));
-    if (links.length === 0) return;
+    const items = Array.from(
+      document.querySelectorAll<HTMLLIElement>("#toc .toc-item"),
+    );
+    if (items.length === 0) return;
 
-    const activeLink =
-      links.find(
-        (link) =>
-          link.getAttribute("data-scroll-section") === hash.replace("#", ""),
-      ) ?? links[0];
+    const activeItem =
+      items.find(
+        (item) =>
+          item.getAttribute("data-scroll-section") === hash.replace("#", ""),
+      ) ?? items[0];
 
-    activeLink?.classList.add("text-sand-12");
+    activeItem?.classList.add("active");
 
-    links.forEach((link) => {
-      link.addEventListener("click", () => {
-        const id = link.getAttribute("data-scroll-section");
+    items.forEach((item) => {
+      const button = item.querySelector("button");
+      button?.addEventListener("click", () => {
+        const id = item.getAttribute("data-scroll-section");
         const section = document.getElementById(id ?? "");
 
-        links.forEach((l) => l.classList.remove("text-sand-12"));
-        link.classList.add("text-sand-12");
+        items.forEach((l) => l.classList.remove("active"));
+        item.classList.add("active");
 
         if (section) {
           observerEnabled = false;
@@ -155,12 +175,13 @@ const { Content, headings } = await render(post);
     });
   });
 
-  const headers = document.querySelectorAll("h2");
-  const links = Array.from(document.querySelectorAll("#toc li"));
+  const headers = document.querySelectorAll("#article-title, h2");
+  const items = Array.from(
+    document.querySelectorAll<HTMLLIElement>("#toc .toc-item"),
+  );
 
   const seen = new WeakSet();
 
-  // Function to check if we're at the bottom of the page
   const isAtBottom = () => {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const windowHeight = window.innerHeight;
@@ -172,11 +193,10 @@ const { Content, headings } = await render(post);
     (entries) => {
       if (!observerEnabled) return;
 
-      // Check if we're at the bottom of the page first
       if (isAtBottom()) {
-        links.forEach((link) => link.classList.remove("text-sand-12"));
-        if (links.length > 0) {
-          links[links.length - 1].classList.add("text-sand-12");
+        items.forEach((item) => item.classList.remove("active"));
+        if (items.length > 0) {
+          items[items.length - 1].classList.add("active");
         }
         return;
       }
@@ -187,17 +207,17 @@ const { Content, headings } = await render(post);
           return;
         }
 
-        const current = links.findIndex((link) => {
-          const id = link.getAttribute("data-scroll-section");
+        const current = items.findIndex((item) => {
+          const id = item.getAttribute("data-scroll-section");
           return id === entry.target.id;
         });
 
         if (entry.isIntersecting) {
-          links.forEach((link, index) => {
+          items.forEach((item, index) => {
             if (index === current) {
-              link.classList.add("text-sand-12");
+              item.classList.add("active");
             } else {
-              link.classList.remove("text-sand-12");
+              item.classList.remove("active");
             }
           });
         } else if (
@@ -205,8 +225,8 @@ const { Content, headings } = await render(post);
           entry.boundingClientRect.bottom >= 0 &&
           current > 0
         ) {
-          links[current].classList.remove("text-sand-12");
-          links[current - 1].classList.add("text-sand-12");
+          items[current].classList.remove("active");
+          items[current - 1].classList.add("active");
         }
       });
     },

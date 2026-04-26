@@ -2,8 +2,7 @@
 import { getCollection, render } from "astro:content";
 
 import { Card } from "@/components/Card.tsx";
-import IconLink from "@/components/IconLink.astro";
-import Link from "@/components/Navlink.astro";
+import { WritingHeatmap } from "@/components/WritingHeatmap.tsx";
 import { getSortedByDate } from "@/helpers/posts.ts";
 import Layout from "@/layouts/TwoColumn.astro";
 import { Icon } from "astro-icon/components";
@@ -25,75 +24,136 @@ const essays = await Promise.all(
 );
 
 const sortedEssays = getSortedByDate(essays);
+
+const heatmapPosts = sortedEssays.map((essay) => ({
+  id: essay.id,
+  title: essay.title,
+  date: essay.date.toISOString(),
+}));
 ---
 
 <Layout title={SITE.title}>
   <Fragment slot="sidebar">
-    <div class="flex flex-col gap-4 h-full">
-      <p class="text-sand-11 lg:px-0">
-        Learn in Public space created by <a
-          href="#about"
-          class="underline hover:text-sand-12">@paczkow</a
-        >.
-      </p>
-      <p></p>
-      <div class="mt-16 hidden flex-col gap-4 lg:flex">
-        <Link to="essays" label="Writing" className="active" />
-        <Link to="about" label="About" />
+    <div class="flex flex-col gap-10 h-full">
+      <div class="flex flex-col gap-6">
+        <h1
+          class="font-display font-normal text-sand-12 text-5xl md:text-6xl leading-[0.95] tracking-tight -mt-3"
+        >
+          Michał<br />Paczków<span class="text-sand-9 italic">.</span>
+        </h1>
+        <p class="text-sand-11 text-base leading-relaxed max-w-[28ch]">
+          A second brain in public — notes on
+          <span class="text-sand-12">software</span>,
+          <span class="text-sand-12">AI</span>, and
+          <span class="text-sand-12">how we think</span>.
+        </p>
       </div>
-      <div class="mt-auto hidden gap-4 lg:flex">
-        <IconLink to={SITE.social.github} icon="github" />
-        <IconLink to={SITE.social.linkedin} icon="linkedin" />
-        <IconLink to={SITE.social.bluesky} icon="bluesky" />
+
+      <nav
+        id="section-nav"
+        aria-label="Sections"
+        class="hidden lg:flex flex-col gap-4"
+      >
+        <button
+          type="button"
+          data-target="essays"
+          class="nav-item group relative flex w-full cursor-pointer items-center py-1 text-left"
+        >
+          <span
+            class="nav-line block h-px w-6 bg-sand-7 transition-all duration-200 ease-out group-hover:w-9 group-hover:bg-sand-12 dark:bg-sand-8 dark:group-hover:bg-sand-12"
+          ></span>
+          <span
+            class="nav-label absolute left-12 text-sand-11 text-sm opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+          >
+            Writing
+          </span>
+        </button>
+        <button
+          type="button"
+          data-target="about"
+          class="nav-item group relative flex w-full cursor-pointer items-center py-1 text-left"
+        >
+          <span
+            class="nav-line block h-px w-6 bg-sand-7 transition-all duration-200 ease-out group-hover:w-9 group-hover:bg-sand-12 dark:bg-sand-8 dark:group-hover:bg-sand-12"
+          ></span>
+          <span
+            class="nav-label absolute left-12 text-sand-11 text-sm opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+          >
+            About
+          </span>
+        </button>
+      </nav>
+
+      <div class="mt-auto hidden lg:block">
+        <WritingHeatmap client:load posts={heatmapPosts} weeks={26} />
       </div>
     </div>
   </Fragment>
   <Fragment slot="content">
-    <div class="flex flex-col gap-20">
-      <section id="essays" class="mt-[-116px] flex flex-col gap-12 pt-[116px]">
+    <div class="flex flex-col gap-24">
+      <section id="essays" class="mt-[-116px] flex flex-col gap-8 pt-[116px]">
         <div class="flex items-baseline justify-between px-4">
-          <h2 class="text-sand-12 font-medium">Writing</h2>
+          <h2
+            class="text-sand-11 text-xs uppercase tracking-[0.2em] font-medium"
+          >
+            Writing
+          </h2>
           <a
             href="/writing"
-            class="text-sand-11 underline hover:text-sand-12 flex items-center gap-1 mb-2 active:text-sand-12"
-            >All Writing <Icon name="arrow-up-right" class="h-4 w-4" /></a
+            class="text-sand-11 text-sm hover:text-sand-12 flex items-center gap-1 transition-colors"
           >
+            All Writing <Icon name="arrow-up-right" class="h-3.5 w-3.5" />
+          </a>
         </div>
-        <div class="group flex flex-col gap-8">
+        <div
+          class="group flex flex-col divide-y divide-sand-3 dark:divide-sand-4"
+        >
           {
-            sortedEssays.slice(0, 4).map((post) => {
-              return (
+            sortedEssays
+              .slice(0, 4)
+              .map((post) => (
                 <Card
                   client:load
                   id={post.id}
                   date={post.date}
                   title={post.title}
                   description={post.description}
+                  readTime={post.readTime}
                 />
-              );
-            })
+              ))
           }
         </div>
       </section>
 
-      <section id="about" class="flex flex-col gap-12 px-4">
-        <h2 class="text-sand-12 font-medium">About</h2>
-        <div class="flex flex-col gap-4">
-          <p class="text-sand-11">
-            With over 10 years of experience in product development. I have
-            worked on both front-end and back-end, starting in a small software
-            house and advancing to FAANG companies.
+      <section id="about" class="flex flex-col gap-6 px-4">
+        <h2 class="text-sand-11 text-xs uppercase tracking-[0.2em] font-medium">
+          About
+        </h2>
+        <div class="flex flex-col gap-5">
+          <p
+            class="font-serif text-sand-12 text-2xl md:text-3xl leading-snug tracking-tight"
+          >
+            Ten years in product engineering — from a small software house to
+            FAANG.
           </p>
-          <p class="text-sand-11">
-            I am deeply engaged in tools and methods for cognitive
-            enhancement—such as Personal Knowledge Management (PKM),
-            Zettelkasten, Obsidian, Anki, and AI to improve learning, boost
-            productivity, and manage information overload in our rapidly
-            changing world.
+          <p class="text-sand-11 leading-relaxed">
+            I'm deeply engaged in tools and methods for cognitive enhancement —
+            Personal Knowledge Management, Zettelkasten, Obsidian, Anki, and AI
+            — to learn faster, stay focused, and make sense of an increasingly
+            noisy world.
           </p>
-          <p class="text-sand-11">
-            If you have any questions, feel free to reach out to me on social
-            media.
+          <p class="text-sand-11 leading-relaxed">
+            If something here resonates, find me on
+            <a
+              href={SITE.social.linkedin}
+              class="text-sand-12 underline underline-offset-2 decoration-sand-7 hover:decoration-sand-12 transition-colors"
+              >LinkedIn</a
+            > or
+            <a
+              href={SITE.social.bluesky}
+              class="text-sand-12 underline underline-offset-2 decoration-sand-7 hover:decoration-sand-12 transition-colors"
+              >Bluesky</a
+            >.
           </p>
         </div>
       </section>
@@ -101,72 +161,81 @@ const sortedEssays = getSortedByDate(essays);
   </Fragment>
 </Layout>
 
-<script>
-  let observerEnabled = true;
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const links = Array.from(document.querySelectorAll("li.link"));
-    const sections = Array.from(document.querySelectorAll("section"));
-
-    registerScrollIntoSections(links);
-    registerObserver(links, sections);
-  });
-
-  function registerScrollIntoSections(links: Element[]) {
-    links.forEach((link) => {
-      link.addEventListener("click", () => {
-        links.forEach((l) => l.classList.remove("active"));
-        link.classList.add("active");
-
-        const sectionId = link.getAttribute("data-scroll-section");
-        const section = document.getElementById(sectionId ?? "");
-
-        if (section) {
-          observerEnabled = false;
-
-          const elementPosition = section.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - 48;
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: "smooth",
-          });
-
-          setTimeout(() => {
-            observerEnabled = true;
-          }, 500);
-        }
-      });
-    });
+<style>
+  #section-nav .nav-item.active .nav-line {
+    width: 36px;
+    background: var(--color-sand-12);
   }
+  #section-nav .nav-item.active .nav-label {
+    opacity: 1;
+    color: var(--color-sand-12);
+  }
+</style>
 
-  function registerObserver(links: Element[], sections: Element[]) {
-    if (!sections.length) return;
+<script>
+  const items = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("#section-nav .nav-item"),
+  );
 
-    const observerOptions = {
-      root: null,
-      rootMargin: "0px 0px -128px 0px",
-      threshold: 0.5,
+  if (items.length > 0) {
+    let observerEnabled = true;
+
+    const setActive = (id: string) => {
+      items.forEach((item) =>
+        item.classList.toggle(
+          "active",
+          item.getAttribute("data-target") === id,
+        ),
+      );
     };
 
-    const observer = new IntersectionObserver((entries) => {
-      if (!observerEnabled) return;
-
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const activeLink = links.find(
-            (link) =>
-              link.getAttribute("data-scroll-section") === entry.target.id,
-          );
-
-          links.forEach((link) => link.classList.remove("active"));
-          activeLink?.classList.add("active");
+    items.forEach((item) => {
+      item.addEventListener("click", () => {
+        const id = item.getAttribute("data-target");
+        if (!id) return;
+        const section = document.getElementById(id);
+        setActive(id);
+        if (section) {
+          observerEnabled = false;
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.setTimeout(() => {
+            observerEnabled = true;
+          }, 1000);
         }
       });
-    }, observerOptions);
-
-    sections.forEach((section) => {
-      observer.observe(section);
     });
+
+    const sections = items
+      .map((item) =>
+        document.getElementById(item.getAttribute("data-target") ?? ""),
+      )
+      .filter((s): s is HTMLElement => !!s);
+
+    const onScroll = () => {
+      if (!observerEnabled) return;
+
+      const scrollBottom = window.scrollY + window.innerHeight;
+      const atBottom =
+        scrollBottom >= document.documentElement.scrollHeight - 4;
+
+      if (atBottom) {
+        setActive(sections[sections.length - 1]?.id ?? "");
+        return;
+      }
+
+      const triggerY = window.innerHeight * 0.35;
+      let activeId = sections[0]?.id ?? "";
+
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= triggerY) {
+          activeId = section.id;
+        }
+      }
+
+      setActive(activeId);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
   }
 </script>

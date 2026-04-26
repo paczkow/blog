@@ -5,6 +5,7 @@ import type { Post } from "@/models.ts";
 import { searchQuery } from "@/stores/searchQuery";
 import { useSearch } from "./useSearch";
 import { Card } from "../Card";
+import { EmptyResults } from "./EmptyResults";
 
 export const SearchResults = ({ posts }: { posts: Post[] }) => {
 	const query = useStore(searchQuery);
@@ -12,12 +13,17 @@ export const SearchResults = ({ posts }: { posts: Post[] }) => {
 
 	const filteredPosts = getSortedByDate(search(query));
 
+	if (!filteredPosts.length) {
+		return (
+			<section id="articles" className="flex flex-1 flex-col">
+				<EmptyResults query={query} />
+			</section>
+		);
+	}
+
 	return (
 		<section id="articles" className="flex flex-1 flex-col gap-12">
-			<div className="group flex flex-col gap-8">
-				{!filteredPosts.length && (
-					<h2 className="text-sand-12">No results found</h2>
-				)}
+			<div className="group flex flex-col divide-y divide-sand-3 dark:divide-sand-4">
 				{filteredPosts.map((post) => (
 					<Card
 						id={post.id}
