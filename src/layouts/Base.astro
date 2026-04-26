@@ -23,7 +23,7 @@ const isHome = Astro.url.pathname === "/";
     {isHome && <NeuralBackground client:only="react" />}
     <svg
       aria-hidden="true"
-      class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-[0.035] mix-blend-multiply dark:mix-blend-screen dark:opacity-[0.06]"
+      class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-[0.035] dark:opacity-[0.06]"
     >
       <filter id="grain">
         <feTurbulence
@@ -37,9 +37,12 @@ const isHome = Astro.url.pathname === "/";
     </svg>
     <nav
       aria-hidden="true"
-      class="fixed top-0 left-0 right-0 h-14 z-50 backdrop-blur-md bg-sand-1/70"
-    ></nav>
-    <div class="relative z-10 mx-auto max-w-3xl lg:max-w-6xl pt-(--nav-height) pb-(--page-bottom)">
+      class="fixed top-0 left-0 right-0 h-14 z-50 backdrop-blur-sm bg-sand-1/1"
+    >
+    </nav>
+    <div
+      class="relative z-10 mx-auto max-w-3xl lg:max-w-6xl pt-(--nav-height) pb-(--page-bottom)"
+    >
       <slot />
     </div>
   </body>

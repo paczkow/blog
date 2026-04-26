@@ -52,7 +52,7 @@ const heatmapPosts = sortedEssays.map((essay) => ({
       <nav
         id="section-nav"
         aria-label="Sections"
-        class="hidden lg:flex flex-col gap-3"
+        class="hidden lg:flex flex-col gap-4"
       >
         <button
           type="button"
@@ -105,18 +105,22 @@ const heatmapPosts = sortedEssays.map((essay) => ({
             All Writing <Icon name="arrow-up-right" class="h-3.5 w-3.5" />
           </a>
         </div>
-        <div class="group flex flex-col divide-y divide-sand-3 dark:divide-sand-4">
+        <div
+          class="group flex flex-col divide-y divide-sand-3 dark:divide-sand-4"
+        >
           {
-            sortedEssays.slice(0, 4).map((post) => (
-              <Card
-                client:load
-                id={post.id}
-                date={post.date}
-                title={post.title}
-                description={post.description}
-                readTime={post.readTime}
-              />
-            ))
+            sortedEssays
+              .slice(0, 4)
+              .map((post) => (
+                <Card
+                  client:load
+                  id={post.id}
+                  date={post.date}
+                  title={post.title}
+                  description={post.description}
+                  readTime={post.readTime}
+                />
+              ))
           }
         </div>
       </section>
@@ -126,15 +130,17 @@ const heatmapPosts = sortedEssays.map((essay) => ({
           About
         </h2>
         <div class="flex flex-col gap-5">
-          <p class="font-serif text-sand-12 text-2xl md:text-3xl leading-snug tracking-tight">
+          <p
+            class="font-serif text-sand-12 text-2xl md:text-3xl leading-snug tracking-tight"
+          >
             Ten years in product engineering — from a small software house to
             FAANG.
           </p>
           <p class="text-sand-11 leading-relaxed">
-            I'm deeply engaged in tools and methods for cognitive
-            enhancement — Personal Knowledge Management, Zettelkasten,
-            Obsidian, Anki, and AI — to learn faster, stay focused, and make
-            sense of an increasingly noisy world.
+            I'm deeply engaged in tools and methods for cognitive enhancement —
+            Personal Knowledge Management, Zettelkasten, Obsidian, Anki, and AI
+            — to learn faster, stay focused, and make sense of an increasingly
+            noisy world.
           </p>
           <p class="text-sand-11 leading-relaxed">
             If something here resonates, find me on
@@ -200,14 +206,17 @@ const heatmapPosts = sortedEssays.map((essay) => ({
     });
 
     const sections = items
-      .map((item) => document.getElementById(item.getAttribute("data-target") ?? ""))
+      .map((item) =>
+        document.getElementById(item.getAttribute("data-target") ?? ""),
+      )
       .filter((s): s is HTMLElement => !!s);
 
     const onScroll = () => {
       if (!observerEnabled) return;
 
       const scrollBottom = window.scrollY + window.innerHeight;
-      const atBottom = scrollBottom >= document.documentElement.scrollHeight - 4;
+      const atBottom =
+        scrollBottom >= document.documentElement.scrollHeight - 4;
 
       if (atBottom) {
         setActive(sections[sections.length - 1]?.id ?? "");

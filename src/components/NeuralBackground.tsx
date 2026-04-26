@@ -8,7 +8,7 @@ type Particle = {
   r: number;
 };
 
-const LINK_DIST = 150;
+const LINK_DIST = 200;
 const MOUSE_RADIUS = 120;
 
 export const NeuralBackground = () => {
@@ -41,10 +41,19 @@ export const NeuralBackground = () => {
     resize();
     window.addEventListener("resize", resize);
 
-    const count = width < 768 ? 32 : 64;
+    let isDark = document.documentElement.classList.contains("dark");
+
+    const count = width < 768 ? (isDark ? 30 : 60) : (isDark ? 70 : 140);
+
+    const gaussian = (mean: number, std: number) => {
+      const u = Math.random() || 1e-10;
+      const v = Math.random();
+      return mean + std * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    };
+
     const particles: Particle[] = Array.from({ length: count }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
+      x: gaussian(width / 2, width * 0.32),
+      y: gaussian(height / 2, height * 0.32),
       vx: (Math.random() - 0.5) * 0.22,
       vy: (Math.random() - 0.5) * 0.22,
       r: Math.random() * 1.2 + 0.6,
@@ -61,8 +70,6 @@ export const NeuralBackground = () => {
     };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseleave", onLeave);
-
-    let isDark = document.documentElement.classList.contains("dark");
     const themeObserver = new MutationObserver(() => {
       isDark = document.documentElement.classList.contains("dark");
     });
@@ -72,11 +79,13 @@ export const NeuralBackground = () => {
     });
 
     const draw = () => {
-      ctx.clearRect(0, 0, width, height);
+      const bgColor = getComputedStyle(document.documentElement).getPropertyValue("--color-sand-1").trim();
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, width, height);
       const base = isDark ? "238, 238, 236" : "33, 32, 28";
-      const dotAlpha = isDark ? 0.42 : 0.32;
-      const linkAlphaMax = isDark ? 0.18 : 0.12;
-      const mouseLinkAlphaMax = isDark ? 0.55 : 0.45;
+      const dotAlpha = isDark ? 0.18 : 0.12;
+      const linkAlphaMax = isDark ? 0.07 : 0.05;
+      const mouseLinkAlphaMax = isDark ? 0.35 : 0.28;
 
       for (const p of particles) {
         if (!prefersReducedMotion) {
