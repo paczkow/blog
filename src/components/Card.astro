@@ -1,0 +1,59 @@
+---
+interface Props {
+  id: string;
+  url?: string;
+  date: Date;
+  title: string;
+  description: string;
+  readTime?: number;
+  lang?: string;
+  showLang?: boolean;
+  locale: string;
+  readTimeLabel: string;
+}
+
+const {
+  id,
+  url = `/writing/${id}`,
+  date,
+  title,
+  description,
+  readTime,
+  lang,
+  showLang = false,
+  locale,
+  readTimeLabel,
+} = Astro.props;
+
+const formattedDate = new Date(date).toLocaleDateString(locale, {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+---
+
+<a href={url} class="block no-underline">
+  <article
+    class="relative block cursor-pointer px-4 py-6 rounded-md will-change-transform transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-60 hover:!opacity-100 hover:translate-x-1 active:bg-sand-3 dark:active:bg-sand-5"
+  >
+    <div class="flex items-baseline justify-between gap-4 mb-3 text-sand-10 text-sm">
+      <time class="tabular-nums" datetime={new Date(date).toISOString()}>
+        {formattedDate}
+      </time>
+      {
+        readTime ? (
+          <span class="flex items-center gap-2 tabular-nums">
+            {showLang && lang ? (
+              <span class="text-sand-9 uppercase">{lang}</span>
+            ) : null}
+            {readTime} {readTimeLabel}
+          </span>
+        ) : null
+      }
+    </div>
+    <h3 class="font-display text-sand-12 text-xl leading-tight mb-2">
+      {title}
+    </h3>
+    <p class="text-sand-11 leading-relaxed">{description}</p>
+  </article>
+</a>
