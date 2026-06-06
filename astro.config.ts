@@ -1,5 +1,4 @@
 import mdx from "@astrojs/mdx";
-import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
@@ -11,13 +10,23 @@ import { remarkReadingTime } from "./plugins/minutes-read.mjs";
 import type { Element } from "node_modules/rehype-autolink-headings/lib";
 import { SITE } from "./config";
 
+import svelte from "@astrojs/svelte";
+
 export default defineConfig({
   site: SITE.website,
+  i18n: {
+    locales: ["en", "pl"],
+    defaultLocale: "en",
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
   markdown: {
     syntaxHighlight: "shiki",
     shikiConfig: {
       theme: "catppuccin-latte",
     },
+    remarkPlugins: [remarkReadingTime],
     rehypePlugins: [
       rehypeSlug,
       [
@@ -49,10 +58,9 @@ export default defineConfig({
           ],
         },
       ],
-      remarkReadingTime,
     ],
   },
-  integrations: [icon(), mdx(), react()],
+  integrations: [icon(), mdx(), svelte()],
   vite: {
     plugins: [tailwindcss()],
   },

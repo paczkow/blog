@@ -3,7 +3,6 @@ import path from "node:path";
 import satori, { type SatoriOptions } from "satori";
 import sharp from "sharp";
 
-import type React from "react";
 import { writing } from "./templates";
 
 const options: SatoriOptions = {
@@ -36,7 +35,7 @@ export async function createWritingOgImage({
   const base64 = `data:image/png;base64,${file.toString("base64")}`;
 
   const svg = await satori(
-    writing({ text, image: base64 }) as React.ReactNode,
+    writing({ text, image: base64 }) as Parameters<typeof satori>[0],
     options,
   );
 

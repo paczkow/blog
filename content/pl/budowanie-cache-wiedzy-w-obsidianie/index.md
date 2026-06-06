@@ -1,9 +1,10 @@
 ---
-title: Building a knowledge "cache" in Obsidian.
+title: Budowanie "cache" wiedzy w Obsidianie.
 date: 2025-06-22
-description: By prioritizing connections over a rigid hierarchy, I transformed Obsidian into a flexible, scalable system that keeps information easily accessible whenever need it.
+description: Stawiając połączenia ponad sztywną hierarchię, przekształciłem Obsidian w elastyczny system, który pomaga szybko wracać do potrzebnych informacji.
 image: social-media.png
 toc: true
+translationKey: building-a-knowledge-cache-in-obsidian
 ---
 
 In the [previous article](/writing/how-i-use-obsidian-to-manage-mental-overload-in-fast-paced-tech-world), I described how using Obsidian helps me manage information overload and work more effectively.

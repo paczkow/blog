@@ -1,11 +1,25 @@
 import { z } from "astro/zod";
 
-export const Essay = z.object({
+import type { Lang } from "@/i18n/config.ts";
+
+export { defaultLang, languages } from "@/i18n/config.ts";
+export type { Lang } from "@/i18n/config.ts";
+
+export const Article = z.object({
   title: z.string(),
   date: z.coerce.date(),
   description: z.string(),
   toc: z.boolean().default(true),
+  translationKey: z.string().optional(),
 });
-export type Essay = z.infer<typeof Essay> & { id: string; type: "essay"; readTime: number };
 
-export type Post = Essay;
+export type Article = z.infer<typeof Article> & {
+  id: string;
+  lang: Lang;
+  slug: string;
+  url: string;
+  type: "article";
+  readTime: number;
+};
+
+export type Post = Article;

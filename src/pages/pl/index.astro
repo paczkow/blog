@@ -1,15 +1,15 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n";
 import Card from "@/components/Card.astro";
 import SidebarLinks from "@/components/SidebarLinks.astro";
 import WritingHeatmap from "@/components/WritingHeatmap.svelte";
 import { getHomePosts, loadWritingPosts } from "@/helpers/page-data.ts";
 import { interpolate, useTranslations } from "@/i18n/utils.ts";
+import { getRelativeLocaleUrl } from "astro:i18n";
 import Layout from "@/layouts/TwoColumn.astro";
 import { Icon } from "astro-icon/components";
 import { SITE } from "config";
 
-const lang = "en" as const;
+const lang = "pl" as const;
 const { posts: allPosts } = await loadWritingPosts();
 const posts = getHomePosts(allPosts, lang);
 const t = useTranslations(lang);
@@ -35,10 +35,7 @@ const heatmapPosts = posts.map((post) => ({
   title={SITE.title}
   lang={lang}
   isHome
-  languageLinks={{
-    en: getRelativeLocaleUrl("en"),
-    pl: getRelativeLocaleUrl("pl"),
-  }}
+  languageLinks={{ en: getRelativeLocaleUrl("en"), pl: getRelativeLocaleUrl("pl") }}
   alternates={[
     { lang: "en", href: getRelativeLocaleUrl("en") },
     { lang: "pl", href: getRelativeLocaleUrl("pl") },
@@ -120,11 +117,12 @@ const heatmapPosts = posts.map((post) => ({
             href={writingHref}
             class="text-sand-11 text-sm hover:text-sand-12 flex items-center gap-1 transition-colors"
           >
-            {t("common.allWriting")}
-            <Icon name="arrow-up-right" class="h-3.5 w-3.5" />
+            {t("common.allWriting")} <Icon name="arrow-up-right" class="h-3.5 w-3.5" />
           </a>
         </div>
-        <div class="group flex flex-col">
+        <div
+          class="group flex flex-col"
+        >
           {
             posts
               .slice(0, 4)
