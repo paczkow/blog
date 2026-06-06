@@ -3,7 +3,7 @@ import Card from "@/components/Card.astro";
 import SidebarLinks from "@/components/SidebarLinks.astro";
 import WritingHeatmap from "@/components/WritingHeatmap.svelte";
 import { getHomePosts, loadWritingPosts } from "@/helpers/page-data.ts";
-import { interpolate, useTranslations } from "@/i18n/utils.ts";
+import { useTranslations } from "@/i18n/utils.ts";
 import { getRelativeLocaleUrl } from "astro:i18n";
 import Layout from "@/layouts/TwoColumn.astro";
 import { Icon } from "astro-icon/components";
@@ -17,12 +17,13 @@ const locale = t("common.locale");
 const readTimeLabel = t("common.readTime");
 const writingHref = getRelativeLocaleUrl(lang, "writing");
 
-const linkClass =
-  "text-sand-12 underline underline-offset-2 decoration-sand-7 hover:decoration-sand-12 transition-colors";
-const contactHtml = interpolate(t("home.about.contact"), {
-  linkedin: `<a href="${SITE.social.linkedin}" class="${linkClass}">LinkedIn</a>`,
-  bluesky: `<a href="${SITE.social.bluesky}" class="${linkClass}">Bluesky</a>`,
-});
+const aboutParagraphs = [
+  "Hej, jestem Michał, Software Engineer z nieodłączną potrzebą nauki i ciekawością do odkrywania i łączenia \"kropek\".",
+  "Jako dziecko byłem przekonany, że będę sportowcem. Zamiast tego zacząłem budować produkty. Nie byłem tym obiecującym studentem informatyki; bardziej niż kod interesował mnie sekcja futsalu na uczelni. Jednak wspomniana ciekawość zaprowadziła mnie w różne miejsca takie jak Meta i Amazon.",
+  "Przez te dziesięć lat — od małych startupów po big tech — dużo nauczyłem się o produktywności, budowaniu produktów i szybkim uczeniu się.",
+  "Im więcej się uczyłem, tym częściej wpadałem na dobry problem: wartościowych rzeczy jest znacznie więcej, niż jesteśmy w stanie utrzymać w głowie. Dlatego wciągnęło mnie mądre ogarnianie informacji — zamienianie tego, co czytam, w coś, z czym naprawdę mogę myśleć i działać. Tak trafiłem na Zettelkasten i zacząłem budować własny system wiedzy: nie kolekcję notatek, tylko sposób pracy z pomysłami.",
+  "I o tym jest ten blog: jak się uczyć, ogarniać odpowiedzialności i używać AI tak, żeby być na bieżąco bez ciągłego poczucia przytłoczenia.",
+];
 
 const heatmapPosts = posts.map((post) => ({
   id: post.id,
@@ -50,7 +51,7 @@ const heatmapPosts = posts.map((post) => ({
           Michał<br />Paczków<span class="text-sand-9 italic">.</span>
         </h1>
         <p
-          class="text-sand-11 text-base leading-relaxed max-w-[28ch]"
+          class="text-sand-11 text-base leading-relaxed lg:max-w-[28ch]"
           set:html={t("home.hero")}
         />
       </div>
@@ -147,15 +148,20 @@ const heatmapPosts = posts.map((post) => ({
           {t("home.about.heading")}
         </h2>
         <div class="flex flex-col gap-5">
-          <p
-            class="font-serif text-sand-12 text-2xl md:text-3xl leading-snug tracking-tight"
-          >
-            {t("home.about.lede")}
-          </p>
+          {
+            aboutParagraphs.map((paragraph) => (
+              <p class="text-sand-11 leading-relaxed">{paragraph}</p>
+            ))
+          }
           <p class="text-sand-11 leading-relaxed">
-            {t("home.about.body")}
+            Chcesz pogadać? Odezwij się do mnie na{" "}
+            <a
+              href={SITE.social.linkedin}
+              class="text-sand-12 underline underline-offset-2 decoration-sand-7 transition-colors hover:decoration-sand-12"
+            >
+              LinkedIn
+            </a>.
           </p>
-          <p class="text-sand-11 leading-relaxed" set:html={contactHtml} />
         </div>
       </section>
     </div>

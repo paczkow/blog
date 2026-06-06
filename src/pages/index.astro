@@ -1,12 +1,12 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n";
 import Card from "@/components/Card.astro";
 import SidebarLinks from "@/components/SidebarLinks.astro";
 import WritingHeatmap from "@/components/WritingHeatmap.svelte";
 import { getHomePosts, loadWritingPosts } from "@/helpers/page-data.ts";
-import { interpolate, useTranslations } from "@/i18n/utils.ts";
+import { useTranslations } from "@/i18n/utils.ts";
 import Layout from "@/layouts/TwoColumn.astro";
 import { Icon } from "astro-icon/components";
+import { getRelativeLocaleUrl } from "astro:i18n";
 import { SITE } from "config";
 
 const lang = "en" as const;
@@ -17,12 +17,13 @@ const locale = t("common.locale");
 const readTimeLabel = t("common.readTime");
 const writingHref = getRelativeLocaleUrl(lang, "writing");
 
-const linkClass =
-  "text-sand-12 underline underline-offset-2 decoration-sand-7 hover:decoration-sand-12 transition-colors";
-const contactHtml = interpolate(t("home.about.contact"), {
-  linkedin: `<a href="${SITE.social.linkedin}" class="${linkClass}">LinkedIn</a>`,
-  bluesky: `<a href="${SITE.social.bluesky}" class="${linkClass}">Bluesky</a>`,
-});
+const aboutParagraphs = [
+  "Hey, I'm Michał, a software engineer with a constant need to learn and a curiosity for discovering and connecting the dots.",
+  "As a kid, I was sure I'd become an athlete. Instead, I started building products. I wasn't exactly the promising computer science student; I was far more interested in the university futsal club than in code. But that same curiosity eventually took me to different places, including Meta and Amazon.",
+  "Across those ten years — from small startups to big tech — I learned a lot about productivity, building products, and learning fast.",
+  "The more I learned, the more often I ran into a good problem: there are far more valuable things to know than we can hold in our heads. So I got drawn into managing information well — turning what I read into something I can actually think with and act on. That's how I found Zettelkasten and started building my own knowledge system: not a collection of notes, but a way of working with ideas.",
+  "And that's what this blog is about: how to learn, handle responsibilities, and use AI to stay on top of things without the constant feeling of being overwhelmed.",
+];
 
 const heatmapPosts = posts.map((post) => ({
   id: post.id,
@@ -53,7 +54,7 @@ const heatmapPosts = posts.map((post) => ({
           Michał<br />Paczków<span class="text-sand-9 italic">.</span>
         </h1>
         <p
-          class="text-sand-11 text-base leading-relaxed max-w-[28ch]"
+          class="text-sand-11 text-base leading-relaxed lg:max-w-[28ch]"
           set:html={t("home.hero")}
         />
       </div>
@@ -146,18 +147,23 @@ const heatmapPosts = posts.map((post) => ({
 
       <section id="about" class="flex flex-col gap-6 px-4">
         <h2 class="text-sand-11 text-xs uppercase tracking-[0.2em] font-medium">
-          {t("home.about.heading")}
+          About
         </h2>
         <div class="flex flex-col gap-5">
-          <p
-            class="font-serif text-sand-12 text-2xl md:text-3xl leading-snug tracking-tight"
-          >
-            {t("home.about.lede")}
-          </p>
+          {
+            aboutParagraphs.map((paragraph) => (
+              <p class="text-sand-11 leading-relaxed">{paragraph}</p>
+            ))
+          }
           <p class="text-sand-11 leading-relaxed">
-            {t("home.about.body")}
+            Want to chat? Feel free to reach out on{" "}
+            <a
+              href={SITE.social.linkedin}
+              class="text-sand-12 underline underline-offset-2 decoration-sand-7 transition-colors hover:decoration-sand-12"
+            >
+              LinkedIn
+            </a>.
           </p>
-          <p class="text-sand-11 leading-relaxed" set:html={contactHtml} />
         </div>
       </section>
     </div>

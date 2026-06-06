@@ -12,7 +12,7 @@ const en = {
   // Full sentence with inline markup; rendered via `set:html`. Each locale
   // controls its own punctuation and word order. The <span> emphasizes terms.
   "home.hero":
-    'A second brain in public — notes on <span class="text-sand-12">software</span>, <span class="text-sand-12">AI</span>, and <span class="text-sand-12">how we think</span>.',
+    'Connecting the dots across <span class="font-medium text-sand-12">creating</span>, <span class="font-medium text-sand-12">productivity</span>, and <span class="font-medium text-sand-12">learning</span> in the AI era.',
   "home.nav.sections": "Sections",
   "home.nav.writing": "Writing",
   "home.nav.about": "About",
@@ -31,8 +31,8 @@ const en = {
   "writingArchive.pageTitle": "Writing - paczkow.me",
   "writingArchive.current": "Writing",
   "writingArchive.section": "Writing",
-  "writingArchive.title": "An archive of articles",
-  "writingArchive.searchPlaceholder": "Search articles…",
+  "writingArchive.title": "Find my writing here",
+  "writingArchive.searchPlaceholder": "Search",
   "writingArchive.searchLanguage": "Search language",
   "writingArchive.empty.broken": "The thread is broken.",
   "writingArchive.empty.quiet": "The archive is quiet.",
@@ -59,16 +59,16 @@ type UiKey = keyof typeof en;
 const pl = {
   "common.locale": "pl-PL",
   "common.home": "Strona główna",
-  "common.writing": "Pisanie",
-  "common.allWriting": "Wszystkie teksty",
+  "common.writing": "Wpisy",
+  "common.allWriting": "Wszystkie wpisy",
   "common.readTime": "min czytania",
   "common.breadcrumb": "Ścieżka nawigacji",
   "common.links": "Linki",
 
   "home.hero":
-    'Drugi mózg publicznie — notatki o <span class="text-sand-12">software</span>, <span class="text-sand-12">AI</span> i <span class="text-sand-12">tym, jak myślimy</span>.',
+    'Łączę kropki między <span class="font-medium text-sand-12">tworzeniem</span>, <span class="font-medium text-sand-12">produktywnością</span> i <span class="font-medium text-sand-12">nauką</span> w erze AI.',
   "home.nav.sections": "Sekcje",
-  "home.nav.writing": "Pisanie",
+  "home.nav.writing": "Wpisy",
   "home.nav.about": "O mnie",
   "home.about.heading": "O mnie",
   "home.about.lede":
@@ -80,22 +80,22 @@ const pl = {
   "home.heatmap.title": "Ostatnie wpisy",
   "home.heatmap.noWriting": "Brak wpisów",
 
-  "writingArchive.pageTitle": "Pisanie - paczkow.me",
-  "writingArchive.current": "Pisanie",
-  "writingArchive.section": "Pisanie",
-  "writingArchive.title": "Archiwum artykułów",
-  "writingArchive.searchPlaceholder": "Szukaj artykułów…",
+  "writingArchive.pageTitle": "Wpisy - paczkow.me",
+  "writingArchive.current": "Wpisy",
+  "writingArchive.section": "Wpisy",
+  "writingArchive.title": "Tu znajdziesz moje wpisy",
+  "writingArchive.searchPlaceholder": "Wyszukaj",
   "writingArchive.searchLanguage": "Język wyszukiwania",
   "writingArchive.empty.broken": "Wątek się urwał.",
   "writingArchive.empty.quiet": "Archiwum jest ciche.",
-  "writingArchive.empty.noResults": "Żadne artykuły nie pasują do",
+  "writingArchive.empty.noResults": "Żadne wpisy nie pasują do",
   "writingArchive.empty.tryAnother": "Spróbuj innego słowa.",
   "writingArchive.empty.empty": "Na razie nic tu nie ma — zajrzyj później.",
   "writingArchive.empty.imageTitle":
     "Przerwane połączenie między dwoma klastrami",
 
-  "article.titleAria": "Tytuł artykułu",
-  "article.breadcrumbWriting": "Pisanie",
+  "article.titleAria": "Tytuł wpisu",
+  "article.breadcrumbWriting": "Wpisy",
 
   "preferences.site": "Preferencje strony",
   "preferences.language": "Język",
@@ -129,10 +129,10 @@ export type PluralKey = keyof typeof enPlurals;
 
 const plPlurals = {
   "writingArchive.articles": {
-    one: "artykuł",
-    few: "artykuły",
-    many: "artykułów",
-    other: "artykułów",
+    one: "wpis",
+    few: "wpisy",
+    many: "wpisów",
+    other: "wpisów",
   },
 } as const satisfies Record<PluralKey, PluralForms>;
 
