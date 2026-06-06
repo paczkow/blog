@@ -5,8 +5,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@lucide/astro": ["./node_modules/@lucide/astro/src/lucide-astro.ts"]
+      "@/*": ["./src/*"]
     }
   }
 }

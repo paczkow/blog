@@ -5,10 +5,6 @@ import type { Lang, Post } from "@/models.ts";
 import { defaultLang } from "@/models.ts";
 import { getLangAndSlug, getPostsByLang, getSortedByDate, LANGS, toPost } from "./posts.ts";
 
-export type LocaleRouteParams = {
-  lang?: Lang;
-};
-
 export const getLocaleRouteParam = (lang: Lang) =>
   lang === defaultLang ? undefined : lang;
 
