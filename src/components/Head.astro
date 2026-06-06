@@ -5,6 +5,7 @@ const {
   title = SITE.title,
   author = SITE.author,
   description = SITE.desc,
+  alternates = [],
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -20,6 +21,11 @@ const socialMediaImageURL = new URL(
   <meta name="generator" content={Astro.generator || "Astro"} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="canonical" href={canonicalURL} />
+  {
+    alternates.map(({ lang, href }: { lang: string; href: string }) => (
+      <link rel="alternate" hreflang={lang} href={new URL(href, Astro.site)} />
+    ))
+  }
 
   <title>{title}</title>
   <meta name="title" content={title} />
@@ -46,5 +52,16 @@ const socialMediaImageURL = new URL(
   <meta property="twitter:description" content={description} />
   <meta property="twitter:image" content={socialMediaImageURL} />
 
+  <script is:inline>
+    {
+      const theme = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
+      const isDark =
+        theme === "dark" || (theme !== "light" && prefersDark);
+      if (isDark) document.documentElement.classList.add("dark");
+    }
+  </script>
   <script src="/scripts/theme.js" is:inline></script>
 </head>
