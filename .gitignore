@@ -27,3 +27,6 @@ pnpm-debug.log*
 # prompts containing sensitive AI instructions
 prompts/
 .docs/
+
+# pnpm local store
+.pnpm-store/
