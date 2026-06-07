@@ -21,7 +21,7 @@ export async function GET() {
 
   return rss({
     title: SITE.title,
-    description: SITE.desc,
+    description: SITE.desc.en,
     site: SITE.website,
     items: sortedPosts.map(({ slug, title, description, date }) => ({
       link: getWritingUrl(DEFAULT_LANG, slug),

@@ -18,7 +18,7 @@ const readTimeLabel = t("common.readTime");
 const writingHref = getRelativeLocaleUrl(lang, "writing");
 
 const aboutParagraphs = [
-  "Hej, jestem Michał, Software Engineer z nieodłączną potrzebą nauki i ciekawością do odkrywania i łączenia \"kropek\".",
+  'Hej, jestem Michał, Software Engineer z nieodłączną potrzebą nauki i ciekawością do odkrywania i łączenia "kropek".',
   "Jako dziecko byłem przekonany, że będę sportowcem. Zamiast tego skończyłem budując oprogramowanie — choć droga do tego zajęła mi trochę czasu. Na uczelni znacznie bardziej interesowała mnie sekcja futsalu niż kod, i szczerze mówiąc, nic we mnie wtedy nie wyglądało obiecująco. Ale ta sama ciekawość, która napędzała mnie na boisku, powoli pociągnęła mnie w stronę rozwiązywania problemów za pomocą oprogramowania — i zaprowadziła mnie dalej, niż kiedykolwiek się spodziewałem, w tym do Mety i Amazona.",
   "Przez te dziesięć lat — od małych startupów po big tech — dużo nauczyłem się o produktywności, budowaniu produktów i szybkim uczeniu się.",
   "Im więcej się uczyłem, tym częściej wpadałem na dobry problem: wartościowych rzeczy jest znacznie więcej, niż jesteśmy w stanie utrzymać w głowie. Dlatego wciągnęło mnie mądre ogarnianie informacji — zamienianie tego, co czytam, w coś, z czym naprawdę mogę myśleć i działać. Tak trafiłem na Zettelkasten i zacząłem budować własny system wiedzy: nie kolekcję notatek, tylko sposób pracy z pomysłami.",
@@ -36,7 +36,10 @@ const heatmapPosts = posts.map((post) => ({
   title={SITE.title}
   lang={lang}
   isHome
-  languageLinks={{ en: getRelativeLocaleUrl("en"), pl: getRelativeLocaleUrl("pl") }}
+  languageLinks={{
+    en: getRelativeLocaleUrl("en"),
+    pl: getRelativeLocaleUrl("pl"),
+  }}
   alternates={[
     { lang: "en", href: getRelativeLocaleUrl("en") },
     { lang: "pl", href: getRelativeLocaleUrl("pl") },
@@ -46,7 +49,7 @@ const heatmapPosts = posts.map((post) => ({
     <div class="flex flex-col gap-10 h-full">
       <div class="flex flex-col gap-6">
         <h1
-          class="font-display font-normal text-sand-12 text-5xl md:text-6xl leading-[0.95] tracking-tight -mt-3"
+          class="font-display font-normal text-sand-12 text-5xl md:text-5xl leading-[0.95] tracking-tight -mt-3"
         >
           Michał<br />Paczków<span class="text-sand-9 italic">.</span>
         </h1>
@@ -118,12 +121,11 @@ const heatmapPosts = posts.map((post) => ({
             href={writingHref}
             class="text-sand-11 text-sm hover:text-sand-12 flex items-center gap-1 transition-colors"
           >
-            {t("common.allWriting")} <Icon name="arrow-up-right" class="h-3.5 w-3.5" />
+            {t("common.allWriting")}
+            <Icon name="arrow-up-right" class="h-3.5 w-3.5" />
           </a>
         </div>
-        <div
-          class="group flex flex-col"
-        >
+        <div class="group flex flex-col">
           {
             posts
               .slice(0, 4)

@@ -4,6 +4,7 @@ import "@fontsource-variable/newsreader";
 import "@fontsource-variable/newsreader/wght-italic.css";
 
 import Head from "@/components/Head.astro";
+import { SITE } from "config";
 import NeuralBackground from "@/components/NeuralBackground.svelte";
 import Preferences from "@/components/Preferences.svelte";
 import { useTranslations } from "@/i18n/utils.ts";
@@ -32,7 +33,7 @@ const t = useTranslations(lang);
 
 <!doctype html>
 <html lang={lang} class="bg-sand-1 m-0 w-full">
-  <Head title={title} alternates={alternates} />
+  <Head title={title} alternates={alternates} description={SITE.desc[lang]} />
   <body class="m-0 w-full">
     {isHome && <NeuralBackground client:media="(min-width: 1024px)" />}
     <svg

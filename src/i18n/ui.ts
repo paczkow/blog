@@ -12,7 +12,7 @@ const en = {
   // Full sentence with inline markup; rendered via `set:html`. Each locale
   // controls its own punctuation and word order. The <span> emphasizes terms.
   "home.hero":
-    'Connecting the dots across <span class="font-medium text-sand-12">creating</span>, <span class="font-medium text-sand-12">productivity</span>, and <span class="font-medium text-sand-12">learning</span> in the AI era.',
+    'Connecting the dots between <span class="font-medium text-sand-12">learning</span>, <span class="font-medium text-sand-12">creating</span>, and <span class="font-medium text-sand-12">productivity</span> in the AI era.',
   "home.nav.sections": "Sections",
   "home.nav.writing": "Writing",
   "home.nav.about": "About",
@@ -66,7 +66,7 @@ const pl = {
   "common.links": "Linki",
 
   "home.hero":
-    'Łączę kropki między <span class="font-medium text-sand-12">tworzeniem</span>, <span class="font-medium text-sand-12">produktywnością</span> i <span class="font-medium text-sand-12">nauką</span> w erze AI.',
+    'Łączę kropki między <span class="font-medium text-sand-12">nauką</span>, <span class="font-medium text-sand-12">tworzeniem</span> i <span class="font-medium text-sand-12">produktywnością</span> w erze AI.',
   "home.nav.sections": "Sekcje",
   "home.nav.writing": "Wpisy",
   "home.nav.about": "O mnie",
