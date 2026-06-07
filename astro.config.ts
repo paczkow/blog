@@ -1,4 +1,6 @@
 import mdx from "@astrojs/mdx";
+import { unified } from "@astrojs/markdown-remark";
+import svelte from "@astrojs/svelte";
 import tailwindcss from "@tailwindcss/vite";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
@@ -9,8 +11,6 @@ import { remarkReadingTime } from "./plugins/minutes-read.mjs";
 
 import type { Element } from "node_modules/rehype-autolink-headings/lib";
 import { SITE } from "./config";
-
-import svelte from "@astrojs/svelte";
 
 export default defineConfig({
   site: SITE.website,
@@ -26,39 +26,41 @@ export default defineConfig({
     shikiConfig: {
       theme: "catppuccin-latte",
     },
-    remarkPlugins: [remarkReadingTime],
-    rehypePlugins: [
-      rehypeSlug,
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: "wrap",
-          test: (node: { tagName: string }) => node.tagName === "h2",
-          headingProperties: () => ({
-            class: "scroll-mt-[132px]",
-          }),
-          content: (heading: Element) => [
-            h(
-              "div",
-              {
-                className: "group flex gap-2 -ml-5",
-              },
-              [
-                h(
-                  "span",
-                  {
-                    className:
-                      "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                  },
-                  "#",
-                ),
-                h("span", heading.children),
-              ],
-            ),
-          ],
-        },
+    processor: unified({
+      remarkPlugins: [remarkReadingTime],
+      rehypePlugins: [
+        rehypeSlug,
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: "wrap",
+            test: (node: { tagName: string }) => node.tagName === "h2",
+            headingProperties: () => ({
+              class: "scroll-mt-[132px]",
+            }),
+            content: (heading: Element) => [
+              h(
+                "div",
+                {
+                  className: "group flex gap-2 -ml-5",
+                },
+                [
+                  h(
+                    "span",
+                    {
+                      className:
+                        "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+                    },
+                    "#",
+                  ),
+                  h("span", heading.children),
+                ],
+              ),
+            ],
+          },
+        ],
       ],
-    ],
+    }),
   },
   integrations: [icon(), mdx(), svelte()],
   vite: {
