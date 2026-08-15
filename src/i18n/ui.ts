@@ -41,6 +41,15 @@ const en = {
   "writingArchive.empty.empty": "Nothing here yet — check back soon.",
   "writingArchive.empty.imageTitle": "A broken connection between two clusters",
 
+  "notFound.pageTitle": "404 - paczkow.me",
+  "notFound.eyebrow": "Error 404",
+  "notFound.title": "The thread breaks here",
+  "notFound.body":
+    "The page you followed doesn't exist, or it moved. The link points to a node that isn't in the graph — but nothing stays lost here for long.",
+  "notFound.home": "Back home",
+  "notFound.writing": "Browse writing",
+  "notFound.imageTitle": "A broken connection between two clusters",
+
   "article.titleAria": "Article title",
   "article.breadcrumbWriting": "All Writing",
 
@@ -93,6 +102,15 @@ const pl = {
   "writingArchive.empty.empty": "Na razie nic tu nie ma — zajrzyj później.",
   "writingArchive.empty.imageTitle":
     "Przerwane połączenie między dwoma klastrami",
+
+  "notFound.pageTitle": "404 - paczkow.me",
+  "notFound.eyebrow": "Błąd 404",
+  "notFound.title": "Tu urywa się wątek",
+  "notFound.body":
+    "Strona, którą otworzyłeś, nie istnieje albo została przeniesiona. Odnośnik prowadzi do węzła, którego nie ma w grafie — ale tutaj nic nie ginie na długo.",
+  "notFound.home": "Wróć na stronę główną",
+  "notFound.writing": "Przeglądaj wpisy",
+  "notFound.imageTitle": "Przerwane połączenie między dwoma klastrami",
 
   "article.titleAria": "Tytuł wpisu",
   "article.breadcrumbWriting": "Wpisy",
