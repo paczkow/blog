@@ -20,5 +20,13 @@
   // its DNS is empty (the old VPS A record was removed), so `wrangler deploy`
   // creates the proxied record itself and issues the certificate. No nameserver
   // work and no manual DNS entry needed.
-  "routes": [{ "pattern": "paczkow.me", "custom_domain": true }]
+  // www is attached to the same Worker so the hostname resolves at all (it was
+  // NXDOMAIN). Both hostnames serve identical content, and every page's
+  // <link rel="canonical"> points at the apex, so search engines consolidate on
+  // paczkow.me. For a hard 301 instead, add a Single Redirect rule in the
+  // dashboard — that runs ahead of the Worker and cannot be expressed here.
+  "routes": [
+    { "pattern": "paczkow.me", "custom_domain": true },
+    { "pattern": "www.paczkow.me", "custom_domain": true }
+  ]
 }
