@@ -31,14 +31,14 @@ const getSortedByDate = <T extends { date: Date }>(items: T[]) => {
   return items.toSorted((a, b) => b.date.getTime() - a.date.getTime());
 };
 
-let selectedLanguages = $state<Lang[]>([]);
+// Seeded from the page's locale rather than set in an $effect: effects do not
+// run during SSR, so an empty initial value made the prerendered archive render
+// zero posts and flash the empty state until hydration. `lang` only changes on a
+// full navigation, so there is nothing to keep in sync.
+let selectedLanguages = $state<Lang[]>([lang]);
 let query = $state("");
 let localQuery = $state("");
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
-
-$effect(() => {
-  selectedLanguages = [lang];
-});
 
 function toggleLanguage(lang: Lang) {
   if (selectedLanguages.includes(lang)) {
