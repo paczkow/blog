@@ -52,16 +52,28 @@ const socialMediaImageURL = new URL(
   <meta property="twitter:description" content={description} />
   <meta property="twitter:image" content={socialMediaImageURL} />
 
+  {/*
+    Inlined rather than loaded from a file under public/: this has to run before
+    the first paint to avoid a flash of the wrong theme, so an external script
+    would be a blocking request on every page load — and an uncacheable one,
+    since a filename that is stable across builds cannot be marked immutable.
+    At this size the bytes cost far less than the round trip. This comment is an
+    expression, not markup, so it is stripped at build time.
+  */}
   <script is:inline>
     {
-      const theme = localStorage.getItem("theme");
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      const isDark =
-        theme === "dark" || (theme !== "light" && prefersDark);
-      if (isDark) document.documentElement.classList.add("dark");
+      const query = window.matchMedia("(prefers-color-scheme: dark)");
+      const stored = () => localStorage.getItem("theme");
+      const apply = (isDark) =>
+        document.documentElement.classList.toggle("dark", isDark);
+
+      const theme = stored();
+      apply(theme === "dark" || (theme !== "light" && query.matches));
+
+      // Follow the OS only while the visitor has not made an explicit choice.
+      query.addEventListener("change", (e) => {
+        if (!stored()) apply(e.matches);
+      });
     }
   </script>
-  <script src="/scripts/theme.js" is:inline></script>
 </head>

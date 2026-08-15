@@ -2,22 +2,57 @@
 # dist/, so this file ships as dist/_headers where Workers picks it up.
 # Docs: https://developers.cloudflare.com/workers/static-assets/headers/
 #
+# Cloudflare's default for every asset is `public, max-age=0, must-revalidate`,
+# which costs each visitor a conditional request per file on every page load.
+# Anything not listed below is deliberately left on that default.
+#
+# Patterns are kept non-overlapping: when several rules match one request their
+# headers are merged, and two rules setting Cache-Control would collide.
+
 # Astro fingerprints everything under /_astro/ with a content hash, so a given
 # URL's bytes never change — a new build produces a new filename. That makes it
-# safe to cache for a year and skip revalidation entirely. Without this rule
-# Cloudflare serves assets as `max-age=0, must-revalidate`, costing every
-# visitor a conditional request per asset on every page load.
+# safe to cache for a year and skip revalidation entirely. This covers the CSS,
+# the hydrated Svelte islands, the woff2 subsets and the processed post images.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Files copied verbatim from public/ keep their filenames across builds, so they
-# are cached for a day but NOT marked immutable — replacing one at the same path
-# has to be able to take effect without waiting out a year-long browser cache.
-/fonts/*
+# Referenced from every page's <head>. The filename is stable across builds, so
+# it cannot be immutable — a week is long enough that repeat visitors stop
+# re-requesting it, and short enough that a redesign lands without a long tail.
+/favicon.svg
+  Cache-Control: public, max-age=604800
+
+# Generated Open Graph images (/og.png, /pl/og.png, /writing/:slug/og.png, ...).
+# Fetched by social and chat link unfurlers rather than by browsers, and their
+# URLs are stable while their contents track the post title, so a day balances
+# "unfurls stay warm" against "a retitled post updates within a day".
+/*og.png
   Cache-Control: public, max-age=86400
 
-/images/*
+# Polled by feed readers and crawlers on their own schedules. An hour stops the
+# most eager pollers from revalidating on every check without meaningfully
+# delaying discovery of a new post.
+/rss.xml
+  Cache-Control: public, max-age=3600
+
+/sitemap-index.xml
+  Cache-Control: public, max-age=3600
+
+/sitemap-0.xml
+  Cache-Control: public, max-age=3600
+
+/robots.txt
   Cache-Control: public, max-age=86400
 
 # HTML is deliberately left on the default `max-age=0, must-revalidate` so
 # published edits appear immediately rather than being pinned in browser caches.
+# Cloudflare still serves it from the edge cache (cf-cache-status: HIT), so the
+# round trip is short.
+#
+# It is NOT currently answered with a 304: paczkow.me returns no ETag and no
+# Last-Modified on HTML responses, so browsers cannot send a conditional request
+# and every navigation re-downloads the page (~8 KB gzipped). The asset server
+# does emit an ETag — `wrangler dev` returns one for the same file — so the
+# header is being dropped at the zone, not at the origin. Restoring it (Cache
+# Rules / Speed Brain settings in the dashboard) turns each navigation into a
+# ~150-byte 304 without giving up instant publishing.

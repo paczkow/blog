@@ -83,5 +83,18 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          // Rollup splits Svelte's runtime into seven tiny chunks (if, snippet,
+          // this, attributes, render, ...), each of which is a separate request
+          // on every page that hydrates an island. Collapsing the runtime into
+          // one chunk keeps it shared across islands while costing one request.
+          manualChunks(id: string) {
+            if (id.includes("node_modules/svelte/")) return "svelte";
+          },
+        },
+      },
+    },
   },
 });

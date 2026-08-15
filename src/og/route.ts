@@ -1,14 +1,16 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+// Only Content-Type survives: in a static build Astro writes each endpoint's
+// body to a file and drops the response headers, so caching for the emitted
+// og.png files is set in public/_headers instead.
 export const pngHeaders = {
   "Content-Type": "image/png",
-  "Cache-Control": "public, max-age=31536000, immutable",
 };
 
 export const createStaticOgResponse = () => {
   try {
-    const imagePath = resolve("public", "images", "og.png");
+    const imagePath = resolve("src", "og", "assets", "og.png");
     const imageBuffer = readFileSync(imagePath);
 
     return new Response(imageBuffer, {

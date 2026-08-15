@@ -9,14 +9,17 @@ const options: SatoriOptions = {
   width: 1200,
   height: 630,
   embedFont: true,
+  // These TTFs and the fallback image live in src/, not public/: satori reads
+  // them here at build time and nothing requests them over HTTP, so keeping
+  // them in public/ only published ~750 KB of assets no visitor ever fetches.
   fonts: [
     {
       name: "Inter Bold",
-      data: await fs.readFile(path.resolve("./public/fonts/inter-bold.ttf")),
+      data: await fs.readFile(path.resolve("./src/og/assets/inter-bold.ttf")),
     },
     {
       name: "Inter Medium",
-      data: await fs.readFile(path.resolve("./public/fonts/inter-medium.ttf")),
+      data: await fs.readFile(path.resolve("./src/og/assets/inter-medium.ttf")),
     },
   ],
 };
@@ -30,7 +33,7 @@ export async function createWritingOgImage({
 }) {
   const filePath = src
     ? getFilePath(src)
-    : path.resolve("public", "images", "article.png");
+    : path.resolve("src", "og", "assets", "article.png");
   const file = await fs.readFile(filePath);
   const base64 = `data:image/png;base64,${file.toString("base64")}`;
 
