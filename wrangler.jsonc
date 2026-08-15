@@ -1,0 +1,32 @@
+{
+  // Cloudflare Workers configuration — static-assets deployment for paczkow.me.
+  // The site is a fully static Astro build (no adapter, no SSR), so there is no
+  // `main` Worker script: Cloudflare serves the files in ./dist directly, and
+  // static-asset requests are free (no Worker invocation).
+  // Docs: https://developers.cloudflare.com/workers/static-assets/
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "paczkow-me",
+  "compatibility_date": "2026-07-13",
+
+  // Directory produced by `astro build`. Everything here (HTML, hashed assets,
+  // prerendered OG images, rss.xml) is uploaded and served as static content.
+  "assets": {
+    "directory": "./dist",
+    // Serve /404.html on unmatched paths instead of a bare 404.
+    "not_found_handling": "404-page"
+  },
+
+  // Custom domain — paczkow.me is an active zone in this Cloudflare account and
+  // its DNS is empty (the old VPS A record was removed), so `wrangler deploy`
+  // creates the proxied record itself and issues the certificate. No nameserver
+  // work and no manual DNS entry needed.
+  // www is attached to the same Worker so the hostname resolves at all (it was
+  // NXDOMAIN). Both hostnames serve identical content, and every page's
+  // <link rel="canonical"> points at the apex, so search engines consolidate on
+  // paczkow.me. For a hard 301 instead, add a Single Redirect rule in the
+  // dashboard — that runs ahead of the Worker and cannot be expressed here.
+  "routes": [
+    { "pattern": "paczkow.me", "custom_domain": true },
+    { "pattern": "www.paczkow.me", "custom_domain": true }
+  ]
+}

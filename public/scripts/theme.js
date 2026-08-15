@@ -1,14 +1,24 @@
-// Apply theme based on system preference
-const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+const STORAGE_KEY = "theme";
 
 function applyTheme(isDark) {
   document.documentElement.classList.toggle("dark", isDark);
 }
 
-// Apply initial theme
-applyTheme(darkModeQuery.matches);
+function getStoredTheme() {
+  return localStorage.getItem(STORAGE_KEY);
+}
 
-// Listen for system preference changes
-darkModeQuery.addEventListener("change", (e) => {
-  applyTheme(e.matches);
-});
+function initTheme() {
+  const stored = getStoredTheme();
+  if (stored === "dark") applyTheme(true);
+  else if (stored === "light") applyTheme(false);
+  else applyTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
+}
+
+initTheme();
+
+window
+  .matchMedia("(prefers-color-scheme: dark)")
+  .addEventListener("change", (e) => {
+    if (!getStoredTheme()) applyTheme(e.matches);
+  });

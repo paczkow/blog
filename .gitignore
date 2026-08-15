@@ -4,6 +4,9 @@ dist/
 # generated types
 .astro/
 
+# wrangler local state
+.wrangler/
+
 # dependencies
 node_modules/
 
@@ -27,3 +30,11 @@ pnpm-debug.log*
 # prompts containing sensitive AI instructions
 prompts/
 .docs/
+
+# pnpm local store
+.pnpm-store/
+
+# agent skills materialized from skills-lock.json (the lockfile is committed,
+# these two directories are duplicate copies of what it pins)
+.agents/
+.claude/

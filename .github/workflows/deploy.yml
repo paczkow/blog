@@ -1,58 +1,45 @@
-name: Build and Deploy to VPS
+name: Deploy to Cloudflare Workers
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     permissions:
       contents: read
-      packages: write
-
-    env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          node-version: 22
+          cache: pnpm
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Build
+        run: pnpm build
 
-      - name: Compute tag
-        id: vars
-        run: |
-          DATE=$(date -u +'%Y%m%d')
-          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
-          echo "FULL_TAG=${DATE}-g${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-
-      - name: Build and push
-        uses: docker/build-push-action@v6
+      # Deploys ./dist as Workers static assets per wrangler.jsonc. wranglerVersion
+      # is pinned to the repo's devDependency so CI and local deploys behave the
+      # same. Requires two repo secrets: CLOUDFLARE_API_TOKEN (an "Edit Cloudflare
+      # Workers" token) and CLOUDFLARE_ACCOUNT_ID.
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
         with:
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.FULL_TAG }}
-
-      - name: Output deployment info
-        run: |
-          echo "✅ Deployment completed successfully!"
-          echo "🐳 Pushed Docker images:"
-          echo "   - ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
-          echo "   - ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.FULL_TAG }}"
-          echo "🚀 VPS deployment triggered"
-          echo "⏰ Watchtower will automatically update the running container"
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.110.0"
+          command: deploy

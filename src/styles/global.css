@@ -58,6 +58,18 @@
   --color-sand-12: #eeeeec;
 }
 
+.tooltip-popup {
+  background-color: var(--color-sand-12);
+  color: var(--color-sand-1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+}
+
+:root.dark .tooltip-popup {
+  background-color: var(--color-sand-4);
+  color: var(--color-sand-12);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.24);
+}
+
 @utility prose {
   blockquote {
     /* Disable adding quote marks to block-quotes: https://github.com/tailwindlabs/tailwindcss-typography/issues/66 */

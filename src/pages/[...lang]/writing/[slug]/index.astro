@@ -1,0 +1,278 @@
+---
+import { render } from "astro:content";
+
+import Prose from "@/components/Prose.astro";
+import {
+  getArticleStaticPaths,
+  type ArticleRouteProps,
+} from "@/helpers/page-data.ts";
+import { LANGS, findTranslation } from "@/helpers/posts.ts";
+import { useTranslations } from "@/i18n/utils.ts";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "@/layouts/Base.astro";
+import type { Lang } from "@/models.ts";
+
+export const getStaticPaths = getArticleStaticPaths;
+
+const { entry, currentPost, posts } = Astro.props as ArticleRouteProps;
+const lang = currentPost.lang;
+const t = useTranslations(lang);
+const { Content, headings } = await render(entry);
+const tocHeadings = headings
+  .filter((h) => h.depth === 2)
+  .map((h) => ({ ...h, text: h.text.replace(/^#\s*/, "") }));
+
+const getLocalizedPostUrl = (targetLang: Lang) => {
+  if (targetLang === lang) return currentPost.url;
+  return findTranslation(posts, currentPost, targetLang)?.url;
+};
+
+const languageLinks = Object.fromEntries(
+  LANGS.map((targetLang) => [targetLang, getLocalizedPostUrl(targetLang)]),
+) as Partial<Record<Lang, string>>;
+
+const alternates = LANGS.flatMap((targetLang) => {
+  const href = getLocalizedPostUrl(targetLang);
+  return href ? [{ lang: targetLang, href }] : [];
+});
+---
+
+<Layout
+  title={currentPost.title}
+  lang={lang}
+  languageLinks={languageLinks}
+  alternates={alternates}
+>
+  <div class="relative">
+    {
+      currentPost.toc && tocHeadings.length > 0 && (
+        <aside class="toc-rail hidden lg:block absolute top-0 h-full">
+          <nav id="toc" class="sticky top-(--nav-height)">
+            <ul class="m-0 flex list-none flex-col gap-0 p-0">
+              <li
+                data-scroll-section="article-title"
+                class="toc-item toc-top relative mb-3"
+              >
+                <button type="button" aria-label={t("article.titleAria")} class="toc-button group/toc relative flex w-full cursor-pointer items-center py-1.5 pr-4 text-left">
+                  <span class="toc-dot block h-1 w-1 bg-sand-7 transition-all duration-200 ease-out group-hover/toc:bg-sand-11 dark:bg-sand-8 dark:group-hover/toc:bg-sand-11" />
+                </button>
+              </li>
+              {tocHeadings.map((heading) => (
+                <li
+                  data-scroll-section={heading.slug}
+                  class="toc-item relative"
+                >
+                  <button type="button" class="toc-button group/toc relative flex w-full cursor-pointer items-center py-1.5 pr-4 text-left">
+                    <span class="toc-line block h-px w-6 bg-sand-7 transition-all duration-200 ease-out group-hover/toc:w-9 group-hover/toc:bg-sand-11 dark:bg-sand-8 dark:group-hover/toc:bg-sand-11" />
+                    <span class="toc-label pointer-events-none absolute left-12 whitespace-nowrap text-xs leading-snug text-sand-10 opacity-0 translate-x-1 transition-[opacity,transform] duration-200 ease-out group-hover/toc:translate-x-0 group-hover/toc:text-sand-11 group-hover/toc:opacity-100">
+                      {heading.text}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
+      )
+    }
+
+    <div class="mx-auto w-full max-w-prose px-4">
+      <nav
+        aria-label={t("common.breadcrumb")}
+        class="mb-12 flex items-center gap-2 text-sm text-sand-11"
+      >
+        <a
+          href={getRelativeLocaleUrl(lang)}
+          class="transition-colors hover:text-sand-12"
+        >
+          {t("common.home")}
+        </a>
+        <span class="text-sand-9">/</span>
+        <a
+          href={getRelativeLocaleUrl(lang, "writing")}
+          class="transition-colors hover:text-sand-12"
+        >
+          {t("article.breadcrumbWriting")}
+        </a>
+      </nav>
+
+      <header class="mb-8">
+        <h1
+          id="article-title"
+          class="font-display text-sand-12 text-4xl md:text-5xl font-normal leading-[1.05] tracking-tight"
+        >
+          {currentPost.title}
+        </h1>
+        <div class="mt-5 flex items-center gap-3 text-sm text-sand-10">
+          <time datetime={currentPost.date.toISOString()} class="tabular-nums">
+            {
+              currentPost.date.toLocaleDateString(t("common.locale"), {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+          </time>
+          {
+            currentPost.readTime && (
+              <>
+                <span class="text-sand-8">·</span>
+                <span class="tabular-nums">
+                  {currentPost.readTime} {t("common.readTime")}
+                </span>
+              </>
+            )
+          }
+        </div>
+      </header>
+
+      <hr class="mb-12 border-0 border-t border-sand-4 dark:border-sand-6" />
+
+      <article>
+        <Prose>
+          <Content />
+        </Prose>
+      </article>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  #toc {
+    opacity: 0.6;
+    transition: opacity 200ms ease-out;
+  }
+  #toc:has(.toc-item:hover),
+  #toc:has(.toc-item.active) {
+    opacity: 1;
+  }
+  .toc-item.active .toc-line {
+    height: 2px;
+    background: var(--color-sand-11);
+  }
+  .toc-item.toc-top.active .toc-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-sand-11);
+  }
+</style>
+
+<script>
+  const { hash } = window.location;
+  let observerEnabled = true;
+
+  const alignTocRail = () => {
+    const prefs = document.getElementById("preferences-rail");
+    const toc = document.querySelector<HTMLElement>(".toc-rail");
+    if (!prefs || !toc || !toc.offsetParent) return;
+
+    const prefsLeft = prefs.getBoundingClientRect().left;
+    const parentLeft = toc.offsetParent.getBoundingClientRect().left;
+    toc.style.left = `${prefsLeft - parentLeft + 5}px`;
+  };
+
+  alignTocRail();
+  window.addEventListener("resize", alignTocRail);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    alignTocRail();
+    requestAnimationFrame(alignTocRail);
+    const items = Array.from(
+      document.querySelectorAll<HTMLLIElement>("#toc .toc-item"),
+    );
+    if (items.length === 0) return;
+
+    const activeItem =
+      items.find(
+        (item) =>
+          item.getAttribute("data-scroll-section") === hash.replace("#", ""),
+      ) ?? items[0];
+
+    activeItem?.classList.add("active");
+
+    items.forEach((item) => {
+      const button = item.querySelector("button");
+      button?.addEventListener("click", () => {
+        const id = item.getAttribute("data-scroll-section");
+        const section = document.getElementById(id ?? "");
+
+        items.forEach((l) => l.classList.remove("active"));
+        item.classList.add("active");
+
+        if (section) {
+          observerEnabled = false;
+          section?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+          setTimeout(() => {
+            observerEnabled = true;
+          }, 1000);
+        }
+      });
+    });
+  });
+
+  const headers = document.querySelectorAll("#article-title, h2");
+  const items = Array.from(
+    document.querySelectorAll<HTMLLIElement>("#toc .toc-item"),
+  );
+
+  const seen = new WeakSet();
+
+  const isAtBottom = () => {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    return scrollTop + windowHeight >= documentHeight - 50;
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!observerEnabled) return;
+
+      if (isAtBottom()) {
+        items.forEach((item) => item.classList.remove("active"));
+        if (items.length > 0) {
+          items[items.length - 1].classList.add("active");
+        }
+        return;
+      }
+
+      entries.forEach((entry) => {
+        if (!seen.has(entry.target)) {
+          seen.add(entry.target);
+          return;
+        }
+
+        const current = items.findIndex((item) => {
+          const id = item.getAttribute("data-scroll-section");
+          return id === entry.target.id;
+        });
+
+        if (entry.isIntersecting) {
+          items.forEach((item, index) => {
+            if (index === current) {
+              item.classList.add("active");
+            } else {
+              item.classList.remove("active");
+            }
+          });
+        } else if (
+          entry.intersectionRatio === 0 &&
+          entry.boundingClientRect.bottom >= 0 &&
+          current > 0
+        ) {
+          items[current].classList.remove("active");
+          items[current - 1].classList.add("active");
+        }
+      });
+    },
+    {
+      root: null,
+      rootMargin: "0px 0px -50% 0px",
+    },
+  );
+
+  headers.forEach((header) => observer.observe(header));
+</script>

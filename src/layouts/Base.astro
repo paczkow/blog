@@ -4,23 +4,38 @@ import "@fontsource-variable/newsreader";
 import "@fontsource-variable/newsreader/wght-italic.css";
 
 import Head from "@/components/Head.astro";
-import { NeuralBackground } from "@/components/NeuralBackground.tsx";
+import { SITE } from "config";
+import NeuralBackground from "@/components/NeuralBackground.svelte";
+import Preferences from "@/components/Preferences.svelte";
+import { useTranslations } from "@/i18n/utils.ts";
+import type { Lang } from "@/models.ts";
 
 import "@/styles/global.css";
 
 interface Props {
   title: string;
+  lang?: Lang;
+  languageLinks?: Partial<Record<Lang, string>>;
+  alternates?: { lang: Lang; href: string }[];
+  isHome?: boolean;
 }
 
-const { title } = Astro.props;
-const isHome = Astro.url.pathname === "/";
+const {
+  title,
+  lang = "en",
+  languageLinks,
+  alternates = [],
+  isHome = false,
+} = Astro.props;
+
+const t = useTranslations(lang);
 ---
 
 <!doctype html>
-<html lang="en" class="bg-sand-1 m-0 w-full">
-  <Head title={title} />
+<html lang={lang} class="bg-sand-1 m-0 w-full">
+  <Head title={title} alternates={alternates} description={SITE.desc[lang]} />
   <body class="m-0 w-full">
-    {isHome && <NeuralBackground client:only="react" />}
+    {isHome && <NeuralBackground client:media="(min-width: 1024px)" />}
     <svg
       aria-hidden="true"
       class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-[0.035] dark:opacity-[0.06]"
@@ -40,6 +55,32 @@ const isHome = Astro.url.pathname === "/";
       class="fixed top-0 left-0 right-0 h-14 z-50 backdrop-blur-sm bg-sand-1/1"
     >
     </nav>
+    <div
+      class="pointer-events-none fixed inset-x-0 top-4 z-[60] mx-auto w-full max-w-3xl px-4 lg:max-w-6xl"
+    >
+      <div
+        class="grid grid-cols-1 md:justify-between lg:grid-cols-[340px_600px] lg:gap-8"
+      >
+        <div aria-hidden="true" class="hidden lg:block"></div>
+        <div class="pointer-events-auto flex justify-end px-4">
+          <Preferences
+            client:load
+            activeLang={lang}
+            languageLinks={languageLinks}
+            i18n={{
+              siteLabel: t("preferences.site"),
+              langLabel: t("preferences.language"),
+              switchToDark: t("preferences.switchToDark"),
+              switchToLight: t("preferences.switchToLight"),
+              tooltipEn: t("preferences.unavailableTooltip.en"),
+              tooltipPl: t("preferences.unavailableTooltip.pl"),
+              ariaEn: t("preferences.unavailableAria.en"),
+              ariaPl: t("preferences.unavailableAria.pl"),
+            }}
+          />
+        </div>
+      </div>
+    </div>
     <div
       class="relative z-10 mx-auto max-w-3xl lg:max-w-6xl pt-(--nav-height) pb-(--page-bottom)"
     >

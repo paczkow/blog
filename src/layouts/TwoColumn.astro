@@ -1,14 +1,25 @@
 ---
 import Base from "./Base.astro";
+import type { Lang } from "@/models.ts";
 
 interface Props {
   title: string;
+  lang?: Lang;
+  languageLinks?: Partial<Record<Lang, string>>;
+  alternates?: { lang: Lang; href: string }[];
+  isHome?: boolean;
 }
 
-const { title } = Astro.props;
+const { title, lang, languageLinks, alternates, isHome } = Astro.props;
 ---
 
-<Base title={title}>
+<Base
+  title={title}
+  lang={lang}
+  languageLinks={languageLinks}
+  alternates={alternates}
+  isHome={isHome}
+>
   <div
     class="grid grid-cols-1 grid-rows-[1fr] gap-y-8 lg:grid-cols-[340px_600px] lg:gap-8 px-4 md:justify-between"
   >

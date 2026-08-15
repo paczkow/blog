@@ -1,5 +1,7 @@
 import mdx from "@astrojs/mdx";
-import react from "@astrojs/react";
+import { unified } from "@astrojs/markdown-remark";
+import sitemap from "@astrojs/sitemap";
+import svelte from "@astrojs/svelte";
 import tailwindcss from "@tailwindcss/vite";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
@@ -13,46 +15,72 @@ import { SITE } from "./config";
 
 export default defineConfig({
   site: SITE.website,
+  i18n: {
+    locales: ["en", "pl"],
+    defaultLocale: "en",
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
   markdown: {
     syntaxHighlight: "shiki",
     shikiConfig: {
       theme: "catppuccin-latte",
     },
-    rehypePlugins: [
-      rehypeSlug,
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: "wrap",
-          test: (node: { tagName: string }) => node.tagName === "h2",
-          headingProperties: () => ({
-            class: "scroll-mt-[132px]",
-          }),
-          content: (heading: Element) => [
-            h(
-              "div",
-              {
-                className: "group flex gap-2 -ml-5",
-              },
-              [
-                h(
-                  "span",
-                  {
-                    className:
-                      "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                  },
-                  "#",
-                ),
-                h("span", heading.children),
-              ],
-            ),
-          ],
-        },
+    processor: unified({
+      remarkPlugins: [remarkReadingTime],
+      rehypePlugins: [
+        rehypeSlug,
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: "wrap",
+            test: (node: { tagName: string }) => node.tagName === "h2",
+            headingProperties: () => ({
+              class: "scroll-mt-[132px]",
+            }),
+            content: (heading: Element) => [
+              h(
+                "div",
+                {
+                  className: "group flex gap-2 -ml-5",
+                },
+                [
+                  h(
+                    "span",
+                    {
+                      className:
+                        "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+                    },
+                    "#",
+                  ),
+                  h("span", heading.children),
+                ],
+              ),
+            ],
+          },
+        ],
       ],
-      remarkReadingTime,
-    ],
+    }),
   },
-  integrations: [icon(), mdx(), react()],
+  integrations: [
+    icon(),
+    mdx(),
+    svelte(),
+    // Emits sitemap-index.xml, which src/components/Head.astro already links.
+    // The i18n block mirrors the top-level `i18n` config so each page lists its
+    // locale alternates; `prefixDefaultLocale: false` means unprefixed URLs are
+    // the English ones.
+    sitemap({
+      i18n: {
+        defaultLocale: "en",
+        locales: { en: "en-US", pl: "pl-PL" },
+      },
+      // Keep the index to real pages: the 404 is not a destination, and og.png
+      // routes are image endpoints rather than crawlable documents.
+      filter: (page) => !page.includes("/404") && !page.endsWith("og.png"),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

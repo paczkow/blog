@@ -1,0 +1,23 @@
+# Cloudflare Workers static-assets header rules. Astro copies public/ into
+# dist/, so this file ships as dist/_headers where Workers picks it up.
+# Docs: https://developers.cloudflare.com/workers/static-assets/headers/
+#
+# Astro fingerprints everything under /_astro/ with a content hash, so a given
+# URL's bytes never change — a new build produces a new filename. That makes it
+# safe to cache for a year and skip revalidation entirely. Without this rule
+# Cloudflare serves assets as `max-age=0, must-revalidate`, costing every
+# visitor a conditional request per asset on every page load.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Files copied verbatim from public/ keep their filenames across builds, so they
+# are cached for a day but NOT marked immutable — replacing one at the same path
+# has to be able to take effect without waiting out a year-long browser cache.
+/fonts/*
+  Cache-Control: public, max-age=86400
+
+/images/*
+  Cache-Control: public, max-age=86400
+
+# HTML is deliberately left on the default `max-age=0, must-revalidate` so
+# published edits appear immediately rather than being pinned in browser caches.

@@ -1,0 +1,107 @@
+---
+import SidebarLinks from "@/components/SidebarLinks.astro";
+import { useTranslations } from "@/i18n/utils.ts";
+import Layout from "@/layouts/Base.astro";
+import { Icon } from "astro-icon/components";
+import { getRelativeLocaleUrl } from "astro:i18n";
+
+// Astro renders 404.astro once to dist/404.html, which Cloudflare serves on any
+// unmatched path (see wrangler.jsonc `not_found_handling`). Because it is a
+// single static file it can't detect the requested locale, so it renders in the
+// default language — the language switcher below still points at each locale's
+// home.
+const lang = "en" as const;
+const t = useTranslations(lang);
+
+const homeHref = getRelativeLocaleUrl("en");
+const writingHref = getRelativeLocaleUrl("en", "writing");
+---
+
+<Layout
+  title={t("notFound.pageTitle")}
+  lang={lang}
+  languageLinks={{
+    en: getRelativeLocaleUrl("en"),
+    pl: getRelativeLocaleUrl("pl"),
+  }}
+>
+  <main
+    class="flex min-h-[calc(100vh-var(--nav-height)-var(--page-bottom))] items-center justify-center px-6"
+  >
+    <div class="flex max-w-[44ch] flex-col items-center gap-8 text-center">
+      <svg
+        viewBox="0 0 270 130"
+        width="270"
+        height="130"
+        aria-hidden="true"
+        class="text-sand-9 dark:text-sand-8"
+      >
+        <title>{t("notFound.imageTitle")}</title>
+        <line x1="30" y1="40" x2="65" y2="25" stroke="currentColor" stroke-width="0.8" opacity="0.55"></line>
+        <line x1="30" y1="40" x2="55" y2="75" stroke="currentColor" stroke-width="0.8" opacity="0.55"></line>
+        <line x1="65" y1="25" x2="95" y2="55" stroke="currentColor" stroke-width="0.8" opacity="0.55"></line>
+        <line x1="55" y1="75" x2="95" y2="55" stroke="currentColor" stroke-width="0.8" opacity="0.55"></line>
+        <line x1="175" y1="35" x2="215" y2="55" stroke="currentColor" stroke-width="0.8" opacity="0.55"></line>
+        <line x1="215" y1="55" x2="195" y2="95" stroke="currentColor" stroke-width="0.8" opacity="0.55"></line>
+        <line x1="215" y1="55" x2="240" y2="90" stroke="currentColor" stroke-width="0.8" opacity="0.55"></line>
+        <line x1="195" y1="95" x2="240" y2="90" stroke="currentColor" stroke-width="0.8" opacity="0.55"></line>
+        <line x1="95" y1="55" x2="122" y2="60" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.7"></line>
+        <line x1="148" y1="65" x2="175" y2="35" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.7"></line>
+        <g transform="translate(135 62.5) rotate(15)">
+          <line x1="-5" y1="-5" x2="5" y2="5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></line>
+          <line x1="-5" y1="5" x2="5" y2="-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></line>
+        </g>
+        <circle cx="30" cy="40" r="2.8" fill="currentColor"></circle>
+        <circle cx="65" cy="25" r="2.8" fill="currentColor"></circle>
+        <circle cx="55" cy="75" r="2.8" fill="currentColor"></circle>
+        <circle cx="95" cy="55" r="2.8" fill="currentColor"></circle>
+        <circle cx="175" cy="35" r="2.8" fill="currentColor"></circle>
+        <circle cx="215" cy="55" r="2.8" fill="currentColor"></circle>
+        <circle cx="195" cy="95" r="2.8" fill="currentColor"></circle>
+        <circle cx="240" cy="90" r="2.8" fill="currentColor"></circle>
+        <circle cx="122" cy="60" r="1.8" fill="currentColor" opacity="0.4">
+          <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2.4s" repeatCount="indefinite"></animate>
+        </circle>
+        <circle cx="148" cy="65" r="1.8" fill="currentColor" opacity="0.4">
+          <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.4s" repeatCount="indefinite"></animate>
+        </circle>
+      </svg>
+
+      <div class="flex flex-col items-center gap-4">
+        <span class="text-sand-11 text-xs uppercase tracking-[0.2em] font-medium">
+          {t("notFound.eyebrow")}
+        </span>
+        <h1
+          class="font-display font-normal text-sand-12 text-4xl md:text-5xl leading-[1.05] tracking-tight"
+        >
+          {t("notFound.title")}<span class="text-sand-9 italic">.</span>
+        </h1>
+        <p class="text-sand-12 leading-relaxed max-w-[42ch]">
+          {t("notFound.body")}
+        </p>
+      </div>
+
+      <nav
+        aria-label={t("common.links")}
+        class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
+      >
+        <a
+          href={homeHref}
+          class="text-sand-12 text-sm flex items-center gap-1 underline underline-offset-4 decoration-sand-7 transition-colors hover:decoration-sand-12"
+        >
+          {t("notFound.home")}
+          <Icon name="arrow-up-right" class="h-3.5 w-3.5" />
+        </a>
+        <a
+          href={writingHref}
+          class="text-sand-11 text-sm flex items-center gap-1 transition-colors hover:text-sand-12"
+        >
+          {t("notFound.writing")}
+          <Icon name="arrow-up-right" class="h-3.5 w-3.5" />
+        </a>
+      </nav>
+
+      <SidebarLinks ariaLabel={t("common.links")} />
+    </div>
+  </main>
+</Layout>

@@ -4,12 +4,12 @@ import SidebarLinks from "@/components/SidebarLinks.astro";
 import WritingHeatmap from "@/components/WritingHeatmap.svelte";
 import { getHomePosts, loadWritingPosts } from "@/helpers/page-data.ts";
 import { useTranslations } from "@/i18n/utils.ts";
+import { getRelativeLocaleUrl } from "astro:i18n";
 import Layout from "@/layouts/TwoColumn.astro";
 import { Icon } from "astro-icon/components";
-import { getRelativeLocaleUrl } from "astro:i18n";
 import { SITE } from "config";
 
-const lang = "en" as const;
+const lang = "pl" as const;
 const { posts: allPosts } = await loadWritingPosts();
 const posts = getHomePosts(allPosts, lang);
 const t = useTranslations(lang);
@@ -18,10 +18,10 @@ const readTimeLabel = t("common.readTime");
 const writingHref = getRelativeLocaleUrl(lang, "writing");
 
 const aboutParagraphs = [
-  "Hi, I'm Michał.",
-  "As a kid I was certain I'd become an athlete. In university, the futsal club interested me far more than code did. But the same curiosity that drove me on the pitch slowly pulled me toward solving problems with software — and took me further than I expected. Over the last 10 years I've worked in very different places, from startups of a few people to Amazon and Meta.",
-  "That whole time, one problem kept coming back: there's far more worth knowing than we can hold in our heads. I started looking for a way to handle it — that's how I found Zettelkasten, Evergreen Notes, and learning with Anki. Over time I built my own knowledge system. Not a collection of notes, but a way of working with ideas: turning what I read into something I actually think with.",
-  "That's what I write about here — documenting what I tried, what fell apart, where I changed my mind. I'm leaving behind the map I wish I'd had. None of this is settled truth — it's my experience and observations.",
+  "Hej, jestem Michał.",
+  "Jako dziecko byłem pewny, że zostanę sportowcem. Na studiach sekcja futsalu interesowała mnie dużo bardziej niż kod. Ale ta sama ciekawość, która napędzała mnie na boisku, z czasem pociągnęła mnie w stronę rozwiązywania problemów za pomocą oprogramowania — i zaprowadziła dalej, niż się spodziewałem. Przez ostatnie 10 lat pracowałem w bardzo różnych miejscach — od kilkuosobowych startupów po Amazona i Metę.",
+  "Przez cały ten czas wracał do mnie jeden problem: wartościowych rzeczy jest znacznie więcej, niż jesteśmy w stanie utrzymać w głowie. Zacząłem szukać sposobu, żeby to ogarnąć — tak trafiłem na Zettelkasten, Evergreen Notes i naukę z Anki. Z czasem zbudowałem własny system wiedzy. Nie kolekcję notatek, tylko sposób pracy z pomysłami: zamienianie tego, co czytam, w coś, czym naprawdę myślę.",
+  "O tym piszę na blogu — dokumentuję, co próbowałem, co się posypało, gdzie zmieniłem zdanie. Zostawiam mapę, której sam kiedyś mi brakowało. Nic tu nie jest fundamentalną prawdą — to moje doświadczenie i obserwacje.",
 ];
 
 const heatmapPosts = posts.map((post) => ({
@@ -151,7 +151,7 @@ const heatmapPosts = posts.map((post) => ({
 
       <section id="about" class="flex flex-col gap-6 px-4">
         <h2 class="text-sand-11 text-xs uppercase tracking-[0.2em] font-medium">
-          About
+          {t("home.about.heading")}
         </h2>
         <div class="flex flex-col gap-5">
           {
@@ -160,14 +160,14 @@ const heatmapPosts = posts.map((post) => ({
             ))
           }
           <p class="text-sand-12 leading-relaxed">
-            Want to talk? Reach me on{" "}
+            Chcesz pogadać? Napisz na{" "}
             <a
               href={SITE.social.linkedin}
               class="text-sand-12 underline underline-offset-2 decoration-sand-7 transition-colors hover:decoration-sand-12"
             >
               LinkedIn
             </a>{" "}
-            or at{" "}
+            albo{" "}
             <a
               href={`mailto:${SITE.email}`}
               class="text-sand-12 underline underline-offset-2 decoration-sand-7 transition-colors hover:decoration-sand-12"
