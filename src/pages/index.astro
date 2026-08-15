@@ -18,11 +18,10 @@ const readTimeLabel = t("common.readTime");
 const writingHref = getRelativeLocaleUrl(lang, "writing");
 
 const aboutParagraphs = [
-  "Hey, I'm Michał, a software engineer with a constant need to learn and a curiosity for discovering and connecting the dots.",
-  "As a kid, I was sure I'd become an athlete. Instead, I ended up building software — though it took me a while to get there. At university I was far more interested in the futsal club than in code, and honestly, nothing about me back then looked promising. But the same curiosity that drove me on the pitch slowly pulled me toward solving problems with software — and it carried me further than I ever expected, including to Meta and Amazon.",
-  "Across those ten years — from small startups to big tech — I learned a lot about productivity, building products, and learning fast.",
-  "The more I learned, the more often I ran into a good problem: there are far more valuable things to know than we can hold in our heads. So I got drawn into managing information well — turning what I read into something I can actually think with and act on. That's how I found Zettelkasten and started building my own knowledge system: not a collection of notes, but a way of working with ideas.",
-  "And that's what this blog is about: how to learn, handle responsibilities, and use AI to stay on top of things without the constant feeling of being overwhelmed.",
+  "Hey, I'm Michał, a software engineer — these days at Meta, before that Amazon and a few startups.",
+  "As a kid I was sure I'd become an athlete. At university the futsal club interested me far more than code, and honestly, nothing about me back then looked promising. But the same curiosity that drove me on the pitch slowly pulled me toward solving problems with software — and carried me further than I ever expected.",
+  "Somewhere along those ten years that curiosity ran into a good problem: there's far more worth knowing than one head can hold. So I started building a system for it — Zettelkasten, Obsidian, and lately AI — not a collection of notes, but a way of working with knowledge. The payoff is the moment something I read six months ago connects to a problem I'm stuck on today. I built the whole thing to make those moments happen more often than by accident.",
+  "This blog is where I document that: what I tried, what broke, what I changed my mind about. I write for the person a few steps behind me on the same path — mostly for my younger self, leaving the map I wish someone had left me. Nothing here is fundamental truth; it's my experience as of today.",
 ];
 
 const heatmapPosts = posts.map((post) => ({
@@ -53,10 +52,15 @@ const heatmapPosts = posts.map((post) => ({
         >
           Michał<br />Paczków<span class="text-sand-9 italic">.</span>
         </h1>
-        <p
-          class="text-sand-11 text-base leading-relaxed lg:max-w-[28ch]"
-          set:html={t("home.hero")}
-        />
+        <div class="flex flex-col gap-2">
+          <p class="text-sand-12 text-base leading-relaxed lg:max-w-[28ch]">
+            {t("home.hero.hook")}
+          </p>
+          <p
+            class="text-sand-12 text-base leading-relaxed lg:max-w-[28ch]"
+            set:html={t("home.hero.subtitle")}
+          />
+        </div>
       </div>
 
       <nav
@@ -152,16 +156,23 @@ const heatmapPosts = posts.map((post) => ({
         <div class="flex flex-col gap-5">
           {
             aboutParagraphs.map((paragraph) => (
-              <p class="text-sand-11 leading-relaxed">{paragraph}</p>
+              <p class="text-sand-12 leading-relaxed">{paragraph}</p>
             ))
           }
-          <p class="text-sand-11 leading-relaxed">
-            Want to chat? Feel free to reach out on{" "}
+          <p class="text-sand-12 leading-relaxed">
+            Want to chat? Reach out on{" "}
             <a
               href={SITE.social.linkedin}
               class="text-sand-12 underline underline-offset-2 decoration-sand-7 transition-colors hover:decoration-sand-12"
             >
               LinkedIn
+            </a>{" "}
+            or at{" "}
+            <a
+              href={`mailto:${SITE.email}`}
+              class="text-sand-12 underline underline-offset-2 decoration-sand-7 transition-colors hover:decoration-sand-12"
+            >
+              {SITE.email}
             </a>.
           </p>
         </div>

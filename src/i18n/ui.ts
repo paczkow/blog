@@ -9,10 +9,13 @@ const en = {
   "common.breadcrumb": "Breadcrumb",
   "common.links": "Links",
 
-  // Full sentence with inline markup; rendered via `set:html`. Each locale
-  // controls its own punctuation and word order. The <span> emphasizes terms.
-  "home.hero":
-    'Connecting the dots between <span class="font-medium text-sand-12">learning</span>, <span class="font-medium text-sand-12">creating</span>, and <span class="font-medium text-sand-12">productivity</span> in the AI era.',
+  // The hero is a hook plus a subtitle, on separate lines but at the same type
+  // size — the emphasis, not a larger heading, carries the hierarchy. The
+  // subtitle is rendered via `set:html`; each locale picks its own terms to
+  // emphasize and controls its own punctuation and word order.
+  "home.hero.hook": "Curious by default.",
+  "home.hero.subtitle":
+    'Notes on <span class="font-medium text-sand-12">learning</span>, <span class="font-medium text-sand-12">building</span>, and <span class="font-medium text-sand-12">connecting the dots</span> in the AI era.',
   "home.nav.sections": "Sections",
   "home.nav.writing": "Writing",
   "home.nav.about": "About",
@@ -74,8 +77,9 @@ const pl = {
   "common.breadcrumb": "Ścieżka nawigacji",
   "common.links": "Linki",
 
-  "home.hero":
-    'Łączę kropki między <span class="font-medium text-sand-12">nauką</span>, <span class="font-medium text-sand-12">tworzeniem</span> i <span class="font-medium text-sand-12">produktywnością</span> w erze AI.',
+  "home.hero.hook": "Ciekawość przede wszystkim.",
+  "home.hero.subtitle":
+    'Notatki o <span class="font-medium text-sand-12">nauce</span>, <span class="font-medium text-sand-12">budowaniu</span> i <span class="font-medium text-sand-12">łączeniu kropek</span> w erze AI.',
   "home.nav.sections": "Sekcje",
   "home.nav.writing": "Wpisy",
   "home.nav.about": "O mnie",

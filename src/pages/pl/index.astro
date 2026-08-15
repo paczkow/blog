@@ -18,11 +18,10 @@ const readTimeLabel = t("common.readTime");
 const writingHref = getRelativeLocaleUrl(lang, "writing");
 
 const aboutParagraphs = [
-  'Hej, jestem Michał, Software Engineer z nieodłączną potrzebą nauki i ciekawością do odkrywania i łączenia "kropek".',
-  "Jako dziecko byłem przekonany, że będę sportowcem. Zamiast tego skończyłem budując oprogramowanie — choć droga do tego zajęła mi trochę czasu. Na uczelni znacznie bardziej interesowała mnie sekcja futsalu niż kod, i szczerze mówiąc, nic we mnie wtedy nie wyglądało obiecująco. Ale ta sama ciekawość, która napędzała mnie na boisku, powoli pociągnęła mnie w stronę rozwiązywania problemów za pomocą oprogramowania — i zaprowadziła mnie dalej, niż kiedykolwiek się spodziewałem, w tym do Mety i Amazona.",
-  "Przez te dziesięć lat — od małych startupów po big tech — dużo nauczyłem się o produktywności, budowaniu produktów i szybkim uczeniu się.",
-  "Im więcej się uczyłem, tym częściej wpadałem na dobry problem: wartościowych rzeczy jest znacznie więcej, niż jesteśmy w stanie utrzymać w głowie. Dlatego wciągnęło mnie mądre ogarnianie informacji — zamienianie tego, co czytam, w coś, z czym naprawdę mogę myśleć i działać. Tak trafiłem na Zettelkasten i zacząłem budować własny system wiedzy: nie kolekcję notatek, tylko sposób pracy z pomysłami.",
-  "I o tym jest ten blog: jak się uczyć, ogarniać odpowiedzialności i używać AI tak, żeby być na bieżąco bez ciągłego poczucia przytłoczenia.",
+  "Hej, jestem Michał, software engineer — obecnie w Mecie, wcześniej w Amazonie i kilku startupach.",
+  "Jako dziecko byłem pewny, że zostanę sportowcem. Na studiach sekcja futsalu interesowała mnie dużo bardziej niż kod i, szczerze mówiąc, nic wtedy nie zapowiadało, że będzie inaczej. Ale ta sama ciekawość, która napędzała mnie na boisku, powoli pociągnęła mnie w stronę rozwiązywania problemów za pomocą oprogramowania — i zaprowadziła dalej, niż kiedykolwiek się spodziewałem.",
+  "Gdzieś po drodze ta ciekawość natknęła się na dobry problem: wartościowych rzeczy jest dużo więcej, niż da się utrzymać w głowie. Zacząłem więc budować na to system — Zettelkasten, Obsidian, a ostatnio AI — nie kolekcję notatek, tylko sposób pracy z wiedzą. Nagrodą jest moment, w którym coś, co przeczytałem pół roku temu, nagle łączy się z problemem, nad którym siedzę dzisiaj. Zbudowałem to wszystko po to, żeby takie kropki łączyły się częściej niż przypadkiem.",
+  "Na blogu to dokumentuję: co próbowałem, co się posypało, gdzie zmieniłem zdanie. Piszę dla osoby, która jest kilka kroków za mną na tej samej ścieżce — głównie dla młodszej wersji siebie. Zostawiam mapę, której sam żałowałem, że nie miałem. Nic tutaj nie jest fundamentalną prawdą — to moje doświadczenie na ten moment.",
 ];
 
 const heatmapPosts = posts.map((post) => ({
@@ -53,10 +52,15 @@ const heatmapPosts = posts.map((post) => ({
         >
           Michał<br />Paczków<span class="text-sand-9 italic">.</span>
         </h1>
-        <p
-          class="text-sand-11 text-base leading-relaxed lg:max-w-[28ch]"
-          set:html={t("home.hero")}
-        />
+        <div class="flex flex-col gap-2">
+          <p class="text-sand-12 text-base leading-relaxed lg:max-w-[28ch]">
+            {t("home.hero.hook")}
+          </p>
+          <p
+            class="text-sand-12 text-base leading-relaxed lg:max-w-[28ch]"
+            set:html={t("home.hero.subtitle")}
+          />
+        </div>
       </div>
 
       <nav
@@ -152,16 +156,23 @@ const heatmapPosts = posts.map((post) => ({
         <div class="flex flex-col gap-5">
           {
             aboutParagraphs.map((paragraph) => (
-              <p class="text-sand-11 leading-relaxed">{paragraph}</p>
+              <p class="text-sand-12 leading-relaxed">{paragraph}</p>
             ))
           }
-          <p class="text-sand-11 leading-relaxed">
-            Chcesz pogadać? Odezwij się do mnie na{" "}
+          <p class="text-sand-12 leading-relaxed">
+            Chcesz pogadać? Napisz na{" "}
             <a
               href={SITE.social.linkedin}
               class="text-sand-12 underline underline-offset-2 decoration-sand-7 transition-colors hover:decoration-sand-12"
             >
               LinkedIn
+            </a>{" "}
+            albo na{" "}
+            <a
+              href={`mailto:${SITE.email}`}
+              class="text-sand-12 underline underline-offset-2 decoration-sand-7 transition-colors hover:decoration-sand-12"
+            >
+              {SITE.email}
             </a>.
           </p>
         </div>
