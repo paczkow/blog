@@ -51,9 +51,9 @@ const formattedDate = $derived(
 				</span>
 			{/if}
 		</div>
-		<h3 class="font-display text-sand-12 text-xl leading-tight mb-2">
+		<h3 class="font-display font-medium text-sand-12 text-xl leading-tight mb-2">
 			{title}
 		</h3>
-		<p class="text-sand-11 leading-relaxed">{description}</p>
+		<p class="text-sand-12 leading-relaxed">{description}</p>
 	</article>
 </a>

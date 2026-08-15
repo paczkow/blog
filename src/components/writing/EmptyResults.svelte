@@ -58,7 +58,7 @@ const trimmed = $derived(query.trim());
 				? t("writingArchive.empty.broken")
 				: t("writingArchive.empty.quiet")}
 		</p>
-		<p class="text-sand-11 text-sm leading-relaxed">
+		<p class="text-sand-12 text-sm leading-relaxed">
 			{#if trimmed}
 				{t("writingArchive.empty.noResults")}
 				<span class="text-sand-12 font-medium">"{trimmed}"</span>.
