@@ -41,6 +41,13 @@
 /sitemap-0.xml
   Cache-Control: public, max-age=3600
 
+# NOTE: this rule is inert in production. Cloudflare's Managed robots.txt (AI
+# crawler control, under Security -> Bots) synthesizes the response — it prepends
+# a "Cloudflare Managed content" block disallowing GPTBot, ClaudeBot, CCBot and
+# friends, then appends the file below — and that synthesized response carries no
+# Cache-Control, no ETag and no cf-cache-status. Keep the rule so the file is
+# right if the dashboard feature is ever turned off, but expect the live headers
+# not to match it. Verified by diffing the live body against dist/robots.txt.
 /robots.txt
   Cache-Control: public, max-age=86400
 
