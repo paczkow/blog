@@ -83,14 +83,14 @@ const alternates = LANGS.flatMap((targetLang) => {
       >
         <a
           href={getRelativeLocaleUrl(lang)}
-          class="transition-colors hover:text-sand-12"
+          class="transition-colors hover:text-sand-12 touch:active:text-sand-12"
         >
           {t("common.home")}
         </a>
         <span class="text-sand-9">/</span>
         <a
           href={getRelativeLocaleUrl(lang, "writing")}
-          class="transition-colors hover:text-sand-12"
+          class="transition-colors hover:text-sand-12 touch:active:text-sand-12"
         >
           {t("article.breadcrumbWriting")}
         </a>

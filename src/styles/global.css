@@ -9,19 +9,30 @@
   --font-display: "Newsreader Variable", "Iowan Old Style", "Apple Garamond", Georgia, serif;
 }
 
-@custom-variant pressed (&[data-pressed="true"]);
+/* Press feedback for input that cannot hover, where a tap has to stand in for
+   the hover state. Mirrors the `@media (hover: hover)` that Tailwind wraps every
+   `hover:` utility in, so the two never apply to the same device. */
+@custom-variant touch (@media (hover: none));
 
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
-    -webkit-tap-highlight-color: transparent;
     line-height: 1.625;
   }
 
   .font-serif {
     font-optical-sizing: auto;
   }
+}
+
+/* The browser's own tap highlight, which Tailwind's preflight switches off on
+   `html`. It paints a filled box over the whole element, so it belongs on things
+   that already read as a block — a card — and not on a link inside a sentence,
+   where a rectangle behind the words is more distracting than the colour change
+   the link makes on its own. Hence opt-in per element rather than global. */
+@utility tap-highlight {
+  -webkit-tap-highlight-color: var(--tap-highlight);
 }
 
 @theme {
@@ -37,6 +48,10 @@
   --color-sand-10: #82827c;
   --color-sand-11: #63635e;
   --color-sand-12: #21201c;
+
+  /* sand-12 at ~10%: dark enough to read against sand-1, light enough to leave
+     text legible underneath. Lightened rather than darkened in dark mode. */
+  --tap-highlight: #21201c1a;
 
   --nav-height: 96px;
   --page-bottom: 8rem;
@@ -56,6 +71,8 @@
   --color-sand-10: #7c7b74;
   --color-sand-11: #b5b3ad;
   --color-sand-12: #eeeeec;
+
+  --tap-highlight: #eeeeec1f;
 }
 
 .tooltip-popup {

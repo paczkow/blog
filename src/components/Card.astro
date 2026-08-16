@@ -32,9 +32,12 @@ const formattedDate = new Date(date).toLocaleDateString(locale, {
 });
 ---
 
-<a href={url} class="block no-underline">
+<a
+  href={url}
+  class="block no-underline rounded-md tap-highlight touch:active:bg-sand-4 dark:touch:active:bg-sand-5"
+>
   <article
-    class="relative block cursor-pointer px-4 py-6 rounded-md will-change-transform transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-60 hover:!opacity-100 hover:translate-x-1 active:bg-sand-3 dark:active:bg-sand-5"
+    class="relative block cursor-pointer px-4 py-6 rounded-md will-change-transform transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-60 hover:!opacity-100 hover:translate-x-1 hover:active:bg-sand-3 dark:hover:active:bg-sand-5"
   >
     <div class="flex items-baseline justify-between gap-4 mb-3 text-sand-10 text-sm">
       <time class="tabular-nums" datetime={new Date(date).toISOString()}>

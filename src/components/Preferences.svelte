@@ -69,7 +69,7 @@ function langClass(active: boolean, unavailable = false) {
 
   return active
     ? "px-0.5 py-2 transition-colors duration-200 text-sand-12"
-    : "px-0.5 py-2 transition-colors duration-200 text-sand-9 hover:text-sand-11";
+    : "px-0.5 py-2 transition-colors duration-200 text-sand-9 hover:text-sand-11 touch:active:text-sand-12";
 }
 
 function isUnavailable(targetLang: Lang) {
@@ -164,7 +164,7 @@ function isUnavailable(targetLang: Lang) {
 		type="button"
 		onclick={toggleTheme}
 		aria-label={theme === "light" ? i18n.switchToDark : i18n.switchToLight}
-		class="cursor-pointer px-1 py-2 text-base leading-none text-sand-10 transition-colors duration-200 hover:text-sand-12"
+		class="cursor-pointer px-1 py-2 text-base leading-none text-sand-10 transition-colors duration-200 hover:text-sand-12 touch:active:text-sand-12"
 	>
 		{theme === "light" ? "◐" : "◑"}
 	</button>

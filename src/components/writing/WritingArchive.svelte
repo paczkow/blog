@@ -92,7 +92,10 @@ const showLang = $derived(selectedLanguages.length > 1);
 				aria-label={t("common.breadcrumb")}
 				class="flex items-center gap-2 text-sm text-sand-11"
 			>
-				<a href={homeHref} class="transition-colors hover:text-sand-12">
+				<a
+					href={homeHref}
+					class="transition-colors hover:text-sand-12 touch:active:text-sand-12"
+				>
 					{t("common.home")}
 				</a>
 				<span class="text-sand-9">/</span>
@@ -130,7 +133,7 @@ const showLang = $derived(selectedLanguages.length > 1);
 									aria-pressed={selectedLanguages.includes(filter.value)}
 									class={selectedLanguages.includes(filter.value)
 										? "cursor-pointer text-sand-12"
-										: "cursor-pointer text-sand-9 transition-colors hover:text-sand-11"}
+										: "cursor-pointer text-sand-9 transition-colors hover:text-sand-11 touch:active:text-sand-12"}
 								>
 									{filter.label}
 								</button>
