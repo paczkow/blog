@@ -1,32 +1,94 @@
 ---
+import ArchiveFilters from "@/components/writing/ArchiveFilters.svelte";
 import WritingArchive from "@/components/writing/WritingArchive.svelte";
 import { getLocaleStaticPaths, loadWritingPosts } from "@/helpers/page-data.ts";
-import { getWritingIndexUrl } from "@/helpers/posts.ts";
+import {
+  getLocaleLinks,
+  getPostsByLang,
+  getWritingIndexUrl,
+} from "@/helpers/posts.ts";
+import { activeLangs, localizeUrl } from "@/i18n/config.ts";
 import { ui } from "@/i18n/ui.ts";
 import { getPluralForms, useTranslations } from "@/i18n/utils.ts";
-import Layout from "@/layouts/Base.astro";
+import Layout from "@/layouts/TwoColumn.astro";
 
 export const getStaticPaths = getLocaleStaticPaths;
 
 const { lang } = Astro.props;
 const { posts } = await loadWritingPosts();
 const t = useTranslations(lang);
+const { alternates, languageLinks } = getLocaleLinks(getWritingIndexUrl);
+// The stock line names both languages; with one locale live it would promise a
+// version of the archive that is not there.
+const descriptionKey =
+  activeLangs.length > 1
+    ? "writingArchive.description"
+    : "writingArchive.descriptionSingle";
 ---
 
 <Layout
   title={t("writingArchive.pageTitle")}
   lang={lang}
-  languageLinks={{ en: getWritingIndexUrl("en"), pl: getWritingIndexUrl("pl") }}
-  alternates={[
-    { lang: "en", href: getWritingIndexUrl("en") },
-    { lang: "pl", href: getWritingIndexUrl("pl") },
-  ]}
+  languageLinks={languageLinks}
+  alternates={alternates}
+  asideGap={36}
+  asideMinHeight="520px"
 >
-  <WritingArchive
-    client:load
-    posts={posts}
-    lang={lang}
-    messages={ui[lang]}
-    articleForms={getPluralForms(lang, "writingArchive.articles")}
-  />
+  <Fragment slot="sidebar">
+    <nav
+      aria-label={t("common.breadcrumb")}
+      class="flex items-center gap-2 font-mono text-xs text-sub"
+    >
+      <a
+        href={localizeUrl(lang)}
+        class="transition-[color] duration-150 hover:text-ink touch:active:text-ink"
+      >
+        {t("writingArchive.crumbHome")}
+      </a>
+      <span class="text-line2">/</span>
+      <span class="text-ink">{t("writingArchive.crumbCurrent")}</span>
+    </nav>
+
+    <div class="flex flex-col gap-5">
+      <h1
+        class="text-[32px] leading-[1.05] font-medium tracking-[-0.03em] text-balance lg:text-[36px]"
+      >
+        {t("writingArchive.title")}
+      </h1>
+      <p class="max-w-[28ch] text-sub text-pretty">
+        {t(descriptionKey)}
+      </p>
+    </div>
+
+    {
+      /*
+        Two islands over one shared state module: the controls belong to the
+        sidebar column and the list to the main one, so a single component
+        cannot cover both. See `archive-state.svelte.ts`.
+      */
+    }
+    <ArchiveFilters
+      client:load
+      lang={lang}
+      messages={ui[lang]}
+      articleForms={getPluralForms(lang, "writingArchive.articles")}
+      initialCount={getPostsByLang(posts, lang).length}
+    />
+  </Fragment>
+
+  {
+    /*
+      `TwoColumn` gives `main` 28px of top padding on phone, which the home page
+      wants; the archive sits 8px below the stacked sidebar. Pulled back here
+      rather than in the shared layout, which 404 and home also use.
+    */
+  }
+  <div slot="content" class="max-[700px]:-mt-5">
+    <WritingArchive
+      client:load
+      posts={posts}
+      lang={lang}
+      messages={ui[lang]}
+    />
+  </div>
 </Layout>

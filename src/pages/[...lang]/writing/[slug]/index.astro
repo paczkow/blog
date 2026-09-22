@@ -1,14 +1,21 @@
 ---
 import { render } from "astro:content";
 
+import { getRelativeLocaleUrl } from "astro:i18n";
+import ArticleToc from "@/components/ArticleToc.svelte";
 import Prose from "@/components/Prose.astro";
 import {
-  getArticleStaticPaths,
   type ArticleRouteProps,
+  getArticleStaticPaths,
 } from "@/helpers/page-data.ts";
-import { LANGS, findTranslation } from "@/helpers/posts.ts";
+import {
+  findTranslation,
+  getLocaleLinks,
+  getPostsByLang,
+  getSortedByDate,
+  getWritingIndexUrl,
+} from "@/helpers/posts.ts";
 import { useTranslations } from "@/i18n/utils.ts";
-import { getRelativeLocaleUrl } from "astro:i18n";
 import Layout from "@/layouts/Base.astro";
 import type { Lang } from "@/models.ts";
 
@@ -18,23 +25,35 @@ const { entry, currentPost, posts } = Astro.props as ArticleRouteProps;
 const lang = currentPost.lang;
 const t = useTranslations(lang);
 const { Content, headings } = await render(entry);
-const tocHeadings = headings
-  .filter((h) => h.depth === 2)
-  .map((h) => ({ ...h, text: h.text.replace(/^#\s*/, "") }));
+const tocHeadings = headings.filter((heading) => heading.depth === 2);
+
+// The index the eyebrow, the breadcrumb and the footer all show is the post's
+// place in its own locale's list, newest first — the same ordering the archive
+// and the home page number their rows by.
+const localePosts = getSortedByDate(getPostsByLang(posts, lang));
+const position = localePosts.findIndex((post) => post.id === currentPost.id);
+const olderPost = localePosts[position + 1];
+
+const toIndexLabel = (zeroBased: number) =>
+  String(zeroBased + 1).padStart(2, "0");
+
+// Frontmatter dates are plain `YYYY-MM-DD`, so they coerce to UTC midnight and
+// the ISO prefix is the authored day in every timezone.
+const isoDate = currentPost.date.toISOString().slice(0, 10);
 
 const getLocalizedPostUrl = (targetLang: Lang) => {
   if (targetLang === lang) return currentPost.url;
   return findTranslation(posts, currentPost, targetLang)?.url;
 };
 
-const languageLinks = Object.fromEntries(
-  LANGS.map((targetLang) => [targetLang, getLocalizedPostUrl(targetLang)]),
-) as Partial<Record<Lang, string>>;
+const { alternates, languageLinks } = getLocaleLinks(getLocalizedPostUrl);
 
-const alternates = LANGS.flatMap((targetLang) => {
-  const href = getLocalizedPostUrl(targetLang);
-  return href ? [{ lang: targetLang, href }] : [];
-});
+const crumbLinkClass =
+  "transition-[color] duration-150 hover:text-ink touch:active:text-ink";
+const monoLabelClass =
+  "text-mute font-mono text-[11px] tracking-[0.08em] uppercase";
+const footerLinkClass =
+  "text-sub flex flex-col gap-1.5 no-underline transition-[color] duration-150 hover:text-ink touch:active:text-ink";
 ---
 
 <Layout
@@ -43,236 +62,100 @@ const alternates = LANGS.flatMap((targetLang) => {
   languageLinks={languageLinks}
   alternates={alternates}
 >
-  <div class="relative">
+  <Fragment slot="breadcrumb">
+    <nav
+      aria-label={t("common.breadcrumb")}
+      class="flex items-center gap-2 whitespace-nowrap"
+    >
+      <a href={getRelativeLocaleUrl(lang)} class={crumbLinkClass}>
+        {t("article.crumbHome")}
+      </a>
+      <span class="text-line2" aria-hidden="true">/</span>
+      <a href={getWritingIndexUrl(lang)} class={crumbLinkClass}>
+        {t("article.crumbWriting")}
+      </a>
+    </nav>
+  </Fragment>
+
+  <div
+    class="px-5 pt-[88px] pb-16 min-[700px]:px-4 min-[700px]:pt-[112px] min-[700px]:pb-24"
+  >
     {
-      currentPost.toc && tocHeadings.length > 0 && (
-        <aside class="toc-rail hidden lg:block absolute top-0 h-full">
-          <nav id="toc" class="sticky top-(--nav-height)">
-            <ul class="m-0 flex list-none flex-col gap-0 p-0">
-              <li
-                data-scroll-section="article-title"
-                class="toc-item toc-top relative mb-3"
-              >
-                <button type="button" aria-label={t("article.titleAria")} class="toc-button group/toc relative flex w-full cursor-pointer items-center py-1.5 pr-4 text-left">
-                  <span class="toc-dot block h-1 w-1 bg-sand-7 transition-all duration-200 ease-out group-hover/toc:bg-sand-11 dark:bg-sand-8 dark:group-hover/toc:bg-sand-11" />
-                </button>
-              </li>
-              {tocHeadings.map((heading) => (
-                <li
-                  data-scroll-section={heading.slug}
-                  class="toc-item relative"
-                >
-                  <button type="button" class="toc-button group/toc relative flex w-full cursor-pointer items-center py-1.5 pr-4 text-left">
-                    <span class="toc-line block h-px w-6 bg-sand-7 transition-all duration-200 ease-out group-hover/toc:w-9 group-hover/toc:bg-sand-11 dark:bg-sand-8 dark:group-hover/toc:bg-sand-11" />
-                    <span class="toc-label pointer-events-none absolute left-12 whitespace-nowrap text-xs leading-snug text-sand-10 opacity-0 translate-x-1 transition-[opacity,transform] duration-200 ease-out group-hover/toc:translate-x-0 group-hover/toc:text-sand-11 group-hover/toc:opacity-100">
-                      {heading.text}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </aside>
-      )
+      /*
+        The design's `62ch` measures 617px in Geist but only 587px in Inter,
+        which rewraps the title and shortens every line. The measure is pinned in
+        px so the column, the line breaks and the header height stay put
+        whichever sans is loaded.
+      */
     }
-
-    <div class="mx-auto w-full max-w-prose px-4">
-      <nav
-        aria-label={t("common.breadcrumb")}
-        class="mb-12 flex items-center gap-2 text-sm text-sand-11"
-      >
-        <a
-          href={getRelativeLocaleUrl(lang)}
-          class="transition-colors hover:text-sand-12 touch:active:text-sand-12"
-        >
-          {t("common.home")}
-        </a>
-        <span class="text-sand-9">/</span>
-        <a
-          href={getRelativeLocaleUrl(lang, "writing")}
-          class="transition-colors hover:text-sand-12 touch:active:text-sand-12"
-        >
-          {t("article.breadcrumbWriting")}
-        </a>
-      </nav>
-
-      <header class="mb-8">
+    <div class="relative mx-auto w-full max-w-[617px]">
+      <header class="border-line flex flex-col gap-[18px] border-b pb-7">
         <h1
           id="article-title"
-          class="font-display text-sand-12 text-4xl md:text-5xl font-normal leading-[1.05] tracking-tight"
+          class="m-0 scroll-mt-[120px] text-[30px] leading-[1.1] font-medium tracking-[-0.03em] text-balance min-[700px]:text-[34px] lg:text-[38px]"
         >
           {currentPost.title}
         </h1>
-        <div class="mt-5 flex items-center gap-3 text-sm text-sand-10">
-          <time datetime={currentPost.date.toISOString()} class="tabular-nums">
-            {
-              currentPost.date.toLocaleDateString(t("common.locale"), {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-            }
-          </time>
-          {
-            currentPost.readTime && (
-              <>
-                <span class="text-sand-8">·</span>
-                <span class="tabular-nums">
-                  {currentPost.readTime} {t("common.readTime")}
-                </span>
-              </>
-            )
-          }
+        <p class="text-sub m-0 text-[17px] leading-[1.55] text-pretty">
+          {currentPost.description}
+        </p>
+        <div class="text-mute flex gap-4 font-mono text-xs">
+          <time datetime={isoDate}>{isoDate}</time>
+          <span class="text-line2" aria-hidden="true">·</span>
+          <span>{currentPost.readTime} {t("common.readTime")}</span>
+          <span class="text-line2" aria-hidden="true">·</span>
+          <span>{lang.toUpperCase()}</span>
         </div>
       </header>
 
-      <hr class="mb-12 border-0 border-t border-sand-4 dark:border-sand-6" />
+      {
+        /*
+          Renders both forms of the contents list: the rail is absolutely
+          positioned against the column above, so its place in the markup only
+          decides where the inline fallback lands — directly under the header.
+        */
+      }
+      {
+        currentPost.toc && tocHeadings.length > 0 && (
+          <ArticleToc
+            client:load
+            headings={tocHeadings.map(({ slug, text }) => ({
+              id: slug,
+              text,
+            }))}
+            i18n={{ label: t("article.onThisPage"), top: t("article.top") }}
+          />
+        )
+      }
 
-      <article>
-        <Prose>
+      <article class="pt-4">
+        <Prose figureLabel={t("article.figureLabel")}>
           <Content />
         </Prose>
       </article>
+
+      <footer
+        class="border-line mt-14 grid grid-cols-2 gap-6 border-t pt-5 text-[13px]"
+      >
+        <a href={getWritingIndexUrl(lang)} class={footerLinkClass}>
+          <span class={monoLabelClass}>← {t("common.allWriting")}</span>
+          <span class="text-ink font-medium">{t("article.backToList")}</span>
+        </a>
+        {
+          /*
+            The oldest post in a locale has nothing to point at, so the cell is
+            dropped rather than faked; the grid keeps the remaining link left.
+          */
+        }
+        {
+          olderPost && (
+            <a href={olderPost.url} class={`${footerLinkClass} text-right`}>
+              <span class={monoLabelClass}>{t("article.older")}</span>
+              <span class="text-ink font-medium">{olderPost.title}</span>
+            </a>
+          )
+        }
+      </footer>
     </div>
   </div>
 </Layout>
-
-<style>
-  #toc {
-    opacity: 0.6;
-    transition: opacity 200ms ease-out;
-  }
-  #toc:has(.toc-item:hover),
-  #toc:has(.toc-item.active) {
-    opacity: 1;
-  }
-  .toc-item.active .toc-line {
-    height: 2px;
-    background: var(--color-sand-11);
-  }
-  .toc-item.toc-top.active .toc-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--color-sand-11);
-  }
-</style>
-
-<script>
-  const { hash } = window.location;
-  let observerEnabled = true;
-
-  const alignTocRail = () => {
-    const prefs = document.getElementById("preferences-rail");
-    const toc = document.querySelector<HTMLElement>(".toc-rail");
-    if (!prefs || !toc || !toc.offsetParent) return;
-
-    const prefsLeft = prefs.getBoundingClientRect().left;
-    const parentLeft = toc.offsetParent.getBoundingClientRect().left;
-    toc.style.left = `${prefsLeft - parentLeft + 5}px`;
-  };
-
-  alignTocRail();
-  window.addEventListener("resize", alignTocRail);
-
-  document.addEventListener("DOMContentLoaded", () => {
-    alignTocRail();
-    requestAnimationFrame(alignTocRail);
-    const items = Array.from(
-      document.querySelectorAll<HTMLLIElement>("#toc .toc-item"),
-    );
-    if (items.length === 0) return;
-
-    const activeItem =
-      items.find(
-        (item) =>
-          item.getAttribute("data-scroll-section") === hash.replace("#", ""),
-      ) ?? items[0];
-
-    activeItem?.classList.add("active");
-
-    items.forEach((item) => {
-      const button = item.querySelector("button");
-      button?.addEventListener("click", () => {
-        const id = item.getAttribute("data-scroll-section");
-        const section = document.getElementById(id ?? "");
-
-        items.forEach((l) => l.classList.remove("active"));
-        item.classList.add("active");
-
-        if (section) {
-          observerEnabled = false;
-          section?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-          setTimeout(() => {
-            observerEnabled = true;
-          }, 1000);
-        }
-      });
-    });
-  });
-
-  const headers = document.querySelectorAll("#article-title, h2");
-  const items = Array.from(
-    document.querySelectorAll<HTMLLIElement>("#toc .toc-item"),
-  );
-
-  const seen = new WeakSet();
-
-  const isAtBottom = () => {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-    return scrollTop + windowHeight >= documentHeight - 50;
-  };
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (!observerEnabled) return;
-
-      if (isAtBottom()) {
-        items.forEach((item) => item.classList.remove("active"));
-        if (items.length > 0) {
-          items[items.length - 1].classList.add("active");
-        }
-        return;
-      }
-
-      entries.forEach((entry) => {
-        if (!seen.has(entry.target)) {
-          seen.add(entry.target);
-          return;
-        }
-
-        const current = items.findIndex((item) => {
-          const id = item.getAttribute("data-scroll-section");
-          return id === entry.target.id;
-        });
-
-        if (entry.isIntersecting) {
-          items.forEach((item, index) => {
-            if (index === current) {
-              item.classList.add("active");
-            } else {
-              item.classList.remove("active");
-            }
-          });
-        } else if (
-          entry.intersectionRatio === 0 &&
-          entry.boundingClientRect.bottom >= 0 &&
-          current > 0
-        ) {
-          items[current].classList.remove("active");
-          items[current - 1].classList.add("active");
-        }
-      });
-    },
-    {
-      root: null,
-      rootMargin: "0px 0px -50% 0px",
-    },
-  );
-
-  headers.forEach((header) => observer.observe(header));
-</script>

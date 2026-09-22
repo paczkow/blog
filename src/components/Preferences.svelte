@@ -1,6 +1,6 @@
 <script lang="ts">
+import { activeLangs } from "@/i18n/config.ts";
 import type { Lang } from "@/models.ts";
-import Tooltip from "./Tooltip.svelte";
 
 type Theme = "light" | "dark";
 
@@ -16,7 +16,7 @@ type PreferencesI18n = {
 };
 
 const {
-  activeLang,
+  activeLang = "en",
   languageLinks,
   i18n,
 }: {
@@ -25,147 +25,80 @@ const {
   i18n: PreferencesI18n;
 } = $props();
 
-let lang = $state<Lang>("en");
+// Only the button's label needs this in JS — the glyph itself is swapped by the
+// `dark:` variant below, so it is already right at first paint. Reading the
+// class rather than localStorage keeps this in step with the blocking script in
+// Head.astro, which is the single place the stored choice and
+// `prefers-color-scheme` are reconciled.
 let theme = $state<Theme>("light");
 
-function readLang(): Lang {
-  const stored = localStorage.getItem("lang");
-  return stored === "pl" ? "pl" : "en";
-}
-
-function readTheme(): Theme {
-  const stored = localStorage.getItem("theme");
-  if (stored === "dark" || stored === "light") return stored;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
+$effect(() => {
+  theme = document.documentElement.classList.contains("dark")
     ? "dark"
     : "light";
-}
-
-function setLang(next: Lang) {
-  localStorage.setItem("lang", next);
-  document.documentElement.lang = next;
-}
-
-function setTheme(next: Theme) {
-  localStorage.setItem("theme", next);
-  document.documentElement.classList.toggle("dark", next === "dark");
-}
-
-$effect(() => {
-  lang = activeLang ?? readLang();
-  theme = readTheme();
 });
 
 function toggleTheme() {
-  const next = theme === "light" ? "dark" : "light";
-  setTheme(next);
+  const next: Theme = document.documentElement.classList.contains("dark")
+    ? "light"
+    : "dark";
+  localStorage.setItem("theme", next);
+  document.documentElement.classList.toggle("dark", next === "dark");
   theme = next;
 }
 
-function langClass(active: boolean, unavailable = false) {
-  if (unavailable) {
-    return "px-0.5 py-2 transition-colors duration-200 text-sand-8 cursor-default active:text-sand-10";
-  }
+const unavailableCopy: Record<Lang, { title: string; aria: string }> = {
+  en: { title: i18n.tooltipEn, aria: i18n.ariaEn },
+  pl: { title: i18n.tooltipPl, aria: i18n.ariaPl },
+};
 
-  return active
-    ? "px-0.5 py-2 transition-colors duration-200 text-sand-12"
-    : "px-0.5 py-2 transition-colors duration-200 text-sand-9 hover:text-sand-11 touch:active:text-sand-12";
-}
-
-function isUnavailable(targetLang: Lang) {
-  return !!languageLinks && !languageLinks[targetLang];
-}
+// `transition-[color]` rather than `transition-colors`: the design animates the
+// text colour alone, and Tailwind's list drags `outline-color` in with it, which
+// fades the focus ring in instead of painting it on the first frame.
+const linkClass =
+  "text-mute transition-[color] duration-150 hover:text-ink touch:active:text-ink";
 </script>
 
-<div
-	id="preferences-rail"
-	class="group/prefs flex items-center justify-end gap-3 text-xs text-sand-10 opacity-60 transition-opacity duration-200 hover:opacity-100"
-	aria-label={i18n.siteLabel}
->
-	<div
-		class="flex items-center gap-1"
-		role="group"
-		aria-label={i18n.langLabel}
-	>
-		{#if languageLinks?.en}
-			<a
-				href={languageLinks.en}
-				onclick={() => {
-					setLang("en");
-					lang = "en";
-				}}
-				aria-current={lang === "en" ? "page" : undefined}
-				class="cursor-pointer no-underline {langClass(lang === 'en')}"
-			>
-				EN
-			</a>
-		{:else if isUnavailable("en")}
-			<Tooltip content={i18n.tooltipEn}>
+<div class="flex items-center gap-4" aria-label={i18n.siteLabel}>
+	<!--
+		Driven by the locale flags rather than a literal list: pausing a locale
+		takes it out of the switcher, and a site left with one locale shows no
+		switcher at all.
+	-->
+	{#if activeLangs.length > 1}
+	<div class="flex items-center gap-1.5" role="group" aria-label={i18n.langLabel}>
+		{#each activeLangs as code, index (code)}
+			{@const label = code.toUpperCase()}
+			{#if index > 0}
+				<span class="text-line2 select-none" aria-hidden="true">/</span>
+			{/if}
+			{#if code === activeLang}
+				<span class="text-ink" aria-current="page">{label}</span>
+			{:else if languageLinks?.[code]}
+				<a href={languageLinks[code]} hreflang={code} class="no-underline {linkClass}">
+					{label}
+				</a>
+			{:else}
 				<span
+					class="text-line2 cursor-default"
 					aria-disabled="true"
-					aria-label={i18n.ariaEn}
-					class={langClass(lang === "en", true)}
+					aria-label={unavailableCopy[code].aria}
+					title={unavailableCopy[code].title}
 				>
-					EN
+					{label}
 				</span>
-			</Tooltip>
-		{:else}
-			<button
-				type="button"
-				onclick={() => {
-					setLang("en");
-					lang = "en";
-				}}
-				aria-pressed={lang === "en"}
-				class="cursor-pointer {langClass(lang === 'en')}"
-			>
-				EN
-			</button>
-		{/if}
-		<span class="text-sand-7 select-none" aria-hidden="true">·</span>
-		{#if languageLinks?.pl}
-			<a
-				href={languageLinks.pl}
-				onclick={() => {
-					setLang("pl");
-					lang = "pl";
-				}}
-				aria-current={lang === "pl" ? "page" : undefined}
-				class="cursor-pointer no-underline {langClass(lang === 'pl')}"
-			>
-				PL
-			</a>
-		{:else if isUnavailable("pl")}
-			<Tooltip content={i18n.tooltipPl}>
-				<span
-					aria-disabled="true"
-					aria-label={i18n.ariaPl}
-					class={langClass(lang === "pl", true)}
-				>
-					PL
-				</span>
-			</Tooltip>
-		{:else}
-			<button
-				type="button"
-				onclick={() => {
-					setLang("pl");
-					lang = "pl";
-				}}
-				aria-pressed={lang === "pl"}
-				class="cursor-pointer {langClass(lang === 'pl')}"
-			>
-				PL
-			</button>
-		{/if}
+			{/if}
+		{/each}
 	</div>
+	{/if}
 
 	<button
 		type="button"
 		onclick={toggleTheme}
 		aria-label={theme === "light" ? i18n.switchToDark : i18n.switchToLight}
-		class="cursor-pointer px-1 py-2 text-base leading-none text-sand-10 transition-colors duration-200 hover:text-sand-12 touch:active:text-sand-12"
+		class="border-line text-sub hover:border-line2 hover:text-ink touch:active:text-ink grid size-7 cursor-pointer place-items-center rounded-md border text-sm leading-none transition-[border-color,color] duration-150"
 	>
-		{theme === "light" ? "◐" : "◑"}
+		<span class="dark:hidden" aria-hidden="true">◐</span>
+		<span class="hidden dark:block" aria-hidden="true">◑</span>
 	</button>
 </div>

@@ -7,10 +7,45 @@ interface Props {
   lang?: Lang;
   languageLinks?: Partial<Record<Lang, string>>;
   alternates?: { lang: Lang; href: string }[];
-  isHome?: boolean;
+  /** Gap between the sidebar's blocks on tablet and desktop. Home 40, archive/404 36. */
+  asideGap?: number;
+  /** Gap between the sidebar's blocks on phone, where the panel is static. */
+  asideGapPhone?: number;
+  /** Floor for the sticky sidebar's height. Home 560px, archive 520px. Ignored when `asideSticky` is false. */
+  asideMinHeight?: string;
+  /**
+   * Sticky sidebar (home, archive). Set false for the 404, whose panel scrolls
+   * with the page and only reserves the viewport height as a minimum.
+   */
+  asideSticky?: boolean;
+  /**
+   * Clip the sidebar to its own box. Only the home page wants this, to keep the
+   * glyph canvas inside the panel; everywhere else it amputates the focus ring
+   * on the first sidebar link, which sits flush at the panel's origin.
+   */
+  asideClip?: boolean;
+  /** Sidebar's bottom padding on phone, where it stacks above the content. Home/archive 28, 404 24. */
+  asideGapBottomPhone?: number;
 }
 
-const { title, lang, languageLinks, alternates, isHome } = Astro.props;
+const {
+  title,
+  lang,
+  languageLinks,
+  alternates,
+  asideGap = 40,
+  asideGapPhone = 24,
+  asideMinHeight = "560px",
+  asideSticky = true,
+  asideClip = false,
+  asideGapBottomPhone = 28,
+} = Astro.props;
+
+// Both branches are spelled out as literals so Tailwind's source scan sees every
+// class; a template string assembled at runtime would not be generated.
+const asideHeightClass = asideSticky
+  ? "min-[700px]:sticky min-[700px]:top-24 min-[700px]:h-[calc(100vh-176px)] min-[700px]:min-h-(--aside-min-h) lg:top-[104px] lg:h-[calc(100vh-200px)]"
+  : "min-[700px]:min-h-[calc(100vh-176px)] lg:min-h-[calc(100vh-200px)]";
 ---
 
 <Base
@@ -18,17 +53,33 @@ const { title, lang, languageLinks, alternates, isHome } = Astro.props;
   lang={lang}
   languageLinks={languageLinks}
   alternates={alternates}
-  isHome={isHome}
 >
+  <slot name="breadcrumb" slot="breadcrumb" />
   <div
-    class="grid grid-cols-1 grid-rows-[1fr] gap-y-8 lg:grid-cols-[340px_600px] lg:gap-8 px-4 md:justify-between"
+    class="grid grid-cols-[minmax(0,1fr)] items-start px-5 pt-[84px] pb-16 min-[700px]:grid-cols-[260px_minmax(0,1fr)] min-[700px]:px-6 min-[700px]:pt-24 min-[700px]:pb-20 lg:grid-cols-[340px_minmax(0,1fr)] lg:px-4 lg:pt-[104px] lg:pb-24"
   >
+    {
+      /*
+        `relative` is always on: it is the positioning context an absolutely
+        placed decoration needs, and it costs nothing otherwise. Clipping is
+        opt-in — `overflow: clip` (never `hidden`, which would create a scroll
+        container and break the sticky) keeps the home glyph canvas inside the
+        panel, but it would also cut the focus ring off the first sidebar link.
+      */
+    }
     <aside
-      class="lg:sticky z-10 lg:top-(--nav-height) col-start-1 col-end-2 px-4 lg:h-[calc(100vh-var(--nav-height)-var(--page-bottom))]"
+      class:list={[
+        "border-line relative flex flex-col gap-(--aside-gap-phone) border-b pb-(--aside-pb-phone) min-[700px]:gap-(--aside-gap) min-[700px]:border-r min-[700px]:border-b-0 min-[700px]:pr-7 min-[700px]:pb-0 lg:pr-10",
+        asideClip && "overflow-clip",
+        asideHeightClass,
+      ]}
+      style={`--aside-gap:${asideGap}px;--aside-gap-phone:${asideGapPhone}px;--aside-pb-phone:${asideGapBottomPhone}px;--aside-min-h:${asideMinHeight}`}
     >
       <slot name="sidebar" />
     </aside>
-    <main>
+    <main
+      class="flex min-w-0 flex-col pt-7 min-[700px]:pt-0 min-[700px]:pl-7 lg:pl-10"
+    >
       <slot name="content" />
     </main>
   </div>

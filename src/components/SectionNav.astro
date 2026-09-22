@@ -1,0 +1,126 @@
+---
+interface Props {
+  ariaLabel: string;
+  /** `id` must match the `id` of the section it scrolls to. */
+  items: { id: string; label: string }[];
+  class?: string;
+}
+
+const { ariaLabel, items, class: className } = Astro.props;
+---
+
+<nav
+  id="section-nav"
+  aria-label={ariaLabel}
+  class:list={["hidden flex-col gap-[14px] min-[700px]:flex", className]}
+>
+  {
+    items.map((item) => (
+      <button
+        type="button"
+        data-target={item.id}
+        class="nav-item group flex cursor-pointer items-center gap-[14px] text-left font-mono text-[11px] tracking-[0.08em] uppercase"
+      >
+        <span class="nav-line bg-line2 group-hover:bg-ink block h-px w-5 transition-[width,background-color] duration-200 ease-out group-hover:w-8" />
+        <span class="nav-label text-sub group-hover:text-ink transition-colors duration-200">
+          {item.label}
+        </span>
+      </button>
+    ))
+  }
+</nav>
+
+<style>
+  /* The active state is toggled from the script below, so it cannot live in a
+     Tailwind variant. Unlayered rules beat Tailwind's utility layer, which is
+     what lets these override the resting `w-5` / `bg-line2`. */
+  .nav-item.active .nav-line {
+    width: 32px;
+    background-color: var(--color-ink);
+  }
+
+  .nav-item.active .nav-label {
+    color: var(--color-ink);
+  }
+</style>
+
+<script>
+  const items = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("#section-nav .nav-item"),
+  );
+
+  if (items.length > 0) {
+    let observerEnabled = true;
+
+    const setActive = (id: string) => {
+      items.forEach((item) =>
+        item.classList.toggle(
+          "active",
+          item.getAttribute("data-target") === id,
+        ),
+      );
+    };
+
+    items.forEach((item) => {
+      item.addEventListener("click", () => {
+        const id = item.getAttribute("data-target");
+        if (!id) return;
+        const section = document.getElementById(id);
+        setActive(id);
+        if (section) {
+          // The scroll-spy would fight the smooth scroll on the way there, so
+          // it stays muted until the animation has had time to land.
+          observerEnabled = false;
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.setTimeout(() => {
+            observerEnabled = true;
+          }, 1000);
+        }
+      });
+    });
+
+    const sections = items
+      .map((item) =>
+        document.getElementById(item.getAttribute("data-target") ?? ""),
+      )
+      .filter((s): s is HTMLElement => !!s);
+
+    const onScroll = () => {
+      if (!observerEnabled) return;
+
+      const pageHeight = document.documentElement.scrollHeight;
+      const scrollBottom = window.scrollY + window.innerHeight;
+      const scrollable = pageHeight > window.innerHeight + 4;
+
+      // A page too short to scroll has no section the reader is "in", so the
+      // geometry below must not pick one: whether a section clears the trigger
+      // line there is an accident of how much content the locale happens to
+      // have. The first section is the honest answer, and it also keeps such a
+      // page off the "at the bottom" branch, which would otherwise be true
+      // from the very first frame.
+      if (!scrollable) {
+        setActive(sections[0]?.id ?? "");
+        return;
+      }
+
+      if (scrollBottom >= pageHeight - 4) {
+        setActive(sections[sections.length - 1]?.id ?? "");
+        return;
+      }
+
+      const triggerY = window.innerHeight * 0.35;
+      let activeId = sections[0]?.id ?? "";
+
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= triggerY) {
+          activeId = section.id;
+        }
+      }
+
+      setActive(activeId);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+</script>

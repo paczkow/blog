@@ -1,10 +1,10 @@
-import { isLang } from "@/i18n/utils.ts";
-import type { Lang, Post } from "@/models.ts";
-import { defaultLang, languages } from "@/models.ts";
 import type { CollectionEntry } from "astro:content";
 import { getRelativeLocaleUrl } from "astro:i18n";
+import { activeLangs } from "@/i18n/config.ts";
+import { isLang } from "@/i18n/utils.ts";
+import type { Lang, Post } from "@/models.ts";
+import { defaultLang } from "@/models.ts";
 
-export const LANGS = Object.keys(languages) as Lang[];
 export const DEFAULT_LANG: Lang = defaultLang;
 
 export const getSortedByDate = <T extends { date: Date }>(
@@ -74,4 +74,21 @@ export const findTranslation = (
       getTranslationKey(candidate) === translationKey
     );
   });
+};
+
+// The `<link rel="alternate">` list and the language switcher show the same set
+// in two shapes, so one pass builds both: paused locales never appear, and a
+// locale with no URL for the current page (an untranslated article) is dropped
+// rather than linked.
+export const getLocaleLinks = (href: (lang: Lang) => string | undefined) => {
+  const alternates = activeLangs.flatMap((lang) => {
+    const url = href(lang);
+    return url ? [{ lang, href: url }] : [];
+  });
+
+  const languageLinks = Object.fromEntries(
+    alternates.map((link) => [link.lang, link.href]),
+  ) as Partial<Record<Lang, string>>;
+
+  return { alternates, languageLinks };
 };

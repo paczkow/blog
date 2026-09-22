@@ -1,0 +1,51 @@
+---
+import Preferences from "@/components/Preferences.svelte";
+import { useTranslations } from "@/i18n/utils.ts";
+import type { Lang } from "@/models.ts";
+
+interface Props {
+  lang?: Lang;
+  languageLinks?: Partial<Record<Lang, string>>;
+}
+
+const { lang = "en", languageLinks } = Astro.props;
+
+const t = useTranslations(lang);
+---
+
+{
+  /*
+    Absolute rather than fixed: the bar is part of the first screen, not a
+    persistent chrome, and the page's own top padding (104px) already clears it.
+  */
+}
+<div class="absolute inset-x-0 top-0 z-20 flex h-14 items-center">
+  {/* 1184 = 1152 content + 16px each side, matching Base.astro's container so
+     the bar's ends sit on the page's own left and right edges. */}
+  <div
+    class="text-sub mx-auto flex w-full max-w-[1184px] items-center justify-between gap-4 px-4 font-mono text-xs"
+  >
+    {
+      /* Always rendered so the preferences group stays right-aligned when the
+        page has no breadcrumb. */
+    }
+    <div class="flex min-w-0 items-center">
+      <slot name="breadcrumb" />
+    </div>
+    <Preferences
+      client:load
+      activeLang={lang}
+      languageLinks={languageLinks}
+      i18n={{
+        siteLabel: t("preferences.site"),
+        langLabel: t("preferences.language"),
+        switchToDark: t("preferences.switchToDark"),
+        switchToLight: t("preferences.switchToLight"),
+        tooltipEn: t("preferences.unavailableTooltip.en"),
+        tooltipPl: t("preferences.unavailableTooltip.pl"),
+        ariaEn: t("preferences.unavailableAria.en"),
+        ariaPl: t("preferences.unavailableAria.pl"),
+      }}
+    />
+  </div>
+</div>

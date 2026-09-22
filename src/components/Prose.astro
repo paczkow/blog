@@ -1,26 +1,176 @@
 ---
-import { clsx } from "clsx";
+interface Props {
+  /** Caption prefix, e.g. `fig.` — localised by the caller. */
+  figureLabel?: string;
+}
 
-const classes = clsx(
-  "prose",
-
-  // Headings
-  "prose-h1:text-lg prose-h1:font-semibold prose-h1:text-sand-12",
-  "prose-h2:text-base prose-h2:prose-a:font-medium prose-h2:text-sand-12",
-  "prose-h2:mb-8 prose-h2:mt-12 prose-h2:prose-a:no-underline prose-h2:prose-a:text-sand-12 prose-h2:prose-a:hover:text-sand-12",
-  "prose-h3:text-base prose-h3:font-semimedium prose-h3:mt-7 prose-h3:mb-6 prose-h3:text-sand-12",
-
-  // Content
-  "prose-li:text-sand-12",
-  "prose-p:text-sand-12 prose-strong:text-sand-12",
-  "prose-a:font-normal prose-a:text-sand-10 prose-a:underline prose-a:hover:text-sand-12 prose-a:active:text-sand-12 prose-a:focus:text-sand-12",
-
-  // Layout
-  "col-span-full contents",
-  "prose-code:dark:text-sand-12",
-);
+const { figureLabel = "fig." } = Astro.props;
 ---
 
-<div class={classes}>
+<div class="article-body" style={`--figure-label: "${figureLabel}"`}>
   <slot />
 </div>
+
+<style>
+  /* Everything below targets slotted markdown, which never carries this
+     component's scope attribute — hence `:global()` on each descendant. */
+  .article-body {
+    /* The `h2` index and the figure number are counters rather than markup, so
+       each heading keeps a single text node — that node is what `render()`
+       hands to the table of contents. */
+    counter-reset: heading-index figure-index;
+    color: var(--color-ink);
+    /* The design calls for 17px, but that was set in Geist; Inter runs larger at
+       the same size, so the body sits on Tailwind's `base` step instead — one
+       size at every width, no phone override. */
+    font-size: var(--text-base);
+    line-height: 1.7;
+  }
+
+  .article-body :global(p) {
+    margin: 22px 0;
+    text-wrap: pretty;
+  }
+
+  .article-body :global(h2) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 60px 0 20px;
+    scroll-margin-top: 120px;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  .article-body :global(h3) {
+    margin: 36px 0 14px;
+    scroll-margin-top: 120px;
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+  }
+
+  .article-body :global(strong) {
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  .article-body :global(a) {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--color-line2);
+    transition: text-decoration-color 150ms;
+  }
+
+  .article-body :global(a:hover) {
+    text-decoration-color: var(--color-ink);
+  }
+
+  /* Tailwind's preflight strips list markers site-wide; prose is the one place
+     that wants them back. */
+  .article-body :global(ul),
+  .article-body :global(ol) {
+    margin: 22px 0;
+    padding-left: 22px;
+  }
+
+  .article-body :global(ul) {
+    list-style: disc;
+  }
+
+  .article-body :global(ol) {
+    list-style: decimal;
+  }
+
+  .article-body :global(li) {
+    margin: 8px 0;
+    text-wrap: pretty;
+  }
+
+  .article-body :global(li::marker) {
+    color: var(--color-mute);
+  }
+
+  .article-body :global(li > p) {
+    margin: 0;
+  }
+
+  .article-body :global(blockquote) {
+    margin: 30px 0;
+    padding-left: 18px;
+    border-left: 1px solid var(--color-line);
+    color: var(--color-sub);
+  }
+
+  .article-body :global(figure) {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 30px 0;
+  }
+
+  .article-body :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--color-line);
+    border-radius: 6px;
+  }
+
+  .article-body :global(figcaption) {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: var(--color-mute);
+  }
+
+  .article-body :global(figcaption::before) {
+    counter-increment: figure-index;
+    content: var(--figure-label) " " counter(figure-index) " — ";
+  }
+
+  .article-body :global(pre) {
+    margin: 26px 0;
+    padding: 14px 16px;
+    border: 1px solid var(--color-line);
+    border-radius: 6px;
+    background: var(--color-bg2);
+    color: var(--color-sub);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+
+  .article-body :global(:not(pre) > code) {
+    padding: 2px 5px;
+    border: 1px solid var(--color-line);
+    border-radius: 6px;
+    background: var(--color-bg2);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--color-sub);
+  }
+
+  /* Shiki writes both palettes onto every token as custom properties; these two
+     rules are what actually paints one of them. */
+  .article-body :global(.astro-code),
+  .article-body :global(.astro-code span) {
+    color: var(--shiki-light);
+  }
+
+  :global(:root.dark) .article-body :global(.astro-code),
+  :global(:root.dark) .article-body :global(.astro-code span) {
+    color: var(--shiki-dark);
+  }
+
+  .article-body :global(hr) {
+    margin: 48px 0;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+  }
+</style>

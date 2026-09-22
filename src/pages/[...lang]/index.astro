@@ -1,0 +1,208 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import GlyphBackground from "@/components/GlyphBackground.svelte";
+import PostRow from "@/components/PostRow.astro";
+import SectionNav from "@/components/SectionNav.astro";
+import SidebarLinks from "@/components/SidebarLinks.astro";
+import TypedSubtitle from "@/components/TypedSubtitle.svelte";
+import WritingHeatmap from "@/components/WritingHeatmap.svelte";
+import { postListClass } from "@/components/post-row.ts";
+import {
+  getHomePosts,
+  getLocaleStaticPaths,
+  loadWritingPosts,
+} from "@/helpers/page-data.ts";
+import { getLocaleLinks } from "@/helpers/posts.ts";
+import { interpolate, useTranslations } from "@/i18n/utils.ts";
+import Layout from "@/layouts/TwoColumn.astro";
+import { SITE } from "config";
+
+// Home for every locale: the default one has no `lang` param and is served at
+// `/`, the rest are prefixed (`/pl`). A paused locale is absent from
+// `activeLangs`, so its home simply stops being generated.
+export const getStaticPaths = getLocaleStaticPaths;
+
+const { lang } = Astro.props;
+const { posts: allPosts } = await loadWritingPosts();
+const posts = getHomePosts(allPosts, lang);
+const t = useTranslations(lang);
+const locale = t("common.locale");
+const writingHref = getRelativeLocaleUrl(lang, "writing");
+const { alternates, languageLinks } = getLocaleLinks(getRelativeLocaleUrl);
+
+// Home is a teaser for the archive, which holds the rest.
+const HOME_POSTS = 4;
+
+// `PostRow` takes preformatted strings and does no date maths, so the locale is
+// resolved here.
+const rows = posts.slice(0, HOME_POSTS).map((post) => ({
+  href: post.url,
+  title: post.title,
+  description: post.description,
+  date: post.date.toLocaleDateString(locale, {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  }),
+  readTime: `${post.readTime} ${t("common.readTimeShort")}`,
+}));
+
+const navItems = [
+  {
+    id: "writing",
+    label: t("home.nav.writing"),
+  },
+  { id: "about", label: t("home.nav.about") },
+];
+
+const proseLinkClass =
+  "text-ink underline decoration-line2 underline-offset-[3px] transition-[text-decoration-color] duration-150 hover:decoration-ink touch:active:decoration-ink";
+
+const externalLink = (href: string, label: string) =>
+  `<a class="${proseLinkClass}" href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+
+const contact = interpolate(t("home.about.contact"), {
+  linkedin: externalLink(SITE.social.linkedin, "LinkedIn"),
+  bluesky: externalLink(SITE.social.bluesky, "Bluesky"),
+});
+
+const heatmapPosts = posts.map((post) => ({
+  id: post.id,
+  title: post.title,
+  date: post.date.toISOString(),
+}));
+---
+
+<Layout
+  title={SITE.title}
+  lang={lang}
+  languageLinks={languageLinks}
+  alternates={alternates}
+  asideClip
+>
+  <Fragment slot="sidebar">
+    {
+      /*
+        The glyph field fills the panel behind everything else; each block below
+        carries `relative z-[1]` rather than sharing one wrapper so the layout's
+        own `--aside-gap` still spaces them and `mt-auto` still reaches the
+        panel's bottom.
+      */
+    }
+    <div class="pointer-events-none absolute inset-0 z-0 hidden lg:block">
+      <GlyphBackground client:media="(min-width: 1024px)" />
+    </div>
+
+    <div class="relative z-[1] flex flex-col gap-5">
+      <h1
+        class="text-[26px] leading-[1.05] font-medium tracking-[-0.03em] min-[700px]:text-[32px] lg:text-[36px]"
+      >
+        Michał<br />Paczków
+      </h1>
+      {
+        /*
+          The subtitle is server-rendered so it survives with no JavaScript at
+          all, which also means the finished sentence is in the HTML and paints
+          long before hydration can decide to type it — the flash. So the
+          decision is made here instead, inline and parser-blocking, before the
+          paragraph below exists: the mark it leaves is what the component's CSS
+          hides from frame one, and what the island reads back rather than
+          deciding again. Kept here rather than in `Head.astro` beside the theme
+          script because only home has a subtitle, and a copy running on every
+          article page would spend the session's one animation on a page that
+          cannot play it.
+        */
+      }
+      <script is:inline>
+        {
+          let type = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+          if (type) {
+            try {
+              // Once per session. The animation introduces the page; replaying
+              // it on every return to home would only delay reading it.
+              type = !sessionStorage.getItem("pm-typed");
+              if (type) sessionStorage.setItem("pm-typed", "1");
+            } catch {
+              // Storage blocked (private mode) — type rather than skip.
+            }
+          }
+
+          if (type) document.documentElement.dataset.subtitleTyping = "";
+        }
+      </script>
+      <TypedSubtitle client:load html={t("home.hero.subtitle")} />
+    </div>
+
+    <SectionNav
+      class="relative z-[1]"
+      ariaLabel={t("home.nav.sections")}
+      items={navItems}
+    />
+
+    <div class="relative z-[1] mt-auto flex flex-col gap-7">
+      <WritingHeatmap
+        posts={heatmapPosts}
+        i18n={{
+          locale,
+          heatmapTitle: t("home.heatmap.title"),
+          noWriting: t("home.heatmap.noWriting"),
+        }}
+      />
+      <SidebarLinks ariaLabel={t("common.links")} />
+    </div>
+  </Fragment>
+
+  <Fragment slot="content">
+    <div class="flex flex-col gap-[56px] min-[700px]:gap-[72px]">
+      <section id="writing" class="flex scroll-mt-6 flex-col">
+        <div
+          class="flex items-baseline justify-between pb-3"
+        >
+          <h2
+            class="text-sub font-mono text-[11px] font-medium tracking-[0.08em] uppercase"
+          >
+            {t("common.writing")}
+          </h2>
+          <a
+            href={writingHref}
+            class="text-sub hover:text-ink touch:active:text-ink flex items-center gap-1.5 text-[13px] transition-colors duration-150"
+          >
+            {t("common.allWriting")}
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+        <div class={postListClass}>
+          {
+            rows.map((row) => (
+              <PostRow
+                href={row.href}
+                title={row.title}
+                description={row.description}
+                date={row.date}
+                readTime={row.readTime}
+              />
+            ))
+          }
+        </div>
+      </section>
+
+      <section id="about" class="flex scroll-mt-6 flex-col gap-5 pb-2">
+        <div class="pb-3">
+          <h2
+            class="text-sub font-mono text-[11px] font-medium tracking-[0.08em] uppercase"
+          >
+            {t("home.about.heading")}
+          </h2>
+        </div>
+        <p
+          class="max-w-[48ch] text-[17px] leading-[1.4] font-medium tracking-[-0.01em] text-pretty"
+        >
+          {t("home.about.lede")}
+        </p>
+        <p class="text-sub max-w-[62ch] text-pretty">{t("home.about.body")}</p>
+        <p class="text-sub" set:html={contact} />
+      </section>
+    </div>
+  </Fragment>
+</Layout>

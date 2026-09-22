@@ -4,8 +4,11 @@ const en = {
   "common.locale": "en-US",
   "common.home": "Home",
   "common.writing": "Writing",
-  "common.allWriting": "All Writing",
+  "common.allWriting": "All writing",
   "common.readTime": "min read",
+  // The ruled post rows meter the read time into a 96px mono column, where the
+  // sentence form the article header can afford does not fit.
+  "common.readTimeShort": "min",
   "common.breadcrumb": "Breadcrumb",
   "common.links": "Links",
 
@@ -35,8 +38,24 @@ const en = {
   "writingArchive.current": "Writing",
   "writingArchive.section": "Writing",
   "writingArchive.title": "Find my writing here",
+  "writingArchive.description":
+    "Everything published so far, in English and Polish.",
+  // Shown instead of the line above while every locale but one is paused, so
+  // the sidebar does not promise a language the archive no longer lists.
+  "writingArchive.descriptionSingle": "Everything published so far.",
+  // Mono breadcrumb crumbs: lowercase and short, because the sentence-case
+  // `common.*` labels break the 12px mono rhythm of the sidebar.
+  "writingArchive.crumbHome": "home",
+  "writingArchive.crumbCurrent": "writing",
   "writingArchive.searchPlaceholder": "Search",
   "writingArchive.searchLanguage": "Search language",
+  "writingArchive.clearSearch": "Clear search",
+  "writingArchive.columnTitle": "Title",
+  "writingArchive.columnMeta": "Date · read",
+  // The archive's meta column is 96px wide, so the read time is a unit rather
+  // than the sentence `common.readTime` spells out.
+  "writingArchive.readTimeShort": "min",
+  "writingArchive.empty.count": "0 results",
   "writingArchive.empty.broken": "The thread is broken.",
   "writingArchive.empty.quiet": "The archive is quiet.",
   "writingArchive.empty.noResults": "No articles connect to",
@@ -52,9 +71,23 @@ const en = {
   "notFound.home": "Back home",
   "notFound.writing": "Browse writing",
   "notFound.imageTitle": "A broken connection between two clusters",
+  "notFound.meta.statusLabel": "status",
+  "notFound.meta.nodeLabel": "node",
+  "notFound.meta.nodeValue": "not in graph",
+  "notFound.meta.linksLabel": "links",
+  "notFound.meta.linksValue": "0",
 
   "article.titleAria": "Article title",
   "article.breadcrumbWriting": "All Writing",
+  // Mono breadcrumb crumbs, kept short and lowercase — the full-length
+  // `common.*` labels do not fit the 12px mono rhythm of the top bar.
+  "article.crumbHome": "home",
+  "article.crumbWriting": "writing",
+  "article.onThisPage": "On this page",
+  "article.top": "Top",
+  "article.figureLabel": "fig.",
+  "article.backToList": "Back to the list",
+  "article.older": "older",
 
   "preferences.site": "Site preferences",
   "preferences.language": "Language",
@@ -74,6 +107,7 @@ const pl = {
   "common.writing": "Wpisy",
   "common.allWriting": "Wszystkie wpisy",
   "common.readTime": "min czytania",
+  "common.readTimeShort": "min",
   "common.breadcrumb": "Ścieżka nawigacji",
   "common.links": "Linki",
 
@@ -97,11 +131,21 @@ const pl = {
   "writingArchive.current": "Wpisy",
   "writingArchive.section": "Wpisy",
   "writingArchive.title": "Tu znajdziesz moje wpisy",
+  "writingArchive.description":
+    "Wszystko, co dotąd opublikowałem, po angielsku i po polsku.",
+  "writingArchive.descriptionSingle": "Wszystko, co dotąd opublikowałem.",
+  "writingArchive.crumbHome": "start",
+  "writingArchive.crumbCurrent": "wpisy",
   "writingArchive.searchPlaceholder": "Wyszukaj",
   "writingArchive.searchLanguage": "Język wyszukiwania",
+  "writingArchive.clearSearch": "Wyczyść wyszukiwanie",
+  "writingArchive.columnTitle": "Tytuł",
+  "writingArchive.columnMeta": "Data · czas",
+  "writingArchive.readTimeShort": "min",
+  "writingArchive.empty.count": "0 wyników",
   "writingArchive.empty.broken": "Wątek się urwał.",
   "writingArchive.empty.quiet": "Archiwum jest ciche.",
-  "writingArchive.empty.noResults": "Żadne wpisy nie pasują do",
+  "writingArchive.empty.noResults": "Żaden wpis nie pasuje do",
   "writingArchive.empty.tryAnother": "Spróbuj innego słowa.",
   "writingArchive.empty.empty": "Na razie nic tu nie ma — zajrzyj później.",
   "writingArchive.empty.imageTitle":
@@ -115,9 +159,21 @@ const pl = {
   "notFound.home": "Wróć na stronę główną",
   "notFound.writing": "Przeglądaj wpisy",
   "notFound.imageTitle": "Przerwane połączenie między dwoma klastrami",
+  "notFound.meta.statusLabel": "status",
+  "notFound.meta.nodeLabel": "węzeł",
+  "notFound.meta.nodeValue": "brak w grafie",
+  "notFound.meta.linksLabel": "odnośniki",
+  "notFound.meta.linksValue": "0",
 
   "article.titleAria": "Tytuł wpisu",
   "article.breadcrumbWriting": "Wpisy",
+  "article.crumbHome": "start",
+  "article.crumbWriting": "wpisy",
+  "article.onThisPage": "Na tej stronie",
+  "article.top": "Góra",
+  "article.figureLabel": "rys.",
+  "article.backToList": "Wróć do listy",
+  "article.older": "starszy",
 
   "preferences.site": "Preferencje strony",
   "preferences.language": "Język",

@@ -1,9 +1,18 @@
 <script lang="ts">
 import { createTranslator, type Messages } from "@/i18n/translator.ts";
+import {
+  postRowArrowClass,
+  postRowBodyClass,
+  postRowClass,
+  postRowDescriptionClass,
+  postRowLangClass,
+  postRowMetaClass,
+  postRowReadClass,
+  postRowTitleClass,
+} from "./post-row.ts";
 
 const {
-  id,
-  url = `/writing/${id}`,
+  url,
   date,
   title,
   description,
@@ -12,13 +21,13 @@ const {
   showLang = false,
   messages,
 }: {
-  id: string;
-  url?: string;
+  url: string;
   date: Date;
   title: string;
   description: string;
   readTime?: number;
   lang?: string;
+  /** "EN" / "PL" before the read time, only when a list mixes locales. */
   showLang?: boolean;
   messages: Messages;
 } = $props();
@@ -29,34 +38,31 @@ const formattedDate = $derived(
   new Date(date).toLocaleDateString(t("common.locale"), {
     year: "numeric",
     month: "short",
-    day: "numeric",
+    day: "2-digit",
   }),
 );
 </script>
 
-<a
-	href={url}
-	class="block no-underline rounded-md tap-highlight touch:active:bg-sand-4 dark:touch:active:bg-sand-5"
->
-	<article
-		class="relative block cursor-pointer px-4 py-6 rounded-md will-change-transform transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-60 hover:!opacity-100 hover:translate-x-1 hover:active:bg-sand-3 dark:hover:active:bg-sand-5"
-	>
-		<div class="flex items-baseline justify-between gap-4 mb-3 text-sand-10 text-sm">
-			<time class="tabular-nums" datetime={new Date(date).toISOString()}>
-				{formattedDate}
-			</time>
-			{#if readTime}
-				<span class="flex items-center gap-2 tabular-nums">
-					{#if showLang && lang}
-						<span class="text-sand-9 uppercase">{lang}</span>
-					{/if}
-					{readTime} {t("common.readTime")}
-				</span>
-			{/if}
-		</div>
-		<h3 class="font-display font-medium text-sand-12 text-xl leading-tight mb-2">
-			{title}
-		</h3>
-		<p class="text-sand-12 leading-relaxed">{description}</p>
-	</article>
+<!-- The Astro `PostRow` renders the same structure from the same class
+     constants; the two are one definition, split only by what needs client
+     state. Keep them in step. -->
+<a href={url} class={postRowClass}>
+	<span class={postRowBodyClass}>
+		<span class={postRowTitleClass}>{title}</span>
+		<span class={postRowDescriptionClass}>{description}</span>
+	</span>
+	<span class={postRowMetaClass}>
+		<span>{formattedDate}</span>
+		{#if readTime || (showLang && lang)}
+			<span class={postRowReadClass}>
+				{#if showLang && lang}
+					<span class={postRowLangClass}>{lang.toUpperCase()}</span>
+				{/if}
+				{#if readTime}
+					<span>{readTime} {t("writingArchive.readTimeShort")}</span>
+				{/if}
+			</span>
+		{/if}
+		<span aria-hidden="true" class={postRowArrowClass}>→</span>
+	</span>
 </a>

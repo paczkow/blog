@@ -1,21 +1,32 @@
 import type { CollectionEntry } from "astro:content";
 import { getCollection, render } from "astro:content";
 
+import { activeLangs, isLangEnabled } from "@/i18n/config.ts";
 import type { Lang, Post } from "@/models.ts";
 import { defaultLang } from "@/models.ts";
-import { getLangAndSlug, getPostsByLang, getSortedByDate, LANGS, toPost } from "./posts.ts";
+import {
+  getLangAndSlug,
+  getPostsByLang,
+  getSortedByDate,
+  toPost,
+} from "./posts.ts";
 
 export const getLocaleRouteParam = (lang: Lang) =>
   lang === defaultLang ? undefined : lang;
 
 export const getLocaleStaticPaths = () =>
-  LANGS.map((lang) => ({
+  activeLangs.map((lang) => ({
     params: { lang: getLocaleRouteParam(lang) },
     props: { lang },
   }));
 
+// The glob still picks up every locale's files; a paused locale is dropped here
+// so no page, feed or heatmap has to remember to filter it out.
+const getWritingEntries = () =>
+  getCollection("writing", ({ id }) => isLangEnabled(getLangAndSlug(id).lang));
+
 export const loadWritingPosts = async () => {
-  const entries = await getCollection("writing");
+  const entries = await getWritingEntries();
   const posts = await Promise.all(
     entries.map(async (entry) => {
       const { remarkPluginFrontmatter } = await render(entry);
@@ -53,10 +64,11 @@ export const getArticleStaticPaths = async () => {
 };
 
 export const getWritingOgStaticPaths = async () => {
-  const entries = await getCollection("writing");
+  const entries = await getWritingEntries();
 
   return entries.map((entry) => {
     const { lang, slug } = getLangAndSlug(entry.id);
+
     return {
       params: { lang: getLocaleRouteParam(lang), slug },
       props: entry,

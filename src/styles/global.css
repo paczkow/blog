@@ -3,88 +3,130 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --font-sans: "Inter Variable", system-ui, -apple-system, sans-serif;
-  --font-serif: "Newsreader Variable", "Iowan Old Style", "Apple Garamond", Georgia, serif;
-  --font-display: "Newsreader Variable", "Iowan Old Style", "Apple Garamond", Georgia, serif;
-}
-
 /* Press feedback for input that cannot hover, where a tap has to stand in for
    the hover state. Mirrors the `@media (hover: hover)` that Tailwind wraps every
    `hover:` utility in, so the two never apply to the same device. */
 @custom-variant touch (@media (hover: none));
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    line-height: 1.625;
-  }
-
-  .font-serif {
-    font-optical-sizing: auto;
-  }
-}
-
 /* The browser's own tap highlight, which Tailwind's preflight switches off on
    `html`. It paints a filled box over the whole element, so it belongs on things
-   that already read as a block — a card — and not on a link inside a sentence,
-   where a rectangle behind the words is more distracting than the colour change
-   the link makes on its own. Hence opt-in per element rather than global. */
+   that already read as a block — a post row — and not on a link inside a
+   sentence, where a rectangle behind the words is more distracting than the
+   colour change the link makes on its own. Hence opt-in per element rather than
+   global. */
 @utility tap-highlight {
   -webkit-tap-highlight-color: var(--tap-highlight);
 }
 
 @theme {
-  --color-sand-1: #fdfdfc;
-  --color-sand-2: #f9f9f8;
-  --color-sand-3: #f1f0ef;
-  --color-sand-4: #e9e8e6;
-  --color-sand-5: #e2e1de;
-  --color-sand-6: #dad9d6;
-  --color-sand-7: #cfceca;
-  --color-sand-8: #bcbbb5;
-  --color-sand-9: #8d8d86;
-  --color-sand-10: #82827c;
-  --color-sand-11: #63635e;
-  --color-sand-12: #21201c;
+  --font-sans: "Inter Variable", system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
 
-  /* sand-12 at ~10%: dark enough to read against sand-1, light enough to leave
+  /* Light is the declared set so the tokens read correctly with no class on
+     <html>; `:root.dark` below redefines every one of them. Utilities resolve
+     through `var()`, so the swap needs no `dark:` variant at the call site. */
+  --color-bg: #ffffff;
+  --color-bg2: #fafafa;
+  --color-bg3: #f2f2f2;
+  --color-line: #ebebeb;
+  --color-line2: #cfcfcf;
+  --color-mute: #737373;
+  --color-sub: #666666;
+  --color-ink: #171717;
+
+  /* Reserved for the home glyph field's innermost ring. Never text or UI. */
+  --color-accent: #ff3c32;
+
+  /* ink at ~10%: dark enough to register against bg, light enough to leave the
      text legible underneath. Lightened rather than darkened in dark mode. */
-  --tap-highlight: #21201c1a;
+  --tap-highlight: #1717171a;
 
-  --nav-height: 96px;
-  --page-bottom: 8rem;
+  /* Tailwind pairs `text-xs` with a 16px line-height. The design never sets a
+     leading on 12px type, so every one of them (all mono: indices, dates,
+     breadcrumbs, chips, `EN / PL`) inherits the root 1.6 → 19.2px. Retuning the
+     token fixes them all at once; `leading-*` at the call site still wins. */
+  --text-xs--line-height: 1.6;
+
+  /* Every transition in the design uses plain `ease`; Tailwind's default is
+     `cubic-bezier(0.4, 0, 0.2, 1)`, which holds its start longer. Setting the
+     default here keeps all seven — row tints, nav hairlines, TOC ticks, links,
+     buttons — on the design's curve without a per-call-site `ease-*`. */
+  --default-transition-timing-function: ease;
+
   --font-weight-semimedium: 450;
 }
 
 :root.dark {
-  --color-sand-1: #222221;
-  --color-sand-2: #191918;
-  --color-sand-3: #222221;
-  --color-sand-4: #2a2a28;
-  --color-sand-5: #31312e;
-  --color-sand-6: #3b3a37;
-  --color-sand-7: #494844;
-  --color-sand-8: #62605b;
-  --color-sand-9: #6f6d66;
-  --color-sand-10: #7c7b74;
-  --color-sand-11: #b5b3ad;
-  --color-sand-12: #eeeeec;
+  --color-bg: #0a0a0a;
+  --color-bg2: #111111;
+  --color-bg3: #171717;
+  --color-line: #262626;
+  --color-line2: #3d3d3d;
+  --color-mute: #878787;
+  --color-sub: #a1a1a1;
+  --color-ink: #ededed;
 
-  --tap-highlight: #eeeeec1f;
+  --tap-highlight: #ededed1f;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* On `body`, not `html`: the design's base copy is 15px but `rem` — which
+     every Tailwind spacing utility is built on — has to stay anchored to the
+     browser's 16px root. */
+  body {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* A focus ring is feedback, so it has to be the right colour on the first
+     frame. `outline-color` defaults to `currentColor` and Tailwind's
+     `transition-colors` animates it, so any element that gains a ring on focus
+     would fade from its own text colour to the ring colour over its transition
+     duration — black-to-grey in light mode, and plainly visible. Declaring the
+     colour up front leaves nothing to animate. It paints nothing while
+     `outline-style` is `none`, so it is safe on everything, and `:where()`
+     keeps it below any component that sets its own `outline-color`. */
+  :where(*) {
+    outline-color: var(--color-mute);
+  }
+
+  /* One ring for everything interactive. `:where()` keeps it at zero
+     specificity so a component can override it without `!important`.
+
+     `mute` rather than the design's `line2`: line2 measures 1.82:1 on bg in
+     dark and 1.56:1 in light, against the 3:1 WCAG 2.2 asks of a focus
+     indicator. `mute` is the next neutral up the same ramp — 5.51:1 and
+     4.74:1 — so the ring stays grey but is actually visible. */
+  :where(
+      a,
+      button,
+      input,
+      textarea,
+      select,
+      summary,
+      [tabindex]
+    ):focus-visible {
+    outline: 2px solid var(--color-mute);
+    outline-offset: 2px;
+  }
 }
 
 .tooltip-popup {
-  background-color: var(--color-sand-12);
-  color: var(--color-sand-1);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+  background-color: var(--color-ink);
+  color: var(--color-bg);
 }
 
 :root.dark .tooltip-popup {
-  background-color: var(--color-sand-4);
-  color: var(--color-sand-12);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.24);
+  background-color: var(--color-bg3);
+  color: var(--color-ink);
+  /* The dark surface sits too close to the page background to read as a
+     separate layer, and the design allows no shadows — a hairline does it. */
+  border: 1px solid var(--color-line);
 }
 
 @utility prose {
