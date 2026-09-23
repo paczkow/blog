@@ -2,7 +2,6 @@
 title: Building a knowledge "cache" in Obsidian.
 date: 2025-06-22
 description: By prioritizing connections over a rigid hierarchy, I transformed Obsidian into a flexible, scalable system that keeps information easily accessible whenever need it.
-image: social-media.png
 toc: true
 translationKey: building-a-knowledge-cache-in-obsidian
 ---

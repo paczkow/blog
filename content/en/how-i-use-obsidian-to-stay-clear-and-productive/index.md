@@ -2,7 +2,6 @@
 title: How I use Obsidian to stay clear and productive?
 date: 2025-06-01
 description: In the fast-paced tech world, keeping a decluttered mind is essential for being effective. I use Obsidian to capture my thoughts, which helps maintain clarity, focus, and productivity.
-image: 'social-media.png'
 toc: true
 ---
 
