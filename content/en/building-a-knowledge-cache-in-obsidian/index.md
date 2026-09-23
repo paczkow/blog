@@ -72,7 +72,7 @@ For example, if I were to add a note about a certain decision made by "X" and "Y
 
 ### Tags
 
-If you think about a note as an object storing information, tags are the attributes describing that object (type, status, date). I use them on notes and on bullet points in daily notes as additional metadata to filter relevant information. Typical tags I use are `#type/meeting`, `#type/article`, ``#type/podcast`, `#flashcard`, `#todo`, `#💡``.
+If you think about a note as an object storing information, tags are the attributes describing that object (type, status, date). I use them on notes and on bullet points in daily notes as additional metadata to filter relevant information. Typical tags I use are `#type/meeting`, `#type/article`, `#type/podcast`, `#flashcard`, `#todo`, `#💡`.
 
 ### Folders
 
