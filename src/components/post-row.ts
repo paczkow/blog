@@ -29,10 +29,11 @@
 const rowTransition =
   "[transition:background-color_200ms_var(--default-transition-timing-function),opacity_300ms_var(--default-transition-timing-function),scale_300ms_var(--default-transition-timing-function),translate_300ms_var(--default-transition-timing-function)]";
 
-/* The lift: hovering a row drops every other one to 40% and 0.99 while the
-   hovered one stays lit, grows 1.5% out of its left edge and slides 6px right —
-   a card picking itself up off the stack rather than a tint sliding down a
-   list. The list scope comes from `postListClass`.
+/* The lift: hovering a row drops every other one to 35% and 0.99 while the
+   hovered one stays lit, grows just under 1% out of its left edge and slides
+   4px right. The selected *article*, rather than only its headline, therefore
+   comes forward: title, summary, date, and affordance all move as one unit.
+   The list scope comes from `postListClass`.
 
    The trigger is `:has(a:hover)` on the list, not the list's own `:hover`: the
    archive's year separators and any dead space between rows are part of the
@@ -41,7 +42,7 @@ const rowTransition =
    real condition, and `group-hover/list` is what wraps the rule in Tailwind's
    `(hover: hover)` media query, which an arbitrary `:has()` selector does not
    get on its own. Without it a tablet's sticky post-tap `:hover` would dim the
-   list on a device where `hover:bg-bg2` and the lift itself never fire.
+   list even though the desktop lift never runs.
 
    `not-hover:not-focus-visible:` instead of a competing `hover:opacity-100`
    override: the dimmed and lifted states are then mutually exclusive, so
@@ -59,13 +60,27 @@ const rowTransition =
 const rowLift = [
   "min-[700px]:origin-left",
   "min-[700px]:hover:z-10 min-[700px]:focus-visible:z-10",
-  "min-[700px]:group-hover/list:group-has-[a:hover]/list:not-hover:not-focus-visible:opacity-40",
+  "min-[700px]:group-hover/list:group-has-[a:hover]/list:not-hover:not-focus-visible:opacity-35",
   "min-[700px]:motion-safe:group-hover/list:group-has-[a:hover]/list:not-hover:not-focus-visible:scale-[0.99]",
-  "min-[700px]:motion-safe:hover:translate-x-1.5 min-[700px]:motion-safe:hover:scale-[1.015]",
-  "min-[700px]:motion-safe:focus-visible:translate-x-1.5 min-[700px]:motion-safe:focus-visible:scale-[1.015]",
+  "min-[700px]:motion-safe:hover:translate-x-1 min-[700px]:motion-safe:hover:scale-[1.008]",
+  "min-[700px]:motion-safe:focus-visible:translate-x-1 min-[700px]:motion-safe:focus-visible:scale-[1.008]",
 ].join(" ");
 
-export const postRowClass = `group tap-highlight relative -mx-3 grid grid-cols-[minmax(0,1fr)] gap-4 rounded-[10px] px-3 py-5 no-underline hover:bg-bg2 focus-visible:bg-bg2 touch:active:bg-bg2 focus-visible:-outline-offset-2 min-[700px]:mr-0 min-[700px]:grid-cols-[minmax(0,1fr)_96px] min-[700px]:py-[22px] ${rowTransition} ${rowLift}`;
+/* The reference's horizontal hairline anchors the selected article without
+   adding a second vertical structure to the list. It draws left-to-right just
+   below the row, and stays desktop-only because the phone layout already uses
+   the full-width surface tint as its selected-state feedback. */
+const rowMarker = [
+  "min-[700px]:before:pointer-events-none",
+  "min-[700px]:before:absolute min-[700px]:before:right-3 min-[700px]:before:bottom-0 min-[700px]:before:left-3",
+  "min-[700px]:before:h-px min-[700px]:before:bg-ink",
+  "min-[700px]:before:origin-left min-[700px]:before:scale-x-0 min-[700px]:before:opacity-0",
+  "min-[700px]:before:transition-[opacity,scale] min-[700px]:before:duration-200",
+  "min-[700px]:hover:before:opacity-100 min-[700px]:focus-visible:before:opacity-100",
+  "min-[700px]:motion-safe:hover:before:scale-x-100 min-[700px]:motion-safe:focus-visible:before:scale-x-100",
+].join(" ");
+
+export const postRowClass = `group/row tap-highlight relative -mx-3 grid grid-cols-[minmax(0,1fr)] gap-4 rounded-[10px] px-3 py-5 no-underline focus-visible:-outline-offset-2 min-[700px]:mr-0 min-[700px]:grid-cols-[minmax(0,1fr)_96px] min-[700px]:py-[22px] ${rowTransition} ${rowLift} ${rowMarker}`;
 
 /**
  * The list the rows sit in. A row's hover state has to reach its siblings, so
@@ -87,12 +102,9 @@ export const postRowDescriptionClass =
   "max-w-[592px] text-sm leading-[1.6] text-pretty text-sub";
 
 export const postRowMetaClass =
-  "-order-1 flex flex-row items-center gap-3 font-mono text-xs whitespace-nowrap text-mute min-[700px]:order-none min-[700px]:flex-col min-[700px]:items-end min-[700px]:gap-1 min-[700px]:pt-[3px]";
+  "-order-1 flex flex-row items-center gap-3 text-xs whitespace-nowrap tabular-nums text-mute transition-colors duration-200 group-hover/row:text-sub group-focus-visible/row:text-sub min-[700px]:order-none min-[700px]:flex-col min-[700px]:items-end min-[700px]:gap-1 min-[700px]:pt-[3px]";
 
 /** Wraps the optional locale label and the read time so they stay on one line. */
 export const postRowReadClass = "flex gap-2";
 
 export const postRowLangClass = "text-sub";
-
-export const postRowArrowClass =
-  "hidden text-ink opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 touch:group-active:opacity-100 min-[700px]:mt-1 min-[700px]:inline";

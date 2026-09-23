@@ -1,6 +1,5 @@
 ---
 import {
-  postRowArrowClass,
   postRowBodyClass,
   postRowClass,
   postRowDescriptionClass,
@@ -20,8 +19,6 @@ interface Props {
   readTime?: string;
   /** "EN" / "PL", shown before the read time only when a list mixes locales. */
   langLabel?: string;
-  /** The `→` that fades in on hover. */
-  showArrow?: boolean;
   class?: string;
 }
 
@@ -32,7 +29,6 @@ const {
   date,
   readTime,
   langLabel,
-  showArrow = true,
   class: className,
 } = Astro.props;
 
@@ -45,20 +41,13 @@ const hasMeta = Boolean(date || readTime || langLabel);
     {description && <span class={postRowDescriptionClass}>{description}</span>}
   </span>
   {
-    (hasMeta || showArrow) && (
-      /* With nothing but the hidden arrow in it the meta column would still
-         claim a grid row on phone, so it drops out entirely there. */
-      <span class:list={[postRowMetaClass, !hasMeta && "max-[700px]:hidden"]}>
+    hasMeta && (
+      <span class={postRowMetaClass}>
         {date && <span>{date}</span>}
         {(readTime || langLabel) && (
           <span class={postRowReadClass}>
             {langLabel && <span class={postRowLangClass}>{langLabel}</span>}
             {readTime && <span>{readTime}</span>}
-          </span>
-        )}
-        {showArrow && (
-          <span aria-hidden="true" class={postRowArrowClass}>
-            →
           </span>
         )}
       </span>

@@ -14,7 +14,7 @@ const trimmed = $derived(query.trim());
 </script>
 
 <div class="border-line flex flex-col gap-2.5 border-b py-16">
-	<span class="text-mute font-mono text-xs">
+	<span class="text-mute text-xs">
 		{t("writingArchive.empty.count")}
 	</span>
 	<p class="text-[17px] font-medium tracking-[-0.01em]">
@@ -25,7 +25,7 @@ const trimmed = $derived(query.trim());
 	<p class="text-sub text-sm leading-[1.6]">
 		{#if trimmed}
 			{t("writingArchive.empty.noResults")}
-			<span class="text-ink font-mono text-[13px]">"{trimmed}"</span>.
+			<span class="text-ink text-[13px]">"{trimmed}"</span>.
 			{t("writingArchive.empty.tryAnother")}
 		{:else}
 			{t("writingArchive.empty.empty")}

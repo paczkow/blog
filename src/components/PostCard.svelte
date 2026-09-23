@@ -1,7 +1,6 @@
 <script lang="ts">
 import { createTranslator, type Messages } from "@/i18n/translator.ts";
 import {
-  postRowArrowClass,
   postRowBodyClass,
   postRowClass,
   postRowDescriptionClass,
@@ -63,6 +62,5 @@ const formattedDate = $derived(
 				{/if}
 			</span>
 		{/if}
-		<span aria-hidden="true" class={postRowArrowClass}>→</span>
 	</span>
 </a>

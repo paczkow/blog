@@ -1,5 +1,5 @@
 <script lang="ts">
-	// Home sidebar atmosphere — a faint monospace character grid. The pointer wakes the cells
+	// Home sidebar atmosphere — a faint character grid. The pointer wakes the cells
 	// around it, each picking a symbol that fades back out and leaves a decaying trail.
 	// Ported 1:1 from the design bundle's `glyph-bg.js`: every constant, exponent and decay
 	// factor below is a tuned design value, not a guess, so change them only against that file.
@@ -183,7 +183,7 @@
 
 			const k = intensity;
 			ctx.clearRect(0, 0, w, h);
-			ctx.font = "10.5px 'Geist Mono Variable', ui-monospace, SFMono-Regular, monospace";
+			ctx.font = "10.5px 'Inter Variable', system-ui, sans-serif";
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 

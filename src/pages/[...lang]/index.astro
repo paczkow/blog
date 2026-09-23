@@ -1,10 +1,11 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n";
+import ExperienceTimeline from "@/components/ExperienceTimeline.astro";
 import GlyphBackground from "@/components/GlyphBackground.svelte";
+import HeroTerminal from "@/components/HeroTerminal.svelte";
 import PostRow from "@/components/PostRow.astro";
 import SectionNav from "@/components/SectionNav.astro";
 import SidebarLinks from "@/components/SidebarLinks.astro";
-import TypedSubtitle from "@/components/TypedSubtitle.svelte";
 import WritingHeatmap from "@/components/WritingHeatmap.svelte";
 import { postListClass } from "@/components/post-row.ts";
 import {
@@ -13,7 +14,8 @@ import {
   loadWritingPosts,
 } from "@/helpers/page-data.ts";
 import { getLocaleLinks } from "@/helpers/posts.ts";
-import { interpolate, useTranslations } from "@/i18n/utils.ts";
+import { experience } from "@/i18n/experience.ts";
+import { useTranslations } from "@/i18n/utils.ts";
 import Layout from "@/layouts/TwoColumn.astro";
 import { SITE } from "config";
 
@@ -47,24 +49,12 @@ const rows = posts.slice(0, HOME_POSTS).map((post) => ({
   readTime: `${post.readTime} ${t("common.readTimeShort")}`,
 }));
 
+const work = experience[lang];
+
 const navItems = [
-  {
-    id: "writing",
-    label: t("home.nav.writing"),
-  },
-  { id: "about", label: t("home.nav.about") },
+  { id: "writing", label: t("home.nav.writing") },
+  { id: "experience", label: t("home.nav.experience") },
 ];
-
-const proseLinkClass =
-  "text-ink underline decoration-line2 underline-offset-[3px] transition-[text-decoration-color] duration-150 hover:decoration-ink touch:active:decoration-ink";
-
-const externalLink = (href: string, label: string) =>
-  `<a class="${proseLinkClass}" href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`;
-
-const contact = interpolate(t("home.about.contact"), {
-  linkedin: externalLink(SITE.social.linkedin, "LinkedIn"),
-  bluesky: externalLink(SITE.social.bluesky, "Bluesky"),
-});
 
 const heatmapPosts = posts.map((post) => ({
   id: post.id,
@@ -101,37 +91,19 @@ const heatmapPosts = posts.map((post) => ({
       </h1>
       {
         /*
-          The subtitle is server-rendered so it survives with no JavaScript at
-          all, which also means the finished sentence is in the HTML and paints
-          long before hydration can decide to type it — the flash. So the
-          decision is made here instead, inline and parser-blocking, before the
-          paragraph below exists: the mark it leaves is what the component's CSS
-          hides from frame one, and what the island reads back rather than
-          deciding again. Kept here rather than in `Head.astro` beside the theme
-          script because only home has a subtitle, and a copy running on every
-          article page would spend the session's one animation on a page that
-          cannot play it.
+          The terminal line ships finished and still: the design's typing is
+          replay-on-click, not autoplay, so the sentence is server-rendered and
+          correct with no JavaScript at all — there is no first-paint flash left
+          to guard against, and nothing here has to run before the parser gets
+          to it. `client:idle` because the only thing hydration adds is the click
+          that replays the animation.
         */
       }
-      <script is:inline>
-        {
-          let type = !matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-          if (type) {
-            try {
-              // Once per session. The animation introduces the page; replaying
-              // it on every return to home would only delay reading it.
-              type = !sessionStorage.getItem("pm-typed");
-              if (type) sessionStorage.setItem("pm-typed", "1");
-            } catch {
-              // Storage blocked (private mode) — type rather than skip.
-            }
-          }
-
-          if (type) document.documentElement.dataset.subtitleTyping = "";
-        }
-      </script>
-      <TypedSubtitle client:load html={t("home.hero.subtitle")} />
+      <HeroTerminal
+        client:idle
+        line={t("home.hero.terminal")}
+        subline={t("home.hero.subline")}
+      />
     </div>
 
     <SectionNav
@@ -156,11 +128,9 @@ const heatmapPosts = posts.map((post) => ({
   <Fragment slot="content">
     <div class="flex flex-col gap-[56px] min-[700px]:gap-[72px]">
       <section id="writing" class="flex scroll-mt-6 flex-col">
-        <div
-          class="flex items-baseline justify-between pb-3"
-        >
+        <div class="flex items-baseline justify-between pb-3">
           <h2
-            class="text-sub font-mono text-[11px] font-medium tracking-[0.08em] uppercase"
+            class="text-sub text-[11px] font-medium tracking-[0.08em] uppercase"
           >
             {t("common.writing")}
           </h2>
@@ -187,22 +157,10 @@ const heatmapPosts = posts.map((post) => ({
         </div>
       </section>
 
-      <section id="about" class="flex scroll-mt-6 flex-col gap-5 pb-2">
-        <div class="pb-3">
-          <h2
-            class="text-sub font-mono text-[11px] font-medium tracking-[0.08em] uppercase"
-          >
-            {t("home.about.heading")}
-          </h2>
-        </div>
-        <p
-          class="max-w-[48ch] text-[17px] leading-[1.4] font-medium tracking-[-0.01em] text-pretty"
-        >
-          {t("home.about.lede")}
-        </p>
-        <p class="text-sub max-w-[62ch] text-pretty">{t("home.about.body")}</p>
-        <p class="text-sub" set:html={contact} />
-      </section>
+      <ExperienceTimeline
+        heading={t("home.experience.heading")}
+        content={work}
+      />
     </div>
   </Fragment>
 </Layout>

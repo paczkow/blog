@@ -44,7 +44,7 @@ const showLang = $derived(archive.languages.length > 1);
 </script>
 
 <div
-	class="border-line text-mute hidden grid-cols-[minmax(0,1fr)_96px] gap-4 border-b pr-3 pb-3 font-mono text-[11px] tracking-[0.08em] uppercase min-[700px]:grid"
+	class="border-line text-mute hidden grid-cols-[minmax(0,1fr)_96px] gap-4 border-b pr-3 pb-3 text-[11px] tracking-[0.08em] uppercase min-[700px]:grid"
 >
 	<span>{t("writingArchive.columnTitle")}</span>
 	<span class="text-right">{t("writingArchive.columnMeta")}</span>

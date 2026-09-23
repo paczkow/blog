@@ -20,7 +20,10 @@
 
 @theme {
   --font-sans: "Inter Variable", system-ui, sans-serif;
-  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  /* Code only — `pre` and inline `code` in articles. Everything else is set in
+     Inter, and code keeps the platform's own monospace so its columns line up
+     without a second webfont to download. */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Light is the declared set so the tokens read correctly with no class on
      <html>; `:root.dark` below redefines every one of them. Utilities resolve
@@ -42,8 +45,8 @@
   --tap-highlight: #1717171a;
 
   /* Tailwind pairs `text-xs` with a 16px line-height. The design never sets a
-     leading on 12px type, so every one of them (all mono: indices, dates,
-     breadcrumbs, chips, `EN / PL`) inherits the root 1.6 → 19.2px. Retuning the
+     leading on 12px type, so every one of them (indices, dates, breadcrumbs,
+     chips, `EN / PL`) inherits the root 1.6 → 19.2px. Retuning the
      token fixes them all at once; `leading-*` at the call site still wins. */
   --text-xs--line-height: 1.6;
 

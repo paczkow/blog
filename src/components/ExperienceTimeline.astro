@@ -1,0 +1,307 @@
+---
+import type { ExperienceContent } from "@/i18n/experience.ts";
+
+interface Props {
+  /** Section label, from the UI dictionary — the rest of the copy is in `content`. */
+  heading: string;
+  content: ExperienceContent;
+}
+
+const { heading, content } = Astro.props;
+const { range, intro, resultLabel, roles, education } = content;
+
+/* One hairline-topped row, shared by the roles and by education so the two
+   cannot drift apart. 184px is the dates column the design settled on: wide
+   enough for `Sep 2024 → Present` on one line at every supported locale's month
+   abbreviations, which is why the cell is also `whitespace-nowrap`. Below 700px
+   the dates stack above the content instead. */
+const rowClass =
+  "border-line grid grid-cols-[minmax(0,1fr)] gap-4 border-t py-[18px] min-[700px]:grid-cols-[184px_minmax(0,1fr)]";
+
+/* The post rows' marker, on the timeline: a hairline that draws itself
+   left-to-right along the bottom of the row under the pointer. Same shape, same
+   200ms, same `origin-left` — the two lists on this page then answer a hover the
+   same way, which is the point of reusing it rather than inventing a second
+   signal. Full-bleed (`inset-x-0`) where the post row insets by 12px: a post row
+   has a tinted card to sit inside, these rows have only their own hairlines, so
+   the marker lines up with the `border-t` above it instead.
+
+   Desktop-only and `motion-safe` for the scale, exactly as the post rows are:
+   reduced motion keeps the line, loses the wipe. `focus-within` carries the
+   keyboard, which reaches the row through the summary. */
+const rowMarkerClass = [
+  "relative",
+  "min-[700px]:before:pointer-events-none",
+  "min-[700px]:before:absolute min-[700px]:before:inset-x-0 min-[700px]:before:bottom-0",
+  "min-[700px]:before:h-px min-[700px]:before:bg-ink",
+  "min-[700px]:before:origin-left min-[700px]:before:scale-x-0 min-[700px]:before:opacity-0",
+  "min-[700px]:before:transition-[opacity,scale] min-[700px]:before:duration-200",
+  "min-[700px]:hover:before:opacity-100 min-[700px]:focus-within:before:opacity-100",
+  "min-[700px]:motion-safe:hover:before:scale-x-100 min-[700px]:motion-safe:focus-within:before:scale-x-100",
+].join(" ");
+
+/* `self-start`, not the grid's default stretch-and-centre: a role with four
+   achievements open is tall, and dates floating at its middle read as belonging
+   to the bullets rather than to the row. */
+const datesClass =
+  "text-mute flex items-baseline gap-1.5 self-start text-xs whitespace-nowrap tabular-nums min-[700px]:pt-1";
+
+const companyClass = "text-ink text-base font-medium tracking-[-0.01em]";
+---
+
+<section id="experience" class="flex scroll-mt-6 flex-col gap-5 pb-2">
+  <div class="flex items-baseline justify-between pb-3">
+    <h2 class="text-sub text-[11px] font-medium tracking-[0.08em] uppercase">
+      {heading}
+    </h2>
+    <span class="text-mute text-xs tabular-nums">{range}</span>
+  </div>
+
+  <p
+    class="max-w-[48ch] text-[17px] leading-[1.4] font-medium tracking-[-0.01em] text-pretty"
+  >
+    {intro}
+  </p>
+
+  <div class="flex flex-col">
+    {
+      roles.map((role) => (
+        <div class:list={["group/exp", rowClass, rowMarkerClass]} data-exp-row>
+          <div class={datesClass}>
+            <span>{role.from}</span>
+            <span aria-hidden="true" class="text-line2">
+              →
+            </span>
+            <span>{role.to}</span>
+          </div>
+
+          {/*
+              A native `details`: click, keyboard and touch all work with no
+              JavaScript, and the script at the bottom of this file only adds
+              hover on top of that. At rest a row is a company and a title and
+              nothing else, so the section reads as five names; everything after
+              `summary` is what the browser hides, which is the whole
+              description.
+            */}
+          <details class="min-w-0">
+            <summary class="exp-summary flex cursor-pointer flex-col">
+              <span class="flex w-full items-baseline gap-3">
+                <span class="flex min-w-0 flex-col gap-1">
+                  <span class={companyClass}>{role.company}</span>
+                  {/* Quieter than the company on purpose: the title is the secondary fact. */}
+                  <span class="text-mute text-[13px] text-pretty">
+                    {role.role}
+                  </span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  class="exp-glyph text-mute group-hover/exp:text-ink touch:group-active/exp:text-ink mt-[6px] ml-auto flex-none self-start transition-colors duration-150"
+                />
+              </span>
+            </summary>
+
+            <div class="mt-3 flex max-w-[68ch] flex-col gap-4">
+              <p
+                class="text-sub text-sm leading-[1.6] text-pretty"
+                set:html={role.story}
+              />
+
+              {role.projects.map((project) => (
+                <div class="flex flex-col gap-1">
+                  <div class="text-ink text-sm font-medium">
+                    {project.title}
+                  </div>
+                  <p class="text-sub text-sm leading-[1.6] text-pretty">
+                    {project.work}
+                  </p>
+                  {project.result && (
+                    <p class="text-sub text-sm leading-[1.6] text-pretty">
+                      {/*
+                          `set:html`: the dictionary marks the number inside a
+                          result with `<strong>`, and the rule below is what
+                          makes it `ink` rather than bolder. The copy decides
+                          what matters, the component decides how it looks, and
+                          the strings are ours.
+                        */}
+                      <span class="text-mute">{resultLabel}</span>{" "}
+                      <Fragment set:html={project.result} />
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </details>
+        </div>
+      ))
+    }
+
+    <div class={rowClass}>
+      <div class="text-mute text-xs min-[700px]:pt-1">{education.label}</div>
+      <div class="flex min-w-0 flex-col gap-1">
+        <span class={companyClass}>{education.institution}</span>
+        <span class="text-sub text-sm text-pretty">{education.degree}</span>
+        <span class="text-mute text-[13px] text-pretty">{education.thesis}</span
+        >
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  /* Hover opens a row. The layout part is the hard part: an open row is ~200px
+     taller than a closed one, so anything that opens or closes while the pointer
+     is travelling moves the rows underneath it, and the list ends up chasing the
+     pointer — leave Meta, it collapses, everything jumps up, whatever lands
+     under the cursor opens, and so on down the page.
+
+     Three rules keep the list still:
+     1. Opening waits for the pointer to settle, so crossing a row on the way
+        somewhere else opens nothing.
+     2. A row never closes on its own. The open one closes only when another
+        opens, or when the pointer leaves the section entirely — so the rows
+        below stay where they are for the whole journey.
+     3. On a swap, the page is scrolled by exactly the height the list shifted,
+        which puts the row that just opened back under the pointer. Without this
+        the newly opened row slides up by the height of the one that closed.
+
+     Pointer devices only: on a touch screen `(hover: hover)` is false, a tap
+     both opens a row and leaves it "hovered", and the row would never close.
+     There the native `details` toggle is the whole interaction. */
+  const section = document.getElementById("experience");
+  const rows = section
+    ? Array.from(section.querySelectorAll("[data-exp-row]"))
+    : [];
+
+  if (rows.length > 0 && window.matchMedia("(hover: hover)").matches) {
+    const INTENT_MS = 110;
+    const LEAVE_MS = 240;
+
+    let open: HTMLDetailsElement | null = null;
+    let intent: number | undefined;
+    let leaving: number | undefined;
+
+    const show = (row: HTMLElement, details: HTMLDetailsElement) => {
+      if (details === open) return;
+
+      const before = row.getBoundingClientRect().top;
+      if (open) open.open = false;
+      details.open = true;
+      open = details;
+
+      /* Closing a row above this one has just pulled it upwards; scroll by the
+         same amount so it is still under the pointer that asked for it. */
+      const shift = row.getBoundingClientRect().top - before;
+      if (shift !== 0) window.scrollBy(0, shift);
+    };
+
+    for (const row of rows) {
+      const details = row.querySelector("details");
+      if (!details) continue;
+
+      row.addEventListener("mouseenter", () => {
+        window.clearTimeout(leaving);
+        window.clearTimeout(intent);
+        intent = window.setTimeout(() => show(row, details), INTENT_MS);
+      });
+
+      row.addEventListener("mouseleave", () => {
+        window.clearTimeout(intent);
+      });
+
+      /* A click is the visitor taking over: it toggles, and whatever it leaves
+         behind is what hover has to respect until they point somewhere else. */
+      details.querySelector("summary")?.addEventListener("click", () => {
+        window.clearTimeout(intent);
+        open = details.open ? null : details;
+      });
+    }
+
+    section.addEventListener("mouseleave", () => {
+      window.clearTimeout(intent);
+      leaving = window.setTimeout(() => {
+        if (open) open.open = false;
+        open = null;
+      }, LEAVE_MS);
+    });
+
+    section.addEventListener("mouseenter", () => window.clearTimeout(leaving));
+  }
+</script>
+
+<style>
+  /* Both halves of hiding the disclosure triangle: `list-style` covers Firefox
+     and current Chrome, the pseudo-element covers older WebKit. The `+` / `−`
+     below replaces it. */
+  .exp-summary {
+    list-style: none;
+  }
+
+  .exp-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Opening and closing are animated rather than snapped. At hover speed an
+     instant jump reads as the page twitching, and the row is tall enough that
+     the eye needs the movement to follow where the text came from.
+
+     `details` becomes the grid and `::details-content` its second track, so the
+     height runs between `0fr` and `1fr` — the one height transition that needs
+     no `auto` keyword, and so the one that works wherever `::details-content`
+     does rather than only where `interpolate-size` does. `content-visibility`
+     rides along as a discrete transition, which keeps the text painted for the
+     whole collapse instead of dropping it on the first frame. */
+  details {
+    display: grid;
+    grid-template-rows: auto 0fr;
+    transition: grid-template-rows 260ms
+      var(--default-transition-timing-function);
+  }
+
+  details[open] {
+    grid-template-rows: auto 1fr;
+  }
+
+  details::details-content {
+    overflow: hidden;
+    transition: content-visibility 260ms allow-discrete;
+  }
+
+  /* `+` and `−` drawn as two hairlines rather than typed as two characters:
+     `content` cannot be interpolated, so a swapped glyph can only ever pop. The
+     vertical bar rotates flat instead, on the same 260ms as the content, and the
+     mark reads as one thing turning into the other. `currentColor` keeps it on
+     the `mute` → `ink` hover the span already carries. */
+  .exp-glyph {
+    position: relative;
+    display: block;
+    block-size: 9px;
+    inline-size: 9px;
+  }
+
+  .exp-glyph::before,
+  .exp-glyph::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline: 0;
+    block-size: 1px;
+    background: currentColor;
+  }
+
+  .exp-glyph::after {
+    rotate: 90deg;
+    transition: rotate 260ms var(--default-transition-timing-function);
+  }
+
+  details[open] .exp-glyph::after {
+    rotate: 0deg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    details,
+    details::details-content,
+    .exp-glyph::after {
+      transition: none;
+    }
+  }
+</style>

@@ -50,8 +50,7 @@ const { alternates, languageLinks } = getLocaleLinks(getLocalizedPostUrl);
 
 const crumbLinkClass =
   "transition-[color] duration-150 hover:text-ink touch:active:text-ink";
-const monoLabelClass =
-  "text-mute font-mono text-[11px] tracking-[0.08em] uppercase";
+const eyebrowClass = "text-mute text-[11px] tracking-[0.08em] uppercase";
 const footerLinkClass =
   "text-sub flex flex-col gap-1.5 no-underline transition-[color] duration-150 hover:text-ink touch:active:text-ink";
 ---
@@ -99,7 +98,7 @@ const footerLinkClass =
         <p class="text-sub m-0 text-[17px] leading-[1.55] text-pretty">
           {currentPost.description}
         </p>
-        <div class="text-mute flex gap-4 font-mono text-xs">
+        <div class="text-mute flex gap-4 text-xs">
           <time datetime={isoDate}>{isoDate}</time>
           <span class="text-line2" aria-hidden="true">·</span>
           <span>{currentPost.readTime} {t("common.readTime")}</span>
@@ -123,7 +122,12 @@ const footerLinkClass =
               id: slug,
               text,
             }))}
-            i18n={{ label: t("article.onThisPage"), top: t("article.top") }}
+            title={currentPost.title}
+            i18n={{
+              label: t("article.onThisPage"),
+              read: t("article.read"),
+              end: t("article.end"),
+            }}
           />
         )
       }
@@ -135,10 +139,11 @@ const footerLinkClass =
       </article>
 
       <footer
+        id="article-end"
         class="border-line mt-14 grid grid-cols-2 gap-6 border-t pt-5 text-[13px]"
       >
         <a href={getWritingIndexUrl(lang)} class={footerLinkClass}>
-          <span class={monoLabelClass}>← {t("common.allWriting")}</span>
+          <span class={eyebrowClass}>← {t("common.allWriting")}</span>
           <span class="text-ink font-medium">{t("article.backToList")}</span>
         </a>
         {
@@ -150,7 +155,7 @@ const footerLinkClass =
         {
           olderPost && (
             <a href={olderPost.url} class={`${footerLinkClass} text-right`}>
-              <span class={monoLabelClass}>{t("article.older")}</span>
+              <span class={eyebrowClass}>{t("article.older")}</span>
               <span class="text-ink font-medium">{olderPost.title}</span>
             </a>
           )

@@ -11,6 +11,10 @@ const { ariaLabel, class: className } = Astro.props;
 const links = [
   { label: "GitHub", href: SITE.social.github, external: true },
   { label: "LinkedIn", href: SITE.social.linkedin, external: true },
+  // Carried over from the home page's About paragraph, which the Experience
+  // timeline replaced: the sidebar is the only place left that offers a way to
+  // reach me, so the link moved here rather than being dropped.
+  { label: "Bluesky", href: SITE.social.bluesky, external: true },
   { label: "RSS", href: "/rss.xml", external: false },
 ];
 
@@ -20,7 +24,7 @@ const linkClass =
 
 <nav
   aria-label={ariaLabel}
-  class:list={["text-sub flex gap-[18px] font-mono text-xs", className]}
+  class:list={["text-sub flex gap-[18px] text-xs", className]}
 >
   {
     links.map((link) => (

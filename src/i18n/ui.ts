@@ -12,25 +12,21 @@ const en = {
   "common.breadcrumb": "Breadcrumb",
   "common.links": "Links",
 
-  // The hero is a hook plus a subtitle, on separate lines but at the same type
-  // size — the emphasis, not a larger heading, carries the hierarchy. The
-  // subtitle is rendered via `set:html`; each locale picks its own terms to
-  // emphasize and controls its own punctuation and word order.
-  "home.hero.hook": "Curious by default.",
-  "home.hero.subtitle":
-    'Notes on <span class="font-medium text-sand-12">learning</span>, <span class="font-medium text-sand-12">building</span>, and <span class="font-medium text-sand-12">connecting the dots</span> in the AI era.',
+  // The hero is a typed terminal line plus a static subline, both handed to
+  // `HeroTerminal`. The `<span>` fragments mark what is emphasized and carry no
+  // classes: the component splits the string into characters to type and
+  // supplies the colour itself, which keeps the palette out of the copy. Each
+  // locale picks its own emphasis, punctuation and word order.
+  "home.hero.terminal":
+    "I'm figuring out how to <span>build and learn with AI</span>, in public.",
+  "home.hero.subline":
+    "Ten years in product engineering. I write about what I build, what goes wrong, and what I learn along the way.",
   "home.nav.sections": "Sections",
   "home.nav.writing": "Writing",
-  "home.nav.about": "About",
-  "home.about.heading": "About",
-  "home.about.lede":
-    "Ten years in product engineering — from a small software house to FAANG.",
-  "home.about.body":
-    "I'm deeply engaged in tools and methods for cognitive enhancement — Personal Knowledge Management, Zettelkasten, Obsidian, Anki, and AI — to learn faster, stay focused, and make sense of an increasingly noisy world.",
-  // `{linkedin}` and `{bluesky}` tokens are replaced with anchors in frontmatter
-  // so the URLs stay in config; rendered via `set:html`.
-  "home.about.contact":
-    "If something here resonates, find me on {linkedin} or {bluesky}.",
+  "home.nav.experience": "Experience",
+  // The section's label only. Its content — roles, blurbs, achievements,
+  // education — is structured rather than flat, so it lives in `experience.ts`.
+  "home.experience.heading": "Experience",
   "home.heatmap.title": "Last posts",
   "home.heatmap.noWriting": "No posts",
 
@@ -84,7 +80,9 @@ const en = {
   "article.crumbHome": "home",
   "article.crumbWriting": "writing",
   "article.onThisPage": "On this page",
-  "article.top": "Top",
+  // Follows the percentage under the contents rail: "42% read".
+  "article.read": "read",
+  "article.end": "End of article",
   "article.figureLabel": "fig.",
   "article.backToList": "Back to the list",
   "article.older": "older",
@@ -111,19 +109,14 @@ const pl = {
   "common.breadcrumb": "Ścieżka nawigacji",
   "common.links": "Linki",
 
-  "home.hero.hook": "Ciekawość przede wszystkim.",
-  "home.hero.subtitle":
-    'Notatki o <span class="font-medium text-sand-12">nauce</span>, <span class="font-medium text-sand-12">budowaniu</span> i <span class="font-medium text-sand-12">łączeniu kropek</span> w erze AI.',
+  "home.hero.terminal":
+    "Sprawdzam, jak <span>budować i uczyć się z AI</span> — publicznie.",
+  "home.hero.subline":
+    "Dziesięć lat w inżynierii produktu. Piszę o tym, co buduję, co idzie nie tak i czego się przy tym uczę.",
   "home.nav.sections": "Sekcje",
   "home.nav.writing": "Wpisy",
-  "home.nav.about": "O mnie",
-  "home.about.heading": "O mnie",
-  "home.about.lede":
-    "Dziesięć lat w inżynierii produktu — od małego software house’u po FAANG.",
-  "home.about.body":
-    "Interesują mnie narzędzia i metody wzmacniania myślenia — Personal Knowledge Management, Zettelkasten, Obsidian, Anki i AI — żeby uczyć się szybciej, zachować skupienie i lepiej rozumieć złożony świat.",
-  "home.about.contact":
-    "Jeśli coś tutaj z Tobą rezonuje, znajdziesz mnie na {linkedin} albo {bluesky}.",
+  "home.nav.experience": "Doświadczenie",
+  "home.experience.heading": "Doświadczenie",
   "home.heatmap.title": "Ostatnie wpisy",
   "home.heatmap.noWriting": "Brak wpisów",
 
@@ -170,7 +163,8 @@ const pl = {
   "article.crumbHome": "start",
   "article.crumbWriting": "wpisy",
   "article.onThisPage": "Na tej stronie",
-  "article.top": "Góra",
+  "article.read": "przeczytano",
+  "article.end": "Koniec wpisu",
   "article.figureLabel": "rys.",
   "article.backToList": "Wróć do listy",
   "article.older": "starszy",

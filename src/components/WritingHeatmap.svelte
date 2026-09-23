@@ -18,6 +18,9 @@ const GAP_PX = 3;
 // One column of the marker strip: a cell plus its gap.
 const STEP_PX = CELL_PX + GAP_PX;
 const NOMINAL_WIDTH = WEEKS * CELL_PX + (WEEKS - 1) * GAP_PX;
+// Columns a month label needs to itself: a three-letter mono label at 10px is
+// ~18px, and two columns are 28px even before the strip shrinks to fit.
+const MIN_MARKER_GAP = 2;
 
 const {
   posts,
@@ -119,7 +122,13 @@ const monthMarkers = $derived.by(() => {
     }
   }
 
-  return markers;
+  // A month that only reaches into the first column has no room for its label
+  // before the next month's starts, and the two print over each other. The
+  // earlier one gives way: the later marks a month that actually begins there.
+  return markers.filter((marker, i) => {
+    const next = markers[i + 1];
+    return !next || next.col - marker.col >= MIN_MARKER_GAP;
+  });
 });
 
 const cellClass = (count: number) =>
@@ -129,7 +138,7 @@ const cellClass = (count: number) =>
 <!-- Desktop only: below 1024px the sidebar is too short (tablet) or too narrow
 	(phone) to carry it, so it is dropped rather than scaled down. -->
 <div class="hidden flex-col gap-2.5 lg:flex">
-	<h2 class="text-sub font-mono text-[11px] tracking-[0.08em] uppercase">
+	<h2 class="text-sub text-[11px] tracking-[0.08em] uppercase">
 		{heatmapTitle}
 	</h2>
 
@@ -158,7 +167,7 @@ const cellClass = (count: number) =>
 	</div>
 
 	<div
-		class="text-mute relative h-3 w-full font-mono text-[10px] leading-none"
+		class="text-mute relative h-3 w-full text-[10px] leading-none"
 		style:max-width="{NOMINAL_WIDTH}px"
 		aria-hidden="true"
 	>

@@ -61,7 +61,7 @@ const chipClass =
 	<label
 		class="border-line bg-bg2 focus-within:border-line2 flex h-10 items-center gap-2.5 rounded-md border px-3 transition-colors duration-150 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
 	>
-		<span aria-hidden="true" class="text-mute font-mono text-xs">&gt;</span>
+		<span aria-hidden="true" class="text-mute text-xs">&gt;</span>
 		<input
 			class="text-ink placeholder:text-mute min-w-0 flex-1 border-0 bg-transparent p-0 text-sm outline-none"
 			aria-label={t("writingArchive.searchPlaceholder")}
@@ -78,7 +78,7 @@ const chipClass =
 				type="button"
 				onclick={clear}
 				aria-label={t("writingArchive.clearSearch")}
-				class="text-mute hover:text-ink font-mono text-xs transition-colors duration-150"
+				class="text-mute hover:text-ink text-xs transition-colors duration-150"
 			>
 				esc
 			</button>
@@ -86,7 +86,7 @@ const chipClass =
 	</label>
 
 	<div
-		class="text-mute flex items-center justify-between font-mono text-xs"
+		class="text-mute flex items-center justify-between text-xs"
 	>
 		<!--
 			Paused locales (see `enabledLangs`) have no posts in the archive, so their
