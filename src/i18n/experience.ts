@@ -107,11 +107,6 @@ const en = {
           result:
             "Daily network queries fell from about <strong>500,000 to 100</strong>, and average latency improved by 5% across a surface with 535M+ daily active users.",
         },
-        {
-          title: "Bringing AI tooling to the team",
-          work: "I was the first on my team to build with Claude Code and agents: an MCP server and a skill set for our workflows, then a weekly forum to share them.",
-          result: "Both are now part of how the team works.",
-        },
       ],
     },
     {
@@ -224,11 +219,6 @@ const pl = {
           work: "Poprowadziłem migrację głównych komponentów React z REST na GraphQL.",
           result:
             "Liczba zapytań sieciowych spadła z około <strong>500 000 do 100</strong> dziennie, a średnie opóźnienie poprawiło się o 5% na powierzchni z ponad 535 mln użytkowników dziennie.",
-        },
-        {
-          title: "Wprowadziłem do zespołu narzędzia AI",
-          work: "Jako pierwszy w zespole zacząłem pracować z Claude Code i agentami: serwer MCP i zestaw skilli pod nasze procesy, a do tego cotygodniowe forum, żeby je rozpowszechnić.",
-          result: "Jedno i drugie jest dziś częścią tego, jak pracuje zespół.",
         },
       ],
     },
