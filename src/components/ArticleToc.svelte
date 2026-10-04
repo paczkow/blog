@@ -3,8 +3,11 @@ type TocHeading = { id: string; text: string };
 
 type ArticleTocI18n = { label: string };
 
-const { headings, i18n }: { headings: TocHeading[]; i18n: ArticleTocI18n } =
-  $props();
+const {
+  headings,
+  title,
+  i18n,
+}: { headings: TocHeading[]; title: string; i18n: ArticleTocI18n } = $props();
 
 // -1 until the first heading crosses the threshold: the intro above it belongs
 // to no section, so nothing is marked while the reader is still in it.
@@ -187,8 +190,11 @@ function onKeydown(event: KeyboardEvent) {
 		aria-controls="toc-bar-panel"
 		onclick={() => (barOpen = !barOpen)}
 	>
+		<!-- In the intro, before any section starts, the bar names the article
+		     itself: the title has scrolled off with the header by now, and a bare
+		     "In this post" would tell the reader nothing about where they are. -->
 		<span class="bar-current">
-			{activeIndex >= 0 ? headings[activeIndex].text : i18n.label}
+			{activeIndex >= 0 ? headings[activeIndex].text : title}
 		</span>
 		<span class="percent" aria-hidden="true">{percent}%</span>
 		<svg class="chevron" class:is-open={barOpen} viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
