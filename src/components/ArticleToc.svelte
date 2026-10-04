@@ -305,6 +305,7 @@ function onKeydown(event: KeyboardEvent) {
 		display: block;
 		padding: 5px 0 5px 16px;
 		font-size: 13px;
+		font-weight: 450;
 		line-height: 20px;
 		color: var(--color-mute);
 		text-decoration: none;
@@ -329,9 +330,12 @@ function onKeydown(event: KeyboardEvent) {
 		background: var(--color-ink);
 	}
 
+	/* Bolder without a heavier weight: a heavier face is wider, which rewraps the
+	   row and shoves everything under it. A stroke thickens the glyphs and leaves
+	   every advance width alone, so the lines break the same active or not. */
 	.track li.is-active a {
-		font-weight: 500;
 		color: var(--color-ink);
+		-webkit-text-stroke: 0.25px currentColor;
 	}
 
 	.inline-toc {
