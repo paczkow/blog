@@ -79,10 +79,7 @@ const en = {
   // `common.*` labels do not fit the 12px mono rhythm of the top bar.
   "article.crumbHome": "home",
   "article.crumbWriting": "writing",
-  "article.onThisPage": "On this page",
-  // Follows the percentage under the contents rail: "42% read".
-  "article.read": "read",
-  "article.end": "End of article",
+  "article.onThisPage": "In this post",
   "article.figureLabel": "fig.",
   "article.backToList": "Back to the list",
   "article.older": "older",
@@ -162,9 +159,7 @@ const pl = {
   "article.breadcrumbWriting": "Wpisy",
   "article.crumbHome": "start",
   "article.crumbWriting": "wpisy",
-  "article.onThisPage": "Na tej stronie",
-  "article.read": "przeczytano",
-  "article.end": "Koniec wpisu",
+  "article.onThisPage": "W tym wpisie",
   "article.figureLabel": "rys.",
   "article.backToList": "Wróć do listy",
   "article.older": "starszy",

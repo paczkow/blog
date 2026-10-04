@@ -1,49 +1,48 @@
 <script lang="ts">
 type TocHeading = { id: string; text: string };
 
-type ArticleTocI18n = {
-  label: string;
-  read: string;
-  end: string;
-};
+type ArticleTocI18n = { label: string };
 
-const {
-  headings,
-  title,
-  i18n,
-}: { headings: TocHeading[]; title: string; i18n: ArticleTocI18n } = $props();
+const { headings, i18n }: { headings: TocHeading[]; i18n: ArticleTocI18n } =
+  $props();
 
-// The rail's first dot is a way back to the top of the page, so it points at
-// the article title rather than at a heading in the body. The title names it for
-// screen readers only: the reader has just seen it in full above the fold, and
-// repeated beside the dot it would only crowd out the headings that follow. It
-// and the end dot are left unlabelled, bracketing the headings between them.
-const entries: TocHeading[] = [
-  { id: "article-title", text: title },
-  ...headings,
-];
+// -1 until the first heading crosses the threshold: the intro above it belongs
+// to no section, so nothing is marked while the reader is still in it.
+let activeIndex = $state(-1);
 
-// The footer under the article: the last thing on the page, so jumping to it
-// scrolls as far as the page goes and lands the reader at 100%.
-const endId = "article-end";
-
-let activeId = $state(entries[0].id);
-const activeIndex = $derived(
-  entries.findIndex((entry) => entry.id === activeId),
-);
-
-// How far down the filled thread reaches, in rows: every section behind the
-// reader in full, plus the part of the current one read so far. It meets each
-// dot exactly as that dot becomes the active one, and the end-of-text dot one
-// row past the last heading exactly as the page runs out of scroll.
-let reach = $state(0);
+// How far through the current section the reader is, 0 to 1. Together with
+// the active index it decides where the filled part of the track ends.
+let fraction = $state(0);
 
 let progress = $state(0);
 const percent = $derived(Math.round(progress * 100));
 
+// The two lists that carry a track. Headings wrap to different heights in each,
+// so the fill is measured against each list's own rows rather than counted in a
+// fixed pitch.
+let railList: HTMLElement | undefined = $state();
+let inlineList: HTMLElement | undefined = $state();
+let railFill = $state(0);
+let inlineFill = $state(0);
+
+let inline: HTMLDetailsElement | undefined = $state();
+let barShown = $state(false);
+let barOpen = $state(false);
+
 // Set while a click-to-scroll is in flight: the smooth scroll would otherwise
-// walk the active dot through every heading it passes on the way.
+// walk the active row through every heading it passes on the way.
 let locked = false;
+
+function fillFor(list: HTMLElement | undefined) {
+  if (!list || activeIndex < 0) return 0;
+  const row = list.querySelectorAll("li")[activeIndex];
+  return row ? row.offsetTop + fraction * row.offsetHeight : 0;
+}
+
+function measureFills() {
+  railFill = fillFor(railList);
+  inlineFill = fillFor(inlineList);
+}
 
 $effect(() => {
   const onScroll = () => {
@@ -56,37 +55,36 @@ $effect(() => {
     // How far each heading has travelled past the threshold line: positive
     // once it has scrolled above it.
     const threshold = window.innerHeight * 0.4;
-    const passed = entries.map((entry) => {
-      const element = document.getElementById(entry.id);
+    const passed = headings.map((heading) => {
+      const element = document.getElementById(heading.id);
       return element
         ? threshold - element.getBoundingClientRect().top
         : Number.NEGATIVE_INFINITY;
     });
-    // The end of the text, measured the same way: it crosses the moment the
-    // page can scroll no further.
-    const end = window.scrollY - max;
 
     // The last heading can be too short to ever cross the threshold, so the
     // bottom of the page claims it outright.
     if (ratio >= 0.999) {
-      activeId = entries[entries.length - 1].id;
-      reach = entries.length;
+      activeIndex = headings.length - 1;
+      fraction = 1;
+      measureFills();
       return;
     }
 
-    let index = 0;
+    let index = -1;
     passed.forEach((distance, i) => {
       if (distance >= 0) index = i;
     });
-    activeId = entries[index].id;
+    activeIndex = index;
 
-    // Before the title itself reaches the threshold even the first row is
-    // unread, which would otherwise come out as a negative reach. A page too
-    // short to scroll has nothing to measure against, so the span is guarded.
-    const span = passed[index] - (passed[index + 1] ?? end);
-    const fraction =
+    // The last section runs to the end of the scroll, measured the same way:
+    // it crosses the moment the page can scroll no further. A page too short
+    // to scroll has nothing to measure against, so the span is guarded.
+    const end = window.scrollY - max;
+    const span = index >= 0 ? passed[index] - (passed[index + 1] ?? end) : 0;
+    fraction =
       span > 0 && Number.isFinite(span) ? Math.min(1, passed[index] / span) : 0;
-    reach = Math.max(0, index + fraction);
+    measureFills();
   };
 
   onScroll();
@@ -101,315 +99,380 @@ $effect(() => {
   };
 });
 
-// The jump itself is the browser's: these are real anchors, and the 120px
-// offset is the targets' own `scroll-margin-top`. All that is left for JS is to
-// hold the dot the reader just picked until the scroll settles. The end dot is
-// one row past the last heading, which stays the active one.
-function hold(id: string) {
-  const index =
-    id === endId
-      ? entries.length
-      : entries.findIndex((entry) => entry.id === id);
+// The bar stands in for the inline list once that list has scrolled off the
+// top. Only off the top: below the viewport, on a page loaded mid-way and
+// scrolled back up, it is still ahead of the reader. Above 1180px the list is
+// `display: none`, reports a zero rect at the origin and never counts as past.
+$effect(() => {
+  if (!inline) return;
+  const observer = new IntersectionObserver(([entry]) => {
+    barShown = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+  });
+  observer.observe(inline);
+  return () => observer.disconnect();
+});
+
+$effect(() => {
+  if (!barShown) barOpen = false;
+});
+
+// The jump itself is the browser's: these are real anchors, and the offset is
+// the headings' own `scroll-margin-top`. All that is left for JS is to hold the
+// row the reader just picked until the scroll settles.
+function hold(index: number) {
   locked = true;
-  activeId = entries[Math.min(index, entries.length - 1)].id;
-  reach = index;
+  activeIndex = index;
+  fraction = 0;
+  measureFills();
+  barOpen = false;
   setTimeout(() => {
     locked = false;
   }, 1000);
 }
+
+function onKeydown(event: KeyboardEvent) {
+  if (barOpen && event.key === "Escape") barOpen = false;
+}
 </script>
 
-<aside class="rail">
-	<nav class="rail-nav" aria-label={i18n.label} style:--reach={reach}>
+<svelte:window onkeydown={onKeydown} />
+
+{#snippet sections(fill: number | null)}
+	<div class="track">
+		{#if fill !== null}
+			<span class="fill" style:height="{fill}px" aria-hidden="true"></span>
+		{/if}
 		<ul>
-			{#each entries as entry, index (entry.id)}
-				<li>
+			{#each headings as heading, index (heading.id)}
+				<li class:is-active={index === activeIndex}>
 					<a
-						href="#{entry.id}"
-						class="stop"
-						class:is-done={index < activeIndex}
-						class:is-active={index === activeIndex}
-						aria-label={entry.text}
+						href="#{heading.id}"
 						aria-current={index === activeIndex ? "location" : undefined}
-						onclick={() => hold(entry.id)}
+						onclick={() => hold(index)}
 					>
-						<span class="dot" aria-hidden="true"></span>
-						{#if index > 0}
-							<span class="stop-label" aria-hidden="true">{entry.text}</span>
-						{/if}
+						{heading.text}
 					</a>
 				</li>
 			{/each}
-
-			<!-- The end of the text, one row past the last heading. It fills once
-			     the reader gets to it. -->
-			<li>
-				<a
-					href="#{endId}"
-					class="stop"
-					class:is-done={reach >= entries.length}
-					aria-label={i18n.end}
-					onclick={() => hold(endId)}
-				>
-					<span class="dot" aria-hidden="true"></span>
-				</a>
-			</li>
 		</ul>
+	</div>
+{/snippet}
 
-		<div class="progress" aria-hidden="true">
-			<span class="progress-label">{percent}% {i18n.read}</span>
+<aside class="rail">
+	<nav class="rail-nav" aria-label={i18n.label} bind:this={railList}>
+		<div class="rail-head">
+			<span class="eyebrow">{i18n.label}</span>
+			<span class="percent" aria-hidden="true">{percent}%</span>
 		</div>
+		{@render sections(railFill)}
 	</nav>
 </aside>
 
-<nav class="inline-toc" aria-label={i18n.label}>
-	<div class="inline-label">{i18n.label}</div>
-	<ol>
-		{#each headings as heading (heading.id)}
-			<li>
-				<a href="#{heading.id}" onclick={() => hold(heading.id)}>
-					<span>{heading.text}</span>
-				</a>
-			</li>
-		{/each}
-	</ol>
-</nav>
+<details class="inline-toc" open bind:this={inline}>
+	<summary>
+		<svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+		{i18n.label}
+	</summary>
+	<nav aria-label={i18n.label} bind:this={inlineList}>
+		{@render sections(inlineFill)}
+	</nav>
+</details>
+
+<!-- Out of the tab order while it is parked above the viewport. -->
+<div class="bar" class:is-shown={barShown} inert={!barShown}>
+	<button
+		type="button"
+		class="bar-button"
+		aria-expanded={barOpen}
+		aria-controls="toc-bar-panel"
+		onclick={() => (barOpen = !barOpen)}
+	>
+		<span class="bar-current">
+			{activeIndex >= 0 ? headings[activeIndex].text : i18n.label}
+		</span>
+		<span class="percent" aria-hidden="true">{percent}%</span>
+		<svg class="chevron" class:is-open={barOpen} viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+	</button>
+	{#if barOpen}
+		<div id="toc-bar-panel" class="bar-panel">
+			{@render sections(null)}
+		</div>
+	{/if}
+	<span class="bar-progress" style:width="{percent}%" aria-hidden="true"></span>
+</div>
 
 <style>
-	/* Absolute, and 20px wide, so the rail hangs beside the 617px column without
-	   taking a single pixel of reading width from it. The 4px drop puts the
-	   first dot 116px down the page, level with the start of the header. */
+	/* Absolute, so the rail hangs in the gutter left of the 617px column without
+	   taking a single pixel of reading width from it. 208px plus the 48px gap
+	   fits the 283px either side of the column inside the 1184px layout. */
 	.rail {
 		position: absolute;
-		top: 4px;
+		top: 6px;
+		right: calc(100% + 48px);
 		bottom: 0;
-		left: calc(100% + 40px);
-		display: flex;
-		justify-content: flex-start;
-		width: 20px;
+		display: none;
+		width: 208px;
 	}
 
 	/* A reading aid rather than navigation furniture: faint until the pointer or
-	   the keyboard reaches it. Every row is one pitch tall with nothing between
-	   them, so the pointer is always over some link while it is on the rail and
-	   plain `:hover` can carry the reveal.
+	   the keyboard reaches it. The current row still reads darkest at rest.
 
 	   Pinned well above where it starts: the top bar it clears on the first
 	   screen is absolute and scrolls away, so once the reader is into the text
 	   there is nothing up there to keep clear of. */
 	.rail-nav {
-		--pitch: 28px;
 		position: sticky;
 		top: 48px;
-		height: fit-content;
-		opacity: 0.55;
-		transition: opacity 250ms ease-out;
+		opacity: 0.6;
+		transition: opacity 250ms ease;
 	}
 
-	/* Below 1180 the labels would have nowhere to unfold into, so the whole-rail
-	   reveal — brightening the nav and every label at once — is gated there. An
-	   individually hovered dot still reveals its own label at any width the rail
-	   exists at; that rule lives with `.stop-label` below. */
-	@media (width >= 1180px) {
-		.rail-nav:hover,
-		.rail-nav:focus-within {
-			opacity: 1;
-		}
-	}
-
-	.rail-nav ul {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	/* The thread runs from the centre of the first row to the centre of the
-	   end-of-text row — one row above the percentage, which sits off the end of
-	   it — and its filled part is `--reach` rows long. Drawn on the nav, not the
-	   list, so it spans the end row too; the sticky nav is already the
-	   containing block for it. 3px from the left puts the 1px line through the
-	   centre of the 7px dots. */
-	.rail-nav::before,
-	.rail-nav::after {
-		position: absolute;
-		top: calc(var(--pitch) / 2);
-		left: 3px;
-		width: 1px;
-		content: "";
-	}
-
-	.rail-nav::before {
-		bottom: calc(var(--pitch) * 1.5);
-		background: var(--color-line2);
-	}
-
-	/* Short and linear, as the fill follows the scroll position continuously
-	   and anything longer would trail behind it. */
-	.rail-nav::after {
-		height: calc(var(--reach) * var(--pitch));
-		background: var(--color-ink);
-		transition: height 100ms linear;
-	}
-
-	/* Lifted above the thread: the nav's `::after` is positioned and comes
-	   last in tree order, so without a z-index it would paint across the dots. */
-	.stop {
-		position: relative;
-		z-index: 1;
-		display: flex;
-		align-items: center;
-		width: 20px;
-		height: var(--pitch);
-	}
-
-	/* Small on purpose: the rail sits in the reader's peripheral vision and
-	   should never pull the eye off the text. The page-colour fill is what
-	   breaks the thread at each hollow dot. */
-	.dot {
-		display: block;
-		flex: none;
-		width: 7px;
-		height: 7px;
-		border: 1px solid var(--color-line2);
-		border-radius: 50%;
-		background: var(--color-bg);
-		transition:
-			background-color 250ms ease-out,
-			border-color 250ms ease-out,
-			transform 250ms ease-out;
-	}
-
-	.stop:hover .dot,
-	.stop:focus-visible .dot {
-		border-color: var(--color-sub);
-	}
-
-	/* After the hover rule so that pointing at a dot already read does not
-	   hollow it back out. */
-	.stop.is-done .dot,
-	.stop.is-active .dot {
-		border-color: var(--color-ink);
-		background: var(--color-ink);
-	}
-
-	/* Scaled rather than resized, so it grows about the thread instead of
-	   pushing off it to the right. */
-	.stop.is-active .dot {
-		transform: scale(1.3);
-	}
-
-	/* The label is part of the link, not a caption beside it: it spans the full
-	   row height and starts where the 20px dot column ends, so the pointer can
-	   travel from a dot onto its title — or straight onto a title still hidden —
-	   without ever leaving the link, and a click anywhere on it follows it. */
-	.stop-label,
-	.progress-label {
-		position: absolute;
-		top: 0;
-		left: 20px;
-		height: var(--pitch);
-		padding-left: 2px;
-		pointer-events: none;
-		white-space: nowrap;
-		font-size: 10.5px;
-		line-height: var(--pitch);
-		letter-spacing: 0.01em;
-		color: var(--color-mute);
-		opacity: 0;
-		transform: translateX(-3px);
-		transition:
-			opacity 250ms ease-out,
-			transform 250ms ease-out,
-			color 250ms ease-out;
-	}
-
-	/* The width cap is what is left between the label's left edge — half the
-	   viewport, plus half the 617px column, the 40px gap and the 20px dot
-	   column — and a 24px margin to the viewport's right edge, so a label never
-	   runs off the page at the narrow end of the range the rail exists in. */
-	.stop-label {
-		max-width: min(240px, calc(50vw - 392px));
-		overflow: hidden;
-		pointer-events: auto;
-		text-overflow: ellipsis;
-	}
-
-	.stop:hover .stop-label,
-	.stop:focus-visible .stop-label,
-	.stop.is-active .stop-label {
-		color: var(--color-ink);
-	}
-
-	/* One dot at a time answers for itself at any width the rail exists at: a
-	   single label has room to unfold even where the full set would not. */
-	.stop:hover .stop-label,
-	.stop:focus-visible .stop-label {
+	.rail-nav:hover,
+	.rail-nav:focus-within {
 		opacity: 1;
-		transform: translateX(0);
 	}
 
-	/* Revealing every label at once needs clear space to the right of the rail.
-	   Narrower than this and they would run into the edge of the viewport. */
-	@media (width >= 1180px) {
-		.rail-nav:hover :is(.stop-label, .progress-label),
-		.rail-nav:focus-within :is(.stop-label, .progress-label) {
-			opacity: 1;
-			transform: translateX(0);
-		}
+	.rail-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		margin-bottom: 12px;
 	}
 
-	.progress {
-		position: relative;
-		height: var(--pitch);
-	}
-
-	.inline-toc {
-		display: none;
-		flex-direction: column;
-		gap: 10px;
-		padding: 18px 0;
-		border-bottom: 1px solid var(--color-line);
-	}
-
-	.inline-label {
+	.eyebrow {
 		font-size: 11px;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
 		color: var(--color-mute);
 	}
 
-	.inline-toc ol {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
+	.percent {
+		font-size: 11px;
+		font-variant-numeric: tabular-nums;
+		color: var(--color-mute);
+	}
+
+	/* The 1px track runs the full height of the list; the fill over it ends
+	   part-way through the current row, as far as the reader has got. */
+	.track {
+		position: relative;
+	}
+
+	.track::before,
+	.fill {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 1px;
+		content: "";
+	}
+
+	.track::before {
+		bottom: 0;
+		background: var(--color-line);
+	}
+
+	/* Short and linear, as the fill follows the scroll position continuously
+	   and anything longer would trail behind it. */
+	.fill {
+		background: var(--color-line2);
+		transition: height 100ms linear;
+	}
+
+	.track ul {
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
 
-	/* `fit-content` so the row — and with it the hit area and the focus ring —
-	   stops at the end of the heading instead of spanning the reading column. */
-	.inline-toc a {
-		display: flex;
-		width: fit-content;
-		font-size: 14px;
-		line-height: 1.45;
-		color: var(--color-sub);
-		text-decoration: none;
-		transition: color 150ms;
+	/* The marker sits on the track: 1px and mute for the row under the pointer,
+	   2px and ink for the current one. */
+	.track li {
+		position: relative;
 	}
 
-	.inline-toc a:hover {
+	.track li::before {
+		position: absolute;
+		top: 8px;
+		bottom: 8px;
+		left: 0;
+		width: 1px;
+		content: "";
+		transition: background-color 150ms ease;
+	}
+
+	.track a {
+		display: block;
+		padding: 5px 0 5px 16px;
+		font-size: 13px;
+		line-height: 20px;
+		color: var(--color-mute);
+		text-decoration: none;
+		text-wrap: pretty;
+		transition: color 150ms ease;
+	}
+
+	.track li:hover::before {
+		background: var(--color-mute);
+	}
+
+	.track a:hover,
+	.track a:focus-visible {
 		color: var(--color-ink);
 	}
 
-	@media (width < 1000px) {
+	/* After the hover rules so that pointing at the current row keeps its
+	   heavier marker. */
+	.track li.is-active::before {
+		left: -0.5px;
+		width: 2px;
+		background: var(--color-ink);
+	}
+
+	.track li.is-active a {
+		font-weight: 500;
+		color: var(--color-ink);
+	}
+
+	.inline-toc {
+		border-bottom: 1px solid var(--color-line);
+	}
+
+	.inline-toc summary {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		min-height: 44px;
+		list-style: none;
+		cursor: pointer;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.inline-toc summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.chevron {
+		flex: none;
+		width: 14px;
+		height: 14px;
+		fill: none;
+		stroke: var(--color-mute);
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		transition: transform 200ms ease;
+	}
+
+	.inline-toc[open] summary .chevron {
+		transform: rotate(90deg);
+	}
+
+	.inline-toc .track {
+		margin: 0 0 12px 3px;
+	}
+
+	/* Shorter than 44px on purpose: five headings at full tap height would push
+	   the first paragraph off a phone screen. 34px still clears the 24px WCAG
+	   2.2 minimum by a wide margin. */
+	.inline-toc .track a,
+	.bar-panel .track a {
+		padding-block: 7px;
+		font-size: 14px;
+	}
+
+	.inline-toc .track li::before,
+	.bar-panel .track li::before {
+		top: 7px;
+		bottom: 7px;
+	}
+
+	/* Parked just above the viewport until the inline list scrolls away. */
+	.bar {
+		position: fixed;
+		inset-inline: 0;
+		top: 0;
+		z-index: 30;
+		border-bottom: 1px solid var(--color-line);
+		background: var(--color-bg);
+		transform: translateY(-101%);
+		transition: transform 220ms ease;
+	}
+
+	.bar.is-shown {
+		transform: translateY(0);
+	}
+
+	.bar-button {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		width: 100%;
+		min-height: 44px;
+		padding: 0 20px;
+		border: 0;
+		background: none;
+		font: inherit;
+		text-align: left;
+		color: var(--color-ink);
+		cursor: pointer;
+	}
+
+	.bar-current {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 13px;
+		font-weight: 500;
+	}
+
+	.bar-button .percent {
+		font-size: 12px;
+	}
+
+	.bar-button .chevron.is-open {
+		transform: rotate(180deg);
+	}
+
+	.bar-panel {
+		padding: 4px 20px 8px 23px;
+		border-top: 1px solid var(--color-line);
+	}
+
+	.bar-progress {
+		position: absolute;
+		bottom: -1px;
+		left: 0;
+		height: 1px;
+		background: var(--color-ink);
+		transition: width 100ms linear;
+	}
+
+	/* The labels need the full gutter to sit beside the column. Narrower than
+	   this the inline list and the bar take over. */
+	@media (width >= 1180px) {
 		.rail {
-			display: none;
+			display: block;
 		}
 
-		.inline-toc {
-			display: flex;
+		.inline-toc,
+		.bar {
+			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.rail-nav,
+		.fill,
+		.track li::before,
+		.track a,
+		.chevron,
+		.bar,
+		.bar-progress {
+			transition: none;
 		}
 	}
 </style>
